@@ -36,3 +36,12 @@ cypress/videos/
 
 # Uploads (local file storage for MVP)
 uploads/
+
+# Claude Code
+.claude/
+
+# Project planning docs (local only)
+CLAUDE.md
+PROJECT_BRIEF.md
+ARCHITECTURE.md
+DESIGN_SYSTEM.md
