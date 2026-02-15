@@ -13,7 +13,9 @@ export class CorrelationIdInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         const response = context.switchToHttp().getResponse();
-        response.setHeader('x-correlation-id', correlationId);
+        if (!response.headersSent) {
+          response.setHeader('x-correlation-id', correlationId);
+        }
       }),
     );
   }
