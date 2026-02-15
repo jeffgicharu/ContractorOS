@@ -140,7 +140,7 @@ export class ContractorsRepository {
     const contractor = await this.findById(orgId, id);
     if (!contractor) return null;
 
-    // Onboarding steps
+    // Onboarding steps (may not exist yet in Phase 1)
     const { rows: stepRows } = await this.pool.query<{
       id: string;
       step_type: string;
@@ -152,7 +152,7 @@ export class ContractorsRepository {
     }>(
       'SELECT id, step_type, status, completed_at, data, created_at, updated_at FROM onboarding_steps WHERE contractor_id = $1 ORDER BY created_at',
       [id],
-    );
+    ).catch(() => ({ rows: [] as never[] }));
 
     const steps = stepRows.map((s) => ({
       id: s.id,
