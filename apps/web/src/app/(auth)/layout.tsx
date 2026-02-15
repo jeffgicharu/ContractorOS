@@ -10,7 +10,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             Unified contractor lifecycle platform
           </p>
         </div>
-        {children}
+        <div className="rounded-lg border border-slate-200 bg-white p-6">
+          {children}
+        </div>
       </div>
     </div>
   );
