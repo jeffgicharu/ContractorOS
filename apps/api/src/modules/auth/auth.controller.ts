@@ -127,10 +127,11 @@ export class AuthController {
   }
 
   private setRefreshCookie(res: Response, token: string): void {
+    const isProduction = process.env['NODE_ENV'] === 'production';
     res.cookie(REFRESH_COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env['NODE_ENV'] === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
       maxAge: REFRESH_COOKIE_MAX_AGE,
       path: '/',
     });

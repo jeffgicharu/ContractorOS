@@ -21,6 +21,7 @@ class ApiClientError extends Error {
 
 let accessToken: string | null = null;
 let onUnauthorized: (() => Promise<boolean>) | null = null;
+let refreshPromise: Promise<boolean> | null = null;
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
@@ -72,10 +73,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
     return { data: undefined as T };
   }
 
-  if (response.status === 401 && onUnauthorized) {
-    const refreshed = await onUnauthorized();
+  if (response.status === 401 && onUnauthorized && !path.includes('/auth/refresh')) {
+    // Deduplicate: if a refresh is already in flight, wait for it
+    if (!refreshPromise) {
+      refreshPromise = onUnauthorized().finally(() => {
+        refreshPromise = null;
+      });
+    }
+    const refreshed = await refreshPromise;
     if (refreshed) {
-      // Retry with new token
       return request<T>(path, options);
     }
   }
