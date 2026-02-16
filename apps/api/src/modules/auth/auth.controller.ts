@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -86,6 +88,15 @@ export class AuthController {
         accessToken: result.accessToken,
       },
     };
+  }
+
+  @Get('invite/validate')
+  async validateInvite(@Query('token') token: string) {
+    if (!token) {
+      throw new BadRequestException('Token is required');
+    }
+    const result = await this.authService.validateInviteToken(token);
+    return { data: result };
   }
 
   @Post('invite/accept')

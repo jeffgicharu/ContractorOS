@@ -84,8 +84,14 @@ export class ContractorsRepository {
     let paramIdx = 2;
 
     if (query.status) {
-      conditions.push(`c.status = $${paramIdx}`);
-      params.push(query.status);
+      if (query.status.includes(',')) {
+        const statuses = query.status.split(',').map((s) => s.trim());
+        conditions.push(`c.status = ANY($${paramIdx}::contractor_status[])`);
+        params.push(statuses);
+      } else {
+        conditions.push(`c.status = $${paramIdx}`);
+        params.push(query.status);
+      }
       paramIdx++;
     }
 
@@ -140,7 +146,7 @@ export class ContractorsRepository {
     const contractor = await this.findById(orgId, id);
     if (!contractor) return null;
 
-    // Onboarding steps (may not exist yet in Phase 1)
+    // Onboarding steps
     const { rows: stepRows } = await this.pool.query<{
       id: string;
       step_type: string;
@@ -152,7 +158,7 @@ export class ContractorsRepository {
     }>(
       'SELECT id, step_type, status, completed_at, data, created_at, updated_at FROM onboarding_steps WHERE contractor_id = $1 ORDER BY created_at',
       [id],
-    ).catch(() => ({ rows: [] as never[] }));
+    );
 
     const steps = stepRows.map((s) => ({
       id: s.id,

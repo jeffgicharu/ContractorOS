@@ -16,14 +16,17 @@ import {
   updateContractorSchema,
   bulkInviteSchema,
   contractorListQuerySchema,
+  completeOnboardingStepSchema,
   type CreateContractorInput,
   type UpdateContractorInput,
   type BulkInviteInput,
   type ContractorListQuery,
+  type CompleteOnboardingStepInput,
   type ContractorStatus,
   UserRole,
 } from '@contractor-os/shared';
 import { ContractorsService } from './contractors.service';
+import { OnboardingService } from './onboarding.service';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -33,7 +36,10 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 @Controller('contractors')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ContractorsController {
-  constructor(private readonly contractorsService: ContractorsService) {}
+  constructor(
+    private readonly contractorsService: ContractorsService,
+    private readonly onboardingService: OnboardingService,
+  ) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
@@ -115,5 +121,33 @@ export class ContractorsController {
       body.reason,
     );
     return { data: { message: 'Status updated' } };
+  }
+
+  @Get(':id/onboarding')
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  async getOnboarding(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ) {
+    const onboarding = await this.onboardingService.getOnboardingStatus(user.orgId, id);
+    return { data: onboarding };
+  }
+
+  @Patch(':id/onboarding/:stepType')
+  @Roles(UserRole.ADMIN, UserRole.CONTRACTOR)
+  async completeOnboardingStep(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Param('stepType') stepType: string,
+    @Body(new ZodValidationPipe(completeOnboardingStepSchema)) body: CompleteOnboardingStepInput,
+  ) {
+    const result = await this.onboardingService.completeStep(
+      user.orgId,
+      id,
+      stepType,
+      body,
+      user.sub,
+    );
+    return { data: result };
   }
 }

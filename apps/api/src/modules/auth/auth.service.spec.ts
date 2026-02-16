@@ -315,4 +315,59 @@ describe('AuthService', () => {
       );
     });
   });
+
+  describe('validateInviteToken', () => {
+    const MOCK_CONTRACTOR_ROW = {
+      first_name: 'James',
+      last_name: 'Wilson',
+      email: 'james@example.com',
+      invite_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      user_id: null,
+    };
+
+    it('should return valid=true with contractor details for valid token', async () => {
+      pool.query.mockResolvedValueOnce({ rows: [MOCK_CONTRACTOR_ROW] });
+
+      const result = await service.validateInviteToken('valid-token');
+
+      expect(result.valid).toBe(true);
+      expect(result.contractor).toEqual({
+        firstName: 'James',
+        lastName: 'Wilson',
+        email: 'james@example.com',
+      });
+    });
+
+    it('should return valid=false for nonexistent token', async () => {
+      pool.query.mockResolvedValueOnce({ rows: [] });
+
+      const result = await service.validateInviteToken('bad-token');
+
+      expect(result.valid).toBe(false);
+      expect(result.contractor).toBeUndefined();
+    });
+
+    it('should return valid=false for expired token', async () => {
+      pool.query.mockResolvedValueOnce({
+        rows: [{
+          ...MOCK_CONTRACTOR_ROW,
+          invite_expires_at: new Date(Date.now() - 1000).toISOString(),
+        }],
+      });
+
+      const result = await service.validateInviteToken('expired-token');
+
+      expect(result.valid).toBe(false);
+    });
+
+    it('should return valid=false for already-accepted token', async () => {
+      pool.query.mockResolvedValueOnce({
+        rows: [{ ...MOCK_CONTRACTOR_ROW, user_id: 'some-user-id' }],
+      });
+
+      const result = await service.validateInviteToken('used-token');
+
+      expect(result.valid).toBe(false);
+    });
+  });
 });

@@ -211,6 +211,14 @@ export class AuthService {
         [contractor.id, newUser.id],
       );
 
+      // Mark invite_accepted onboarding step as completed
+      await client.query(
+        `UPDATE onboarding_steps
+         SET status = 'completed', completed_at = now()
+         WHERE contractor_id = $1 AND step_type = 'invite_accepted'`,
+        [contractor.id],
+      );
+
       await client.query('COMMIT');
 
       return this.generateAuthResult(newUser);
@@ -248,6 +256,37 @@ export class AuthService {
       orgId: user.organization_id,
       firstName: user.first_name,
       lastName: user.last_name,
+    };
+  }
+
+  async validateInviteToken(token: string): Promise<{
+    valid: boolean;
+    contractor?: { firstName: string; lastName: string; email: string };
+  }> {
+    const { rows } = await this.pool.query<{
+      first_name: string;
+      last_name: string;
+      email: string;
+      invite_expires_at: string;
+      user_id: string | null;
+    }>(
+      `SELECT first_name, last_name, email, invite_expires_at, user_id
+       FROM contractors WHERE invite_token = $1`,
+      [token],
+    );
+
+    const contractor = rows[0];
+    if (!contractor || contractor.user_id || new Date(contractor.invite_expires_at) < new Date()) {
+      return { valid: false };
+    }
+
+    return {
+      valid: true,
+      contractor: {
+        firstName: contractor.first_name,
+        lastName: contractor.last_name,
+        email: contractor.email,
+      },
     };
   }
 

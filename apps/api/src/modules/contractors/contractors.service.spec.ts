@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ContractorsService } from './contractors.service';
 import { ContractorsRepository } from './contractors.repository';
+import { OnboardingRepository } from './onboarding.repository';
 
 const ORG_ID = 'org-1';
 const USER_ID = 'user-1';
@@ -51,13 +52,24 @@ function createMockRepo(): jest.Mocked<ContractorsRepository> {
   } as unknown as jest.Mocked<ContractorsRepository>;
 }
 
+function createMockOnboardingRepo(): jest.Mocked<OnboardingRepository> {
+  return {
+    createSteps: jest.fn().mockResolvedValue(undefined),
+    findByContractorId: jest.fn(),
+    findStep: jest.fn(),
+    completeStep: jest.fn(),
+  } as unknown as jest.Mocked<OnboardingRepository>;
+}
+
 describe('ContractorsService', () => {
   let service: ContractorsService;
   let repo: jest.Mocked<ContractorsRepository>;
+  let onboardingRepo: jest.Mocked<OnboardingRepository>;
 
   beforeEach(() => {
     repo = createMockRepo();
-    service = new ContractorsService(repo);
+    onboardingRepo = createMockOnboardingRepo();
+    service = new ContractorsService(repo, onboardingRepo);
     jest.clearAllMocks();
   });
 

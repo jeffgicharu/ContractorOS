@@ -43,6 +43,33 @@ export async function refreshToken(): Promise<boolean> {
   }
 }
 
+export async function validateInviteToken(token: string): Promise<{
+  valid: boolean;
+  contractor?: { firstName: string; lastName: string; email: string };
+}> {
+  const { data } = await api.get<{
+    valid: boolean;
+    contractor?: { firstName: string; lastName: string; email: string };
+  }>('/auth/invite/validate', { token });
+  return data;
+}
+
+export async function acceptInvite(
+  token: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+): Promise<AuthUser> {
+  const { data } = await api.post<LoginResponse>('/auth/invite/accept', {
+    token,
+    password,
+    firstName,
+    lastName,
+  });
+  setAccessToken(data.accessToken);
+  return data.user;
+}
+
 export async function getMe(): Promise<AuthUser> {
   const { data } = await api.get<AuthUser>('/auth/me');
   return data;

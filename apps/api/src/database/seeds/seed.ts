@@ -15,6 +15,7 @@ async function seed() {
 
   try {
     // Clean existing seed data (in reverse dependency order)
+    await pool.query('DELETE FROM onboarding_steps');
     await pool.query('DELETE FROM contractor_status_history');
     await pool.query('DELETE FROM refresh_tokens');
     await pool.query('DELETE FROM audit_events');
@@ -56,8 +57,8 @@ async function seed() {
           id, organization_id, email, first_name, last_name, status, type,
           phone, city, state, zip_code, country,
           tin_last_four, bank_name, bank_account_last_four, bank_verified,
-          activated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+          activated_at, invite_token, invite_expires_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
         [
           c.id,
           c.organizationId,
@@ -76,6 +77,8 @@ async function seed() {
           c.bankAccountLastFour ?? null,
           c.bankVerified ?? false,
           activatedAt,
+          (c as Record<string, unknown>).inviteToken ?? null,
+          (c as Record<string, unknown>).inviteExpiresAt ?? null,
         ],
       );
 
@@ -85,8 +88,36 @@ async function seed() {
          VALUES ($1, $2, $3, $4, $5)`,
         [c.id, c.status, SEED_ADMIN_ID, 'Seeded', new Date().toISOString()],
       );
+
+      // Create onboarding steps based on contractor status
+      const stepTypes = [
+        'invite_accepted',
+        'tax_form_submitted',
+        'contract_signed',
+        'bank_details_submitted',
+      ];
+      const statusToCompletedSteps: Record<string, number> = {
+        invite_sent: 0,
+        tax_form_pending: 1,
+        contract_pending: 2,
+        bank_details_pending: 3,
+        active: 4,
+        suspended: 4,
+        offboarded: 4,
+      };
+      const completedCount = statusToCompletedSteps[c.status] ?? 0;
+
+      for (let i = 0; i < stepTypes.length; i++) {
+        const stepStatus = i < completedCount ? 'completed' : 'pending';
+        const completedAt = i < completedCount ? new Date().toISOString() : null;
+        await pool.query(
+          `INSERT INTO onboarding_steps (contractor_id, step_type, status, completed_at)
+           VALUES ($1, $2, $3, $4)`,
+          [c.id, stepTypes[i], stepStatus, completedAt],
+        );
+      }
     }
-    console.log(`Inserted ${contractors.length} contractor(s)`);
+    console.log(`Inserted ${contractors.length} contractor(s) with onboarding steps`);
 
     console.log('\nSeed complete!');
     console.log('Login credentials:');

@@ -18,6 +18,7 @@ import {
   isValidTransition,
 } from '@contractor-os/shared';
 import { ContractorsRepository } from './contractors.repository';
+import { OnboardingRepository } from './onboarding.repository';
 import { buildPaginationMeta } from '../../common/pagination/paginate';
 
 const INVITE_TOKEN_EXPIRY_DAYS = 7;
@@ -26,7 +27,10 @@ const INVITE_TOKEN_EXPIRY_DAYS = 7;
 export class ContractorsService {
   private readonly logger = new Logger(ContractorsService.name);
 
-  constructor(private readonly repo: ContractorsRepository) {}
+  constructor(
+    private readonly repo: ContractorsRepository,
+    private readonly onboardingRepo: OnboardingRepository,
+  ) {}
 
   async create(
     orgId: string,
@@ -45,6 +49,7 @@ export class ContractorsService {
     inviteExpiresAt.setDate(inviteExpiresAt.getDate() + INVITE_TOKEN_EXPIRY_DAYS);
 
     const contractor = await this.repo.create(orgId, input, inviteToken, inviteExpiresAt);
+    await this.onboardingRepo.createSteps(contractor.id);
 
     this.logger.log(`Contractor created: ${contractor.id} (invite sent to ${input.email})`);
 
@@ -159,7 +164,8 @@ export class ContractorsService {
       const inviteExpiresAt = new Date();
       inviteExpiresAt.setDate(inviteExpiresAt.getDate() + INVITE_TOKEN_EXPIRY_DAYS);
 
-      await this.repo.create(orgId, contractor, inviteToken, inviteExpiresAt);
+      const newContractor = await this.repo.create(orgId, contractor, inviteToken, inviteExpiresAt);
+      await this.onboardingRepo.createSteps(newContractor.id);
       created++;
     }
 

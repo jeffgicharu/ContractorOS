@@ -62,6 +62,8 @@ export const contractors = [
     lastName: 'Wilson',
     status: 'invite_sent' as const,
     type: 'domestic' as const,
+    inviteToken: 'test-invite-token-james-wilson',
+    inviteExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: '33333333-3333-3333-3333-333333333306',
