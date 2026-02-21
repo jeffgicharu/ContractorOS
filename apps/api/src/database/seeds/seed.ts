@@ -4,6 +4,8 @@ import { loadDatabaseConfig } from '../../config/database.config';
 import { organizations } from './fixtures/organizations';
 import { users, SEED_ADMIN_ID } from './fixtures/users';
 import { contractors } from './fixtures/contractors';
+import { engagements } from './fixtures/engagements';
+import { timeEntries } from './fixtures/time-entries';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -15,6 +17,8 @@ async function seed() {
 
   try {
     // Clean existing seed data (in reverse dependency order)
+    await pool.query('DELETE FROM time_entries');
+    await pool.query('DELETE FROM engagements');
     await pool.query('DELETE FROM onboarding_steps');
     await pool.query('DELETE FROM contractor_status_history');
     await pool.query('DELETE FROM refresh_tokens');
@@ -118,6 +122,42 @@ async function seed() {
       }
     }
     console.log(`Inserted ${contractors.length} contractor(s) with onboarding steps`);
+
+    // Seed engagements
+    for (const e of engagements) {
+      await pool.query(
+        `INSERT INTO engagements (
+          id, contractor_id, organization_id, title, description,
+          start_date, end_date, hourly_rate, fixed_rate,
+          currency, payment_terms, status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [
+          e.id,
+          e.contractorId,
+          e.organizationId,
+          e.title,
+          e.description,
+          e.startDate,
+          e.endDate,
+          e.hourlyRate,
+          e.fixedRate,
+          e.currency,
+          e.paymentTerms,
+          e.status,
+        ],
+      );
+    }
+    console.log(`Inserted ${engagements.length} engagement(s)`);
+
+    // Seed time entries
+    for (const t of timeEntries) {
+      await pool.query(
+        `INSERT INTO time_entries (id, contractor_id, engagement_id, entry_date, hours, description)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [t.id, t.contractorId, t.engagementId, t.entryDate, t.hours, t.description],
+      );
+    }
+    console.log(`Inserted ${timeEntries.length} time entry(ies)`);
 
     console.log('\nSeed complete!');
     console.log('Login credentials:');

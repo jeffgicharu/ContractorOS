@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/use-auth';
 
 const PORTAL_LINKS = [
   { label: 'Dashboard', href: '/portal/dashboard' },
+  { label: 'Time Entries', href: '/portal/time-entries' },
   { label: 'Invoices', href: '/portal/invoices' },
   { label: 'Documents', href: '/portal/documents' },
   { label: 'Payments', href: '/portal/payments' },

@@ -9,6 +9,8 @@ import type { ContractorDetail } from '@contractor-os/shared';
 import { Button } from '@/components/ui/button';
 import { ContractorStatusBadge } from '@/components/contractors/contractor-status-badge';
 import { RiskLevelBadge } from '@/components/contractors/risk-level-badge';
+import { EngagementsTab } from '@/components/engagements/engagements-tab';
+import { TimeEntriesTab } from '@/components/time-entries/time-entries-tab';
 
 const TABS = ['Overview', 'Engagements', 'Invoices', 'Documents', 'Risk', 'Time Entries'] as const;
 type Tab = (typeof TABS)[number];
@@ -125,7 +127,9 @@ export default function ContractorDetailPage() {
       {/* Tab content */}
       <div className="mt-6">
         {activeTab === 'Overview' && <OverviewTab contractor={contractor} />}
-        {activeTab !== 'Overview' && (
+        {activeTab === 'Engagements' && <EngagementsTab contractorId={contractor.id} />}
+        {activeTab === 'Time Entries' && <TimeEntriesTab contractorId={contractor.id} />}
+        {activeTab !== 'Overview' && activeTab !== 'Engagements' && activeTab !== 'Time Entries' && (
           <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
             <p className="text-sm text-slate-500">
               {activeTab} will be available in a future update.

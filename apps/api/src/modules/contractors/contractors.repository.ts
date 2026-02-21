@@ -195,11 +195,11 @@ export class ContractorsRepository {
         }
       : null;
 
-    // Active engagements count (may not exist yet in Phase 1)
+    // Active engagements count
     const { rows: engRows } = await this.pool.query<{ count: string }>(
       "SELECT COUNT(*) as count FROM engagements WHERE contractor_id = $1 AND status = 'active'",
       [id],
-    ).catch(() => ({ rows: [{ count: '0' }] }));
+    );
 
     // Document status (may not exist yet in Phase 1)
     const { rows: docRows } = await this.pool.query<{
