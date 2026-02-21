@@ -5,12 +5,13 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ContractorsModule } from './modules/contractors/contractors.module';
 import { EngagementsModule } from './modules/engagements/engagements.module';
 import { TimeEntriesModule } from './modules/time-entries/time-entries.module';
+import { InvoicesModule } from './modules/invoices/invoices.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CorrelationIdInterceptor } from './common/interceptors/correlation-id.interceptor';
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule],
+  imports: [DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule, InvoicesModule],
   providers: [
     {
       provide: APP_FILTER,

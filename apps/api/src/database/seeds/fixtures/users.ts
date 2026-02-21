@@ -2,6 +2,7 @@ import { SEED_ORG_ID } from './organizations';
 
 export const SEED_ADMIN_ID = '22222222-2222-2222-2222-222222222222';
 export const SEED_MANAGER_ID = '22222222-2222-2222-2222-222222222223';
+export const SEED_CONTRACTOR_USER_ID = '22222222-2222-2222-2222-222222222224';
 
 export const users = [
   {
@@ -21,5 +22,14 @@ export const users = [
     role: 'manager' as const,
     firstName: 'Michael',
     lastName: 'Torres',
+  },
+  {
+    id: SEED_CONTRACTOR_USER_ID,
+    organizationId: SEED_ORG_ID,
+    email: 'john.smith@example.com',
+    password: 'Password1',
+    role: 'contractor' as const,
+    firstName: 'John',
+    lastName: 'Smith',
   },
 ];

@@ -2,10 +2,11 @@ import { Pool } from 'pg';
 import * as bcrypt from 'bcrypt';
 import { loadDatabaseConfig } from '../../config/database.config';
 import { organizations } from './fixtures/organizations';
-import { users, SEED_ADMIN_ID } from './fixtures/users';
+import { users, SEED_ADMIN_ID, SEED_CONTRACTOR_USER_ID } from './fixtures/users';
 import { contractors } from './fixtures/contractors';
 import { engagements } from './fixtures/engagements';
 import { timeEntries } from './fixtures/time-entries';
+import { invoices, invoiceStatusHistory, approvalSteps } from './fixtures/invoices';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -17,6 +18,10 @@ async function seed() {
 
   try {
     // Clean existing seed data (in reverse dependency order)
+    await pool.query('DELETE FROM approval_steps');
+    await pool.query('DELETE FROM invoice_status_history');
+    await pool.query('DELETE FROM invoice_line_items');
+    await pool.query('DELETE FROM invoices');
     await pool.query('DELETE FROM time_entries');
     await pool.query('DELETE FROM engagements');
     await pool.query('DELETE FROM onboarding_steps');
@@ -123,6 +128,13 @@ async function seed() {
     }
     console.log(`Inserted ${contractors.length} contractor(s) with onboarding steps`);
 
+    // Link John Smith contractor to his user account (for portal login)
+    await pool.query(
+      `UPDATE contractors SET user_id = $1 WHERE id = $2`,
+      [SEED_CONTRACTOR_USER_ID, '33333333-3333-3333-3333-333333333301'],
+    );
+    console.log('Linked contractor John Smith to user account');
+
     // Seed engagements
     for (const e of engagements) {
       await pool.query(
@@ -158,6 +170,74 @@ async function seed() {
       );
     }
     console.log(`Inserted ${timeEntries.length} time entry(ies)`);
+
+    // Seed invoices
+    for (const inv of invoices) {
+      await pool.query(
+        `INSERT INTO invoices (
+          id, contractor_id, engagement_id, organization_id,
+          invoice_number, status, submitted_at, approved_at,
+          scheduled_at, paid_at, due_date, notes,
+          period_start, period_end
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+        [
+          inv.id,
+          inv.contractorId,
+          inv.engagementId,
+          inv.organizationId,
+          inv.invoiceNumber,
+          inv.status,
+          inv.submittedAt,
+          inv.approvedAt,
+          inv.scheduledAt,
+          inv.paidAt,
+          inv.dueDate,
+          inv.notes,
+          inv.periodStart,
+          inv.periodEnd,
+        ],
+      );
+
+      // Insert line items
+      for (let i = 0; i < inv.lineItems.length; i++) {
+        const item = inv.lineItems[i]!;
+        await pool.query(
+          `INSERT INTO invoice_line_items (invoice_id, description, quantity, unit_price, sort_order)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [inv.id, item.description, item.quantity, item.unitPrice, i],
+        );
+      }
+
+      // Update subtotal and total_amount from line items
+      await pool.query(
+        `UPDATE invoices SET
+          subtotal = (SELECT COALESCE(SUM(amount), 0) FROM invoice_line_items WHERE invoice_id = $1),
+          total_amount = (SELECT COALESCE(SUM(amount), 0) FROM invoice_line_items WHERE invoice_id = $1) + tax_amount
+         WHERE id = $1`,
+        [inv.id],
+      );
+    }
+    console.log(`Inserted ${invoices.length} invoice(s) with line items`);
+
+    // Seed invoice status history
+    for (const h of invoiceStatusHistory) {
+      await pool.query(
+        `INSERT INTO invoice_status_history (invoice_id, from_status, to_status, changed_by, reason, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [h.invoiceId, h.fromStatus, h.toStatus, h.changedBy, h.reason, h.createdAt],
+      );
+    }
+    console.log(`Inserted ${invoiceStatusHistory.length} status history entries`);
+
+    // Seed approval steps
+    for (const a of approvalSteps) {
+      await pool.query(
+        `INSERT INTO approval_steps (invoice_id, approver_id, step_order, decision, decided_at, notes)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [a.invoiceId, a.approverId, a.stepOrder, a.decision, a.decidedAt, a.notes],
+      );
+    }
+    console.log(`Inserted ${approvalSteps.length} approval step(s)`);
 
     console.log('\nSeed complete!');
     console.log('Login credentials:');
