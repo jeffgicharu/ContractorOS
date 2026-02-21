@@ -74,6 +74,14 @@ export class ContractorsRepository {
     return rows[0] ?? null;
   }
 
+  async findByUserId(userId: string): Promise<ContractorRow | null> {
+    const { rows } = await this.pool.query<ContractorRow>(
+      'SELECT * FROM contractors WHERE user_id = $1',
+      [userId],
+    );
+    return rows[0] ?? null;
+  }
+
   async findList(
     orgId: string,
     query: ContractorListQuery,

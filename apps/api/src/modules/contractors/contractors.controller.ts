@@ -62,6 +62,13 @@ export class ContractorsController {
     return { data: items, meta };
   }
 
+  @Get('me')
+  @Roles(UserRole.CONTRACTOR)
+  async getMe(@CurrentUser() user: JwtPayload) {
+    const detail = await this.contractorsService.getMe(user);
+    return { data: detail };
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async getDetail(

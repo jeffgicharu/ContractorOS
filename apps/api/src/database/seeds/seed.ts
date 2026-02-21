@@ -7,6 +7,7 @@ import { contractors } from './fixtures/contractors';
 import { engagements } from './fixtures/engagements';
 import { timeEntries } from './fixtures/time-entries';
 import { invoices, invoiceStatusHistory, approvalSteps } from './fixtures/invoices';
+import { documents } from './fixtures/documents';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -28,6 +29,7 @@ async function seed() {
     await pool.query('DELETE FROM contractor_status_history');
     await pool.query('DELETE FROM refresh_tokens');
     await pool.query('DELETE FROM audit_events');
+    await pool.query('DELETE FROM tax_documents');
     await pool.query('DELETE FROM contractors');
     await pool.query('DELETE FROM users');
     await pool.query('DELETE FROM organizations');
@@ -238,6 +240,34 @@ async function seed() {
       );
     }
     console.log(`Inserted ${approvalSteps.length} approval step(s)`);
+
+    // Seed tax documents
+    for (const doc of documents) {
+      await pool.query(
+        `INSERT INTO tax_documents (
+          id, contractor_id, organization_id, document_type, file_path, file_name,
+          file_size_bytes, mime_type, uploaded_by, expires_at, tin_last_four,
+          is_current, version, notes
+        ) VALUES ($1, $2, $3, $4::tax_document_type, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+        [
+          doc.id,
+          doc.contractorId,
+          doc.organizationId,
+          doc.documentType,
+          doc.filePath,
+          doc.fileName,
+          doc.fileSizeBytes,
+          doc.mimeType,
+          doc.uploadedBy,
+          doc.expiresAt,
+          doc.tinLastFour,
+          doc.isCurrent,
+          doc.version,
+          doc.notes,
+        ],
+      );
+    }
+    console.log(`Inserted ${documents.length} tax document(s)`);
 
     console.log('\nSeed complete!');
     console.log('Login credentials:');

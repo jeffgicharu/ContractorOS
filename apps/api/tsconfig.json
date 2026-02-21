@@ -12,5 +12,5 @@
     "declarationMap": false
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "test", "src/database/migrations", "src/database/migration-template.ts"]
+  "exclude": ["node_modules", "dist", "test", "src/database/migrations", "src/database/migration-template.ts", "src/**/*.spec.ts"]
 }

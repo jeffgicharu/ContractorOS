@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -16,7 +17,9 @@ import {
   CONTRACTOR_TRANSITIONS,
   type ContractorStatus,
   isValidTransition,
+  UserRole,
 } from '@contractor-os/shared';
+import type { JwtPayload } from '../../common/decorators/current-user.decorator';
 import { ContractorsRepository } from './contractors.repository';
 import { OnboardingRepository } from './onboarding.repository';
 import { buildPaginationMeta } from '../../common/pagination/paginate';
@@ -171,5 +174,24 @@ export class ContractorsService {
 
     this.logger.log(`Bulk invite: ${created} created, ${skipped.length} skipped`);
     return { created, skipped };
+  }
+
+  async getMe(user: JwtPayload): Promise<ContractorDetail> {
+    if (user.role !== UserRole.CONTRACTOR) {
+      throw new ForbiddenException({
+        code: 'FORBIDDEN',
+        message: 'Only contractors can access this endpoint',
+      });
+    }
+
+    const contractor = await this.repo.findByUserId(user.sub);
+    if (!contractor) {
+      throw new NotFoundException({
+        code: 'NOT_FOUND',
+        message: 'Contractor profile not found for current user',
+      });
+    }
+
+    return this.getDetail(contractor.organization_id, contractor.id);
   }
 }

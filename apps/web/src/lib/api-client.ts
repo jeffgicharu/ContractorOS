@@ -107,6 +107,63 @@ export const api = {
 
   delete: <T>(path: string) =>
     request<T>(path, { method: 'DELETE' }),
+
+  upload: async <T>(path: string, formData: FormData): Promise<ApiResponse<T>> => {
+    const requestHeaders: Record<string, string> = {};
+    if (accessToken) {
+      requestHeaders['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const response = await fetch(buildUrl(path), {
+      method: 'POST',
+      headers: requestHeaders,
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (response.status === 401 && onUnauthorized && !path.includes('/auth/refresh')) {
+      if (!refreshPromise) {
+        refreshPromise = onUnauthorized().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      const refreshed = await refreshPromise;
+      if (refreshed) {
+        return api.upload<T>(path, formData);
+      }
+    }
+
+    const json = await response.json();
+    if (!response.ok) {
+      throw new ApiClientError(response.status, (json as ApiError).error);
+    }
+    return json as ApiResponse<T>;
+  },
+
+  download: async (path: string): Promise<{ blob: Blob; fileName: string }> => {
+    const requestHeaders: Record<string, string> = {};
+    if (accessToken) {
+      requestHeaders['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    const response = await fetch(buildUrl(path), {
+      method: 'GET',
+      headers: requestHeaders,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const json = await response.json();
+      throw new ApiClientError(response.status, (json as ApiError).error);
+    }
+
+    const blob = await response.blob();
+    const disposition = response.headers.get('Content-Disposition') ?? '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    const fileName = match?.[1] ?? 'download';
+
+    return { blob, fileName };
+  },
 };
 
 export { ApiClientError };
