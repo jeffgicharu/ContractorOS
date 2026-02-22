@@ -14,6 +14,7 @@ import { TimeEntriesTab } from '@/components/time-entries/time-entries-tab';
 import { InvoicesTab } from '@/components/invoices/invoices-tab';
 import { DocumentsTab } from '@/components/documents/documents-tab';
 import { RiskTab } from '@/components/classification/risk-tab';
+import { InitiationModal } from '@/components/offboarding/initiation-modal';
 
 const TABS = ['Overview', 'Engagements', 'Invoices', 'Documents', 'Risk', 'Time Entries'] as const;
 type Tab = (typeof TABS)[number];
@@ -25,6 +26,7 @@ export default function ContractorDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('Overview');
+  const [showOffboardModal, setShowOffboardModal] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -100,7 +102,11 @@ export default function ContractorDetailPage() {
             Edit
           </Button>
           {contractor.status === 'active' && (
-            <Button variant="destructive" size="sm">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowOffboardModal(true)}
+            >
               Offboard
             </Button>
           )}
@@ -136,6 +142,21 @@ export default function ContractorDetailPage() {
         {activeTab === 'Documents' && <DocumentsTab contractorId={contractor.id} />}
         {activeTab === 'Risk' && <RiskTab contractorId={contractor.id} />}
       </div>
+
+      {/* Offboard Modal */}
+      {showOffboardModal && (
+        <InitiationModal
+          contractorName={`${contractor.firstName} ${contractor.lastName}`}
+          onConfirm={async (data) => {
+            const { data: result } = await api.post<{ id: string }>(
+              `/contractors/${params.id}/offboard`,
+              data,
+            );
+            router.push(`/offboarding/${result.id}`);
+          }}
+          onClose={() => setShowOffboardModal(false)}
+        />
+      )}
     </div>
   );
 }

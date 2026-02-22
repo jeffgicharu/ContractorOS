@@ -9,6 +9,7 @@ import { timeEntries } from './fixtures/time-entries';
 import { invoices, invoiceStatusHistory, approvalSteps } from './fixtures/invoices';
 import { documents } from './fixtures/documents';
 import { classificationAssessments, classificationFactors } from './fixtures/classification';
+import { equipment, offboardingWorkflow, checklistItems } from './fixtures/offboarding';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -20,6 +21,9 @@ async function seed() {
 
   try {
     // Clean existing seed data (in reverse dependency order)
+    await pool.query('DELETE FROM offboarding_checklist_items');
+    await pool.query('DELETE FROM offboarding_workflows');
+    await pool.query('DELETE FROM equipment');
     await pool.query('DELETE FROM approval_steps');
     await pool.query('DELETE FROM invoice_status_history');
     await pool.query('DELETE FROM invoice_line_items');
@@ -318,6 +322,44 @@ async function seed() {
       );
     }
     console.log(`Inserted ${classificationFactors.length} classification factor(s)`);
+
+    // Seed equipment
+    for (const eq of equipment) {
+      await pool.query(
+        `INSERT INTO equipment (id, contractor_id, organization_id, description, serial_number, status)
+         VALUES ($1, $2, $3, $4, $5, $6::equipment_status)`,
+        [eq.id, eq.contractorId, eq.organizationId, eq.description, eq.serialNumber, eq.status],
+      );
+    }
+    console.log(`Inserted ${equipment.length} equipment item(s)`);
+
+    // Seed offboarding workflow
+    await pool.query(
+      `INSERT INTO offboarding_workflows (
+        id, contractor_id, organization_id, initiated_by, reason, effective_date, status, notes
+      ) VALUES ($1, $2, $3, $4, $5::offboarding_reason, $6, $7::offboarding_status, $8)`,
+      [
+        offboardingWorkflow.id,
+        offboardingWorkflow.contractorId,
+        offboardingWorkflow.organizationId,
+        offboardingWorkflow.initiatedBy,
+        offboardingWorkflow.reason,
+        offboardingWorkflow.effectiveDate,
+        offboardingWorkflow.status,
+        offboardingWorkflow.notes,
+      ],
+    );
+    console.log('Inserted 1 offboarding workflow');
+
+    // Seed offboarding checklist items
+    for (const item of checklistItems) {
+      await pool.query(
+        `INSERT INTO offboarding_checklist_items (workflow_id, item_type, status)
+         VALUES ($1, $2::checklist_item_type, $3::checklist_status)`,
+        [item.workflowId, item.itemType, item.status],
+      );
+    }
+    console.log(`Inserted ${checklistItems.length} checklist item(s)`);
 
     // Refresh materialized view
     await pool.query('REFRESH MATERIALIZED VIEW mv_classification_risk_summary');

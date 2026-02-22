@@ -9,12 +9,13 @@ import { TimeEntriesModule } from './modules/time-entries/time-entries.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { ClassificationModule } from './modules/classification/classification.module';
+import { OffboardingModule } from './modules/offboarding/offboarding.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CorrelationIdInterceptor } from './common/interceptors/correlation-id.interceptor';
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule, InvoicesModule, DocumentsModule, ClassificationModule],
+  imports: [ScheduleModule.forRoot(), DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule, InvoicesModule, DocumentsModule, ClassificationModule, OffboardingModule],
   providers: [
     {
       provide: APP_FILTER,

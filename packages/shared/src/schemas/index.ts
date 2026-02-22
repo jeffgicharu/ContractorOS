@@ -5,3 +5,4 @@ export * from './engagement.schema';
 export * from './document.schema';
 export * from './onboarding.schema';
 export * from './classification.schema';
+export * from './offboarding.schema';

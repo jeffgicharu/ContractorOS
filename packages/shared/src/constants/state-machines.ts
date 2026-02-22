@@ -84,8 +84,12 @@ export const OFFBOARDING_TRANSITIONS: Record<OffboardingStatus, readonly Offboar
   [OffboardingStatus.IN_PROGRESS]: [
     OffboardingStatus.PENDING_FINAL_INVOICE,
     OffboardingStatus.COMPLETED,
+    OffboardingStatus.CANCELLED,
   ],
-  [OffboardingStatus.PENDING_FINAL_INVOICE]: [OffboardingStatus.COMPLETED],
+  [OffboardingStatus.PENDING_FINAL_INVOICE]: [
+    OffboardingStatus.COMPLETED,
+    OffboardingStatus.CANCELLED,
+  ],
   [OffboardingStatus.COMPLETED]: [],
   [OffboardingStatus.CANCELLED]: [],
 };
