@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { ClassificationService } from './classification.service';
 import { ClassificationRepository } from './classification.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 import type {
   ClassificationAssessment,
   ClassificationFactor,
@@ -63,6 +64,7 @@ function makeFactor(overrides: Partial<ClassificationFactor> = {}): Classificati
 describe('ClassificationService', () => {
   let service: ClassificationService;
   let repo: jest.Mocked<ClassificationRepository>;
+  let notificationsService: jest.Mocked<NotificationsService>;
 
   beforeEach(() => {
     repo = {
@@ -79,7 +81,13 @@ describe('ClassificationService', () => {
       getContractorOrgId: jest.fn(),
     } as unknown as jest.Mocked<ClassificationRepository>;
 
-    service = new ClassificationService(repo);
+    notificationsService = {
+      create: jest.fn().mockResolvedValue(undefined),
+      createForAdmins: jest.fn().mockResolvedValue(undefined),
+      findContractorUserId: jest.fn().mockResolvedValue(null),
+    } as unknown as jest.Mocked<NotificationsService>;
+
+    service = new ClassificationService(repo, notificationsService);
   });
 
   describe('runAssessment', () => {

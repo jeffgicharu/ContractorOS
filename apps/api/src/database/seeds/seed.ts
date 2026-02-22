@@ -10,6 +10,7 @@ import { invoices, invoiceStatusHistory, approvalSteps } from './fixtures/invoic
 import { documents } from './fixtures/documents';
 import { classificationAssessments, classificationFactors } from './fixtures/classification';
 import { equipment, offboardingWorkflow, checklistItems } from './fixtures/offboarding';
+import { notifications } from './fixtures/notifications';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -21,6 +22,7 @@ async function seed() {
 
   try {
     // Clean existing seed data (in reverse dependency order)
+    await pool.query('DELETE FROM notifications');
     await pool.query('DELETE FROM offboarding_checklist_items');
     await pool.query('DELETE FROM offboarding_workflows');
     await pool.query('DELETE FROM equipment');
@@ -360,6 +362,16 @@ async function seed() {
       );
     }
     console.log(`Inserted ${checklistItems.length} checklist item(s)`);
+
+    // Seed notifications
+    for (const n of notifications) {
+      await pool.query(
+        `INSERT INTO notifications (user_id, type, title, body, data)
+         VALUES ($1, $2::notification_type, $3, $4, $5)`,
+        [n.userId, n.type, n.title, n.body, JSON.stringify(n.data)],
+      );
+    }
+    console.log(`Inserted ${notifications.length} notification(s)`);
 
     // Refresh materialized view
     await pool.query('REFRESH MATERIALIZED VIEW mv_classification_risk_summary');

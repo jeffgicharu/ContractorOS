@@ -2,6 +2,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { OffboardingService } from './offboarding.service';
 import { OffboardingRepository } from './offboarding.repository';
 import { ContractorsRepository } from '../contractors/contractors.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 import {
   OffboardingStatus,
   ChecklistItemType,
@@ -93,6 +94,7 @@ describe('OffboardingService', () => {
   let service: OffboardingService;
   let repo: jest.Mocked<OffboardingRepository>;
   let contractorsRepo: jest.Mocked<ContractorsRepository>;
+  let notificationsService: jest.Mocked<NotificationsService>;
 
   beforeEach(() => {
     repo = {
@@ -118,7 +120,13 @@ describe('OffboardingService', () => {
       updateStatus: jest.fn(),
     } as unknown as jest.Mocked<ContractorsRepository>;
 
-    service = new OffboardingService(repo, contractorsRepo);
+    notificationsService = {
+      create: jest.fn().mockResolvedValue(undefined),
+      createForAdmins: jest.fn().mockResolvedValue(undefined),
+      findContractorUserId: jest.fn().mockResolvedValue(null),
+    } as unknown as jest.Mocked<NotificationsService>;
+
+    service = new OffboardingService(repo, contractorsRepo, notificationsService);
   });
 
   // ──────────────────────────────────────────────────────────

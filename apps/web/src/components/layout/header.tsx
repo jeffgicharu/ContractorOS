@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
+import { NotificationDropdown } from '@/components/notifications/notification-dropdown';
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -21,19 +22,7 @@ export function Header() {
       <div />
 
       <div className="flex items-center gap-4">
-        {/* Notification bell placeholder */}
-        <button
-          type="button"
-          className="relative text-slate-500 hover:text-slate-700"
-          aria-label="Notifications"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M10 2C7.24 2 5 4.24 5 7V10.59L3.59 12C3.21 12.38 3 12.89 3 13.41V14C3 14.55 3.45 15 4 15H16C16.55 15 17 14.55 17 14V13.41C17 12.89 16.79 12.38 16.41 12L15 10.59V7C15 4.24 12.76 2 10 2ZM10 18C11.1 18 12 17.1 12 16H8C8 17.1 8.9 18 10 18Z"
-              fill="currentColor"
-            />
-          </svg>
-        </button>
+        <NotificationDropdown />
 
         {/* User avatar + dropdown */}
         <div className="flex items-center gap-3">

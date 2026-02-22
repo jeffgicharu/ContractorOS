@@ -17,6 +17,7 @@ import type {
   DisputeInvoiceInput,
   ScheduleInvoiceInput,
   MarkPaidInput,
+  NotificationType,
 } from '@contractor-os/shared';
 import {
   InvoiceStatus,
@@ -28,6 +29,7 @@ import {
 } from '@contractor-os/shared';
 import { InvoicesRepository } from './invoices.repository';
 import { EngagementsRepository } from '../engagements/engagements.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 import { buildPaginationMeta } from '../../common/pagination/paginate';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
 
@@ -38,6 +40,7 @@ export class InvoicesService {
   constructor(
     private readonly repo: InvoicesRepository,
     private readonly engagementsRepo: EngagementsRepository,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(user: JwtPayload, input: CreateInvoiceInput): Promise<Invoice> {
@@ -173,6 +176,15 @@ export class InvoicesService {
     }
 
     this.logger.log(`Invoice ${id}: ${invoice.status} → submitted`);
+
+    // Notify admins/managers
+    this.notificationsService.createForAdmins(
+      invoice.organizationId,
+      'invoice_submitted' as NotificationType,
+      'Invoice Submitted',
+      `Invoice ${invoice.invoiceNumber} has been submitted for review`,
+      { invoiceId: id, invoiceNumber: invoice.invoiceNumber, contractorId: invoice.contractorId },
+    ).catch((err) => this.logger.error('Failed to send invoice_submitted notification', err));
   }
 
   async approve(id: string, user: JwtPayload, notes?: string): Promise<void> {
@@ -230,6 +242,18 @@ export class InvoicesService {
     await this.repo.addStatusHistory(id, InvoiceStatus.UNDER_REVIEW, InvoiceStatus.APPROVED, user.sub, notes);
 
     this.logger.log(`Invoice ${id}: approved (due: ${dueDate})`);
+
+    // Notify contractor
+    const contractorUserId = await this.notificationsService.findContractorUserId(invoice.contractorId);
+    if (contractorUserId) {
+      this.notificationsService.create(
+        contractorUserId,
+        'invoice_approved' as NotificationType,
+        'Invoice Approved',
+        `Invoice ${invoice.invoiceNumber} has been approved`,
+        { invoiceId: id, invoiceNumber: invoice.invoiceNumber },
+      ).catch((err) => this.logger.error('Failed to send invoice_approved notification', err));
+    }
   }
 
   async reject(id: string, user: JwtPayload, input: RejectInvoiceInput): Promise<void> {
@@ -252,6 +276,18 @@ export class InvoicesService {
     await this.repo.addStatusHistory(id, invoice.status, InvoiceStatus.REJECTED, user.sub, input.reason);
 
     this.logger.log(`Invoice ${id}: rejected — ${input.reason}`);
+
+    // Notify contractor
+    const contractorUserId = await this.notificationsService.findContractorUserId(invoice.contractorId);
+    if (contractorUserId) {
+      this.notificationsService.create(
+        contractorUserId,
+        'invoice_rejected' as NotificationType,
+        'Invoice Rejected',
+        `Invoice ${invoice.invoiceNumber} has been rejected: ${input.reason}`,
+        { invoiceId: id, invoiceNumber: invoice.invoiceNumber, reason: input.reason },
+      ).catch((err) => this.logger.error('Failed to send invoice_rejected notification', err));
+    }
   }
 
   async dispute(id: string, user: JwtPayload, input: DisputeInvoiceInput): Promise<void> {
@@ -287,6 +323,18 @@ export class InvoicesService {
     await this.repo.addStatusHistory(id, invoice.status, InvoiceStatus.PAID, user.sub, input.referenceNumber);
 
     this.logger.log(`Invoice ${id}: marked paid`);
+
+    // Notify contractor
+    const contractorUserId = await this.notificationsService.findContractorUserId(invoice.contractorId);
+    if (contractorUserId) {
+      this.notificationsService.create(
+        contractorUserId,
+        'invoice_paid' as NotificationType,
+        'Invoice Paid',
+        `Invoice ${invoice.invoiceNumber} has been paid`,
+        { invoiceId: id, invoiceNumber: invoice.invoiceNumber },
+      ).catch((err) => this.logger.error('Failed to send invoice_paid notification', err));
+    }
   }
 
   async cancel(id: string, user: JwtPayload): Promise<void> {

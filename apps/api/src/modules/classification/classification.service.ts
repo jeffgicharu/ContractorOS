@@ -9,6 +9,7 @@ import type {
 } from '@contractor-os/shared';
 import { FactorCategory as FC } from '@contractor-os/shared';
 import { ClassificationRepository } from './classification.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 import { scoreIrsTest } from './scoring/irs-test.scorer';
 import { scoreDolTest } from './scoring/dol-test.scorer';
 import { scoreAbcTest } from './scoring/abc-test.scorer';
@@ -19,7 +20,10 @@ import type { JwtPayload } from '../../common/decorators/current-user.decorator'
 export class ClassificationService {
   private readonly logger = new Logger(ClassificationService.name);
 
-  constructor(private readonly repo: ClassificationRepository) {}
+  constructor(
+    private readonly repo: ClassificationRepository,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async runAssessment(
     contractorId: string,
@@ -47,8 +51,12 @@ export class ClassificationService {
       abcResult.score,
     );
 
-    // Step 6: Persist
-    return this.repo.createAssessment({
+    // Step 6: Check if risk changed from previous assessment
+    const previous = await this.repo.findLatestAssessment(contractorId);
+    const previousRisk = previous?.overallRisk;
+
+    // Step 7: Persist
+    const assessment = await this.repo.createAssessment({
       contractorId,
       organizationId: orgId,
       overallRisk,
@@ -61,6 +69,19 @@ export class ClassificationService {
       abcFactors: abcResult.factors,
       inputData: input,
     });
+
+    // Step 8: Notify if risk level changed
+    if (previousRisk && previousRisk !== overallRisk) {
+      this.notificationsService.createForAdmins(
+        orgId,
+        'classification_risk_change' as import('@contractor-os/shared').NotificationType,
+        'Risk Level Changed',
+        `Contractor risk level changed from ${previousRisk} to ${overallRisk}`,
+        { contractorId, oldRisk: previousRisk, newRisk: overallRisk, score: overallScore },
+      ).catch((err) => this.logger.error('Failed to send risk change notification', err));
+    }
+
+    return assessment;
   }
 
   async getLatestAssessment(

@@ -20,6 +20,7 @@ import {
 } from '@contractor-os/shared';
 import { OffboardingRepository } from './offboarding.repository';
 import { ContractorsRepository } from '../contractors/contractors.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class OffboardingService {
@@ -28,6 +29,7 @@ export class OffboardingService {
   constructor(
     private readonly repo: OffboardingRepository,
     private readonly contractorsRepo: ContractorsRepository,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async initiateOffboarding(
@@ -71,6 +73,27 @@ export class OffboardingService {
     await this.generateChecklist(workflow.id, contractorId);
 
     this.logger.log(`Offboarding initiated for contractor ${contractorId}: ${workflow.id}`);
+
+    // Notify admins and the contractor
+    const contractorName = `${contractor.first_name} ${contractor.last_name}`;
+    this.notificationsService.createForAdmins(
+      orgId,
+      'offboarding_started' as import('@contractor-os/shared').NotificationType,
+      'Offboarding Started',
+      `Offboarding initiated for ${contractorName}`,
+      { workflowId: workflow.id, contractorId, contractorName },
+    ).catch((err) => this.logger.error('Failed to send offboarding_started notification', err));
+
+    const contractorUserId = await this.notificationsService.findContractorUserId(contractorId);
+    if (contractorUserId) {
+      this.notificationsService.create(
+        contractorUserId,
+        'offboarding_started' as import('@contractor-os/shared').NotificationType,
+        'Offboarding Notice',
+        `Your offboarding process has been initiated`,
+        { workflowId: workflow.id },
+      ).catch((err) => this.logger.error('Failed to send contractor offboarding notification', err));
+    }
 
     const detail = await this.repo.findWorkflowById(workflow.id);
     return detail!;

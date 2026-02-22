@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
+import { NotificationDropdown } from '@/components/notifications/notification-dropdown';
 
 const PORTAL_LINKS = [
   { label: 'Dashboard', href: '/portal/dashboard' },
@@ -55,17 +56,20 @@ export function PortalNav() {
           })}
         </nav>
 
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-xs font-medium text-white">
-            {initials}
+        <div className="flex items-center gap-4">
+          <NotificationDropdown />
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500 text-xs font-medium text-white">
+              {initials}
+            </div>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-xs text-slate-500 hover:text-slate-700"
+            >
+              Logout
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="text-xs text-slate-500 hover:text-slate-700"
-          >
-            Logout
-          </button>
         </div>
       </div>
     </header>

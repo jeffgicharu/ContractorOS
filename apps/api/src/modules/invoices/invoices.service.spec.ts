@@ -6,6 +6,7 @@ import {
 import { InvoicesService } from './invoices.service';
 import { InvoicesRepository } from './invoices.repository';
 import { EngagementsRepository } from '../engagements/engagements.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 import {
   InvoiceStatus,
   EngagementStatus,
@@ -130,15 +131,29 @@ function createMockEngagementsRepo(): jest.Mocked<EngagementsRepository> {
   } as unknown as jest.Mocked<EngagementsRepository>;
 }
 
+function createMockNotificationsService(): jest.Mocked<NotificationsService> {
+  return {
+    create: jest.fn().mockResolvedValue(undefined),
+    createForAdmins: jest.fn().mockResolvedValue(undefined),
+    findList: jest.fn(),
+    markRead: jest.fn(),
+    markAllRead: jest.fn(),
+    getUnreadCount: jest.fn(),
+    findContractorUserId: jest.fn().mockResolvedValue('user-contractor-1'),
+  } as unknown as jest.Mocked<NotificationsService>;
+}
+
 describe('InvoicesService', () => {
   let service: InvoicesService;
   let invoicesRepo: jest.Mocked<InvoicesRepository>;
   let engagementsRepo: jest.Mocked<EngagementsRepository>;
+  let notificationsService: jest.Mocked<NotificationsService>;
 
   beforeEach(() => {
     invoicesRepo = createMockInvoicesRepo();
     engagementsRepo = createMockEngagementsRepo();
-    service = new InvoicesService(invoicesRepo, engagementsRepo);
+    notificationsService = createMockNotificationsService();
+    service = new InvoicesService(invoicesRepo, engagementsRepo, notificationsService);
     jest.clearAllMocks();
 
     // Default: contractor lookup resolves

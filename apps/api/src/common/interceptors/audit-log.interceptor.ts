@@ -17,6 +17,16 @@ interface AuthenticatedUser {
   role: string;
 }
 
+const ENTITY_TABLE_MAP: Record<string, string> = {
+  contractors: 'contractors',
+  invoices: 'invoices',
+  engagements: 'engagements',
+  'time-entries': 'time_entries',
+  documents: 'tax_documents',
+  offboarding: 'offboarding_workflows',
+  notifications: 'notifications',
+};
+
 @Injectable()
 export class AuditLogInterceptor implements NestInterceptor {
   private readonly logger = new Logger(AuditLogInterceptor.name);
@@ -34,10 +44,20 @@ export class AuditLogInterceptor implements NestInterceptor {
     const user = request.user as AuthenticatedUser | undefined;
     const correlationId = request.headers['x-correlation-id'] as string | undefined;
 
+    // For PATCH/PUT, capture old values before the handler runs
+    const isUpdate = request.method === 'PATCH' || request.method === 'PUT';
+    const oldValuesPromise = isUpdate
+      ? this.fetchOldValues(request).catch(() => null)
+      : Promise.resolve(null);
+
     return next.handle().pipe(
       tap({
         next: (responseBody) => {
-          this.logAuditEvent(request, user, correlationId, responseBody).catch((err) => {
+          oldValuesPromise.then((oldValues) => {
+            this.logAuditEvent(request, user, correlationId, responseBody, oldValues).catch((err) => {
+              this.logger.error('Failed to write audit log', err);
+            });
+          }).catch((err) => {
             this.logger.error('Failed to write audit log', err);
           });
         },
@@ -45,11 +65,27 @@ export class AuditLogInterceptor implements NestInterceptor {
     );
   }
 
+  private async fetchOldValues(request: Request): Promise<Record<string, unknown> | null> {
+    const { entityType, entityId } = this.extractEntity(request, null);
+    if (!entityType || !entityId) return null;
+
+    const tableName = ENTITY_TABLE_MAP[entityType];
+    if (!tableName) return null;
+
+    const { rows } = await this.pool.query(
+      `SELECT * FROM ${tableName} WHERE id = $1`,
+      [entityId],
+    );
+
+    return (rows[0] as Record<string, unknown>) ?? null;
+  }
+
   private async logAuditEvent(
     request: Request,
     user: AuthenticatedUser | undefined,
     correlationId: string | undefined,
     responseBody: unknown,
+    oldValues: Record<string, unknown> | null,
   ): Promise<void> {
     if (!user) return;
 
@@ -60,14 +96,15 @@ export class AuditLogInterceptor implements NestInterceptor {
     const ipAddress = request.ip ?? request.socket.remoteAddress ?? null;
 
     await this.pool.query(
-      `INSERT INTO audit_events (organization_id, user_id, entity_type, entity_id, action, new_values, ip_address, correlation_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7::inet, $8)`,
+      `INSERT INTO audit_events (organization_id, user_id, entity_type, entity_id, action, old_values, new_values, ip_address, correlation_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8::inet, $9)`,
       [
         user.orgId,
         user.sub,
         entityType,
         entityId,
         action,
+        oldValues ? JSON.stringify(oldValues) : null,
         JSON.stringify(request.body),
         ipAddress,
         correlationId ?? null,

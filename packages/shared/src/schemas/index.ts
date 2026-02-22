@@ -6,3 +6,5 @@ export * from './document.schema';
 export * from './onboarding.schema';
 export * from './classification.schema';
 export * from './offboarding.schema';
+export * from './notification.schema';
+export * from './audit.schema';
