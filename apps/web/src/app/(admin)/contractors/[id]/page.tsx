@@ -13,6 +13,7 @@ import { EngagementsTab } from '@/components/engagements/engagements-tab';
 import { TimeEntriesTab } from '@/components/time-entries/time-entries-tab';
 import { InvoicesTab } from '@/components/invoices/invoices-tab';
 import { DocumentsTab } from '@/components/documents/documents-tab';
+import { RiskTab } from '@/components/classification/risk-tab';
 
 const TABS = ['Overview', 'Engagements', 'Invoices', 'Documents', 'Risk', 'Time Entries'] as const;
 type Tab = (typeof TABS)[number];
@@ -133,13 +134,7 @@ export default function ContractorDetailPage() {
         {activeTab === 'Time Entries' && <TimeEntriesTab contractorId={contractor.id} />}
         {activeTab === 'Invoices' && <InvoicesTab contractorId={contractor.id} />}
         {activeTab === 'Documents' && <DocumentsTab contractorId={contractor.id} />}
-        {activeTab !== 'Overview' && activeTab !== 'Engagements' && activeTab !== 'Time Entries' && activeTab !== 'Invoices' && activeTab !== 'Documents' && (
-          <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
-            <p className="text-sm text-slate-500">
-              {activeTab} will be available in a future update.
-            </p>
-          </div>
-        )}
+        {activeTab === 'Risk' && <RiskTab contractorId={contractor.id} />}
       </div>
     </div>
   );

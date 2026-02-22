@@ -8,6 +8,7 @@ import { engagements } from './fixtures/engagements';
 import { timeEntries } from './fixtures/time-entries';
 import { invoices, invoiceStatusHistory, approvalSteps } from './fixtures/invoices';
 import { documents } from './fixtures/documents';
+import { classificationAssessments, classificationFactors } from './fixtures/classification';
 
 const BCRYPT_ROUNDS = 12;
 
@@ -29,6 +30,8 @@ async function seed() {
     await pool.query('DELETE FROM contractor_status_history');
     await pool.query('DELETE FROM refresh_tokens');
     await pool.query('DELETE FROM audit_events');
+    await pool.query('DELETE FROM classification_factors');
+    await pool.query('DELETE FROM classification_assessments');
     await pool.query('DELETE FROM tax_documents');
     await pool.query('DELETE FROM contractors');
     await pool.query('DELETE FROM users');
@@ -268,6 +271,57 @@ async function seed() {
       );
     }
     console.log(`Inserted ${documents.length} tax document(s)`);
+
+    // Seed classification assessments
+    for (const a of classificationAssessments) {
+      await pool.query(
+        `INSERT INTO classification_assessments (
+          id, contractor_id, organization_id, overall_risk, overall_score,
+          irs_score, irs_factors, dol_score, dol_factors,
+          abc_score, abc_factors, input_data
+        ) VALUES ($1, $2, $3, $4::risk_level, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [
+          a.id,
+          a.contractorId,
+          a.organizationId,
+          a.overallRisk,
+          a.overallScore,
+          a.irsScore,
+          JSON.stringify(a.irsFactors),
+          a.dolScore,
+          JSON.stringify(a.dolFactors),
+          a.abcScore,
+          JSON.stringify(a.abcFactors),
+          JSON.stringify(a.inputData),
+        ],
+      );
+    }
+    console.log(`Inserted ${classificationAssessments.length} classification assessment(s)`);
+
+    // Seed classification factors
+    for (const f of classificationFactors) {
+      await pool.query(
+        `INSERT INTO classification_factors (
+          contractor_id, category, numeric_value, boolean_value, text_value,
+          period_start, period_end, source
+        ) VALUES ($1, $2::factor_category, $3, $4, $5, $6, $7, $8::factor_source)`,
+        [
+          f.contractorId,
+          f.category,
+          (f as Record<string, unknown>).numericValue ?? null,
+          f.booleanValue ?? null,
+          (f as Record<string, unknown>).textValue ?? null,
+          f.periodStart,
+          f.periodEnd,
+          f.source,
+        ],
+      );
+    }
+    console.log(`Inserted ${classificationFactors.length} classification factor(s)`);
+
+    // Refresh materialized view
+    await pool.query('REFRESH MATERIALIZED VIEW mv_classification_risk_summary');
+    console.log('Refreshed classification risk summary materialized view');
 
     console.log('\nSeed complete!');
     console.log('Login credentials:');
