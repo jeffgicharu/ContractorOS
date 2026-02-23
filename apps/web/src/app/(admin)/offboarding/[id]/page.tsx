@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { OffboardingStatusBadge } from '@/components/offboarding/offboarding-status-badge';
 import { ProgressTracker } from '@/components/offboarding/progress-tracker';
 import { ChecklistCard } from '@/components/offboarding/checklist-card';
+import { useAuth } from '@/hooks/use-auth';
 
 const REASON_LABELS: Record<string, string> = {
   project_completed: 'Project Completed',
@@ -34,6 +35,8 @@ const EQUIPMENT_STATUS_CONFIG: Record<string, { label: string; className: string
 
 export default function OffboardingDetailPage() {
   const params = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [workflow, setWorkflow] = useState<OffboardingWorkflowDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -122,7 +125,7 @@ export default function OffboardingDetailPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {nextStatuses
+          {isAdmin && nextStatuses
             .filter((s) => s !== OffboardingStatusEnum.CANCELLED)
             .map((status) => (
               <Button
@@ -137,7 +140,7 @@ export default function OffboardingDetailPage() {
                 {status === OffboardingStatusEnum.COMPLETED && 'Complete Offboarding'}
               </Button>
             ))}
-          {nextStatuses.includes(OffboardingStatusEnum.CANCELLED) && (
+          {isAdmin && nextStatuses.includes(OffboardingStatusEnum.CANCELLED) && (
             <Button
               variant="secondary"
               size="sm"

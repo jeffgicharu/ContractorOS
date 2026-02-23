@@ -125,9 +125,14 @@ export function generateInvoice(
   orgId: string,
   invoiceNum: number,
   status: string,
+  monthsAgo?: number,
 ) {
   const now = Date.now();
-  const submitted = status !== 'draft' ? new Date(now - randomBetween(10, 60) * 86_400_000).toISOString() : null;
+  // Spread invoices across multiple months for richer chart data
+  const baseOffset = monthsAgo !== undefined
+    ? monthsAgo * 30 + randomBetween(1, 25)
+    : randomBetween(10, 180);
+  const submitted = status !== 'draft' ? new Date(now - baseOffset * 86_400_000).toISOString() : null;
   const approved = ['approved', 'scheduled', 'paid'].includes(status)
     ? new Date(new Date(submitted!).getTime() + randomBetween(1, 5) * 86_400_000).toISOString()
     : null;
@@ -145,21 +150,23 @@ export function generateInvoice(
     unitPrice: randomBetween(50, 200),
   }));
 
+  const periodOffset = baseOffset + randomBetween(0, 30);
+
   return {
     id: randomUUID(),
     contractorId,
     engagementId,
     organizationId: orgId,
-    invoiceNumber: `INV-2025-${String(invoiceNum).padStart(3, '0')}`,
+    invoiceNumber: `INV-2026-${String(invoiceNum).padStart(3, '0')}`,
     status,
     submittedAt: submitted,
     approvedAt: approved,
     scheduledAt: scheduled,
     paidAt: paid,
-    dueDate: randomDateOnly(30, -30),
+    dueDate: new Date(now - (baseOffset - 30) * 86_400_000).toISOString().split('T')[0]!,
     notes: null,
-    periodStart: randomDateOnly(60, 30),
-    periodEnd: randomDateOnly(29, 0),
+    periodStart: new Date(now - periodOffset * 86_400_000).toISOString().split('T')[0]!,
+    periodEnd: new Date(now - (periodOffset - 30) * 86_400_000).toISOString().split('T')[0]!,
     lineItems,
   };
 }

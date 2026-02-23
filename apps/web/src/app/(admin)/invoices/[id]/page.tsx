@@ -9,10 +9,13 @@ import { Button } from '@/components/ui/button';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { InvoiceTimeline } from '@/components/invoices/invoice-timeline';
 import type { InvoiceDetail, InvoiceStatus } from '@contractor-os/shared';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function InvoiceDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [invoice, setInvoice] = useState<InvoiceDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -122,7 +125,7 @@ export default function InvoiceDetailPage() {
               Reject
             </Button>
           )}
-          {actions.includes('schedule') && (
+          {isAdmin && actions.includes('schedule') && (
             <Button
               size="sm"
               onClick={() => setShowScheduleModal(true)}
@@ -130,7 +133,7 @@ export default function InvoiceDetailPage() {
               Schedule Payment
             </Button>
           )}
-          {actions.includes('mark_paid') && (
+          {isAdmin && actions.includes('mark_paid') && (
             <Button
               size="sm"
               onClick={() => setShowPaidModal(true)}
@@ -147,7 +150,7 @@ export default function InvoiceDetailPage() {
               Dispute
             </Button>
           )}
-          {actions.includes('cancel') && (
+          {isAdmin && actions.includes('cancel') && (
             <Button
               variant="ghost"
               size="sm"

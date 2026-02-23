@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { api } from '@/lib/api-client';
 import type { ClassificationAssessment } from '@contractor-os/shared';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
 import { RiskScoreGauge } from './risk-score-gauge';
 import { TestBreakdown } from './test-breakdown';
 import { RiskTrendChart } from './risk-trend-chart';
@@ -13,6 +14,8 @@ interface RiskTabProps {
 }
 
 export function RiskTab({ contractorId }: RiskTabProps) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [assessment, setAssessment] = useState<ClassificationAssessment | null>(null);
   const [history, setHistory] = useState<ClassificationAssessment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,9 +70,11 @@ export function RiskTab({ contractorId }: RiskTabProps) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
         <p className="text-sm text-slate-500">{error}</p>
-        <Button variant="primary" size="sm" className="mt-3" onClick={handleRunAssessment}>
-          Run First Assessment
-        </Button>
+        {isAdmin && (
+          <Button variant="primary" size="sm" className="mt-3" onClick={handleRunAssessment}>
+            Run First Assessment
+          </Button>
+        )}
       </div>
     );
   }
@@ -79,14 +84,16 @@ export function RiskTab({ contractorId }: RiskTabProps) {
       {/* Header with run button */}
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-slate-900">Classification Risk Assessment</h3>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleRunAssessment}
-          disabled={isRunning}
-        >
-          {isRunning ? 'Running...' : 'Run Assessment'}
-        </Button>
+        {isAdmin && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleRunAssessment}
+            disabled={isRunning}
+          >
+            {isRunning ? 'Running...' : 'Run Assessment'}
+          </Button>
+        )}
       </div>
 
       {assessment ? (

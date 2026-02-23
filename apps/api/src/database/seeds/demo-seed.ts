@@ -59,7 +59,7 @@ async function demoSeed() {
     // Organization
     await pool.query(
       `INSERT INTO organizations (id, name, slug, settings) VALUES ($1, $2, $3, $4)`,
-      [SEED_ORG_ID, 'Acme Corp', 'acme-corp', JSON.stringify({})],
+      [SEED_ORG_ID, 'Acme Corp', 'acme-corp', JSON.stringify({ defaultPaymentTerms: 'net_30', defaultCurrency: 'USD', reminderDays: [7, 3, 1] })],
     );
     console.log('Inserted 1 organization');
 
@@ -85,9 +85,14 @@ async function demoSeed() {
     );
     const activeContractorIds: string[] = [];
 
-    for (const c of contractors) {
+    for (let ci = 0; ci < contractors.length; ci++) {
+      const c = contractors[ci]!;
+      // Spread contractor created_at across last 6 months for growth chart
+      const monthsAgo = Math.floor(ci / Math.ceil(contractors.length / 6));
+      const createdDaysAgo = monthsAgo * 30 + randomBetween(1, 28);
+      const createdAt = new Date(Date.now() - createdDaysAgo * 86_400_000).toISOString();
       const activatedAt = ['active', 'suspended'].includes(c.status)
-        ? new Date(Date.now() - 30 * 86_400_000).toISOString()
+        ? new Date(Date.now() - Math.max(createdDaysAgo - 5, 1) * 86_400_000).toISOString()
         : null;
 
       await pool.query(
@@ -95,13 +100,13 @@ async function demoSeed() {
           id, organization_id, email, first_name, last_name, status, type,
           phone, city, state, zip_code, country,
           tin_last_four, bank_name, bank_account_last_four, bank_verified,
-          activated_at
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+          activated_at, created_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
         [
           c.id, c.organizationId, c.email, c.firstName, c.lastName, c.status, c.type,
           c.phone ?? null, c.city ?? null, c.state ?? null, c.zipCode ?? null, c.country,
           c.tinLastFour ?? null, c.bankName ?? null, c.bankAccountLastFour ?? null, c.bankVerified,
-          activatedAt,
+          activatedAt, createdAt,
         ],
       );
 
@@ -171,15 +176,18 @@ async function demoSeed() {
     }
     console.log(`Inserted ${timeEntryCount} time entries`);
 
-    // Invoices
+    // Invoices — spread across last 6 months for rich chart data
     let invoiceNum = 0;
     let invoiceCount = 0;
+    const PAID_MONTHS = [0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]; // weighted toward recent months
     for (const eng of engagementMap) {
       const count = randomBetween(2, 5);
       for (let i = 0; i < count; i++) {
         invoiceNum++;
         const status = randomPick(INVOICE_STATUS_DISTRIBUTION);
-        const inv = generateInvoice(eng.contractorId, eng.id, SEED_ORG_ID, invoiceNum, status);
+        // For paid invoices, distribute across months; others use recent dates
+        const monthsAgo = status === 'paid' ? randomPick(PAID_MONTHS) : randomBetween(0, 1);
+        const inv = generateInvoice(eng.contractorId, eng.id, SEED_ORG_ID, invoiceNum, status, monthsAgo);
 
         await pool.query(
           `INSERT INTO invoices (id, contractor_id, engagement_id, organization_id,

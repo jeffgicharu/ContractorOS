@@ -8,3 +8,4 @@ export * from './classification.schema';
 export * from './offboarding.schema';
 export * from './notification.schema';
 export * from './audit.schema';
+export * from './organization.schema';

@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ContractorStatusBadge } from '@/components/contractors/contractor-status-badge';
+import { useAuth } from '@/hooks/use-auth';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All Statuses' },
@@ -27,6 +28,8 @@ const STATUS_OPTIONS = [
 type SortField = 'created_at' | 'first_name' | 'last_name' | 'status' | 'email';
 
 export default function ContractorListPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [contractors, setContractors] = useState<ContractorListItem[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,9 +103,11 @@ export default function ContractorListPage() {
             Manage your contractor workforce
           </p>
         </div>
-        <Link href="/contractors/new">
-          <Button>Add Contractor</Button>
-        </Link>
+        {isAdmin && (
+          <Link href="/contractors/new">
+            <Button>Add Contractor</Button>
+          </Link>
+        )}
       </div>
 
       {/* Filters */}

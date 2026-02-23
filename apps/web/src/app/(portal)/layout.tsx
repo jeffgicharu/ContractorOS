@@ -3,7 +3,8 @@
 import { useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
-import { PortalNav } from '@/components/layout/portal-nav';
+import { PortalSidebar } from '@/components/layout/portal-sidebar';
+import { Header } from '@/components/layout/header';
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -28,9 +29,14 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <PortalNav />
-      <main className="mx-auto max-w-[960px] px-8 py-6">{children}</main>
+    <div className="flex min-h-screen">
+      <PortalSidebar />
+      <div className="flex flex-1 flex-col pl-64">
+        <Header />
+        <main className="flex-1 px-8 py-6">
+          <div className="mx-auto max-w-[1280px]">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

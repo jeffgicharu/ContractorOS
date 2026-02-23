@@ -15,6 +15,7 @@ import { InvoicesTab } from '@/components/invoices/invoices-tab';
 import { DocumentsTab } from '@/components/documents/documents-tab';
 import { RiskTab } from '@/components/classification/risk-tab';
 import { InitiationModal } from '@/components/offboarding/initiation-modal';
+import { useAuth } from '@/hooks/use-auth';
 
 const TABS = ['Overview', 'Engagements', 'Invoices', 'Documents', 'Risk', 'Time Entries'] as const;
 type Tab = (typeof TABS)[number];
@@ -22,6 +23,8 @@ type Tab = (typeof TABS)[number];
 export default function ContractorDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [contractor, setContractor] = useState<ContractorDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -93,24 +96,26 @@ export default function ContractorDetailPage() {
             {contractor.email} · {contractor.type === 'domestic' ? 'Domestic' : 'Foreign'} contractor
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => router.push(`/contractors/${params.id}/edit`)}
-          >
-            Edit
-          </Button>
-          {contractor.status === 'active' && (
+        {isAdmin && (
+          <div className="flex items-center gap-2">
             <Button
-              variant="destructive"
+              variant="secondary"
               size="sm"
-              onClick={() => setShowOffboardModal(true)}
+              onClick={() => router.push(`/contractors/${params.id}/edit`)}
             >
-              Offboard
+              Edit
             </Button>
-          )}
-        </div>
+            {contractor.status === 'active' && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setShowOffboardModal(true)}
+              >
+                Offboard
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tabs */}

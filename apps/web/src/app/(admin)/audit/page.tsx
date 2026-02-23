@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import { api } from '@/lib/api-client';
 import type { AuditEvent } from '@contractor-os/shared';
 import { AuditFilters } from '@/components/audit/audit-filters';
@@ -131,9 +131,8 @@ export default function AuditPage() {
                 </thead>
                 <tbody>
                   {events.map((event) => (
-                    <>
+                    <Fragment key={event.id}>
                       <tr
-                        key={event.id}
                         className="border-b border-slate-100 last:border-0 hover:bg-slate-50 cursor-pointer"
                         onClick={() =>
                           setExpandedId(expandedId === event.id ? null : event.id)
@@ -180,7 +179,7 @@ export default function AuditPage() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
