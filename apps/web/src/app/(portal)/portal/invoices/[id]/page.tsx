@@ -120,7 +120,7 @@ export default function PortalInvoiceDetailPage() {
 
       {/* Info cards */}
       <div className="mt-6 grid grid-cols-2 gap-4">
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Details</h3>
           <dl className="mt-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -140,7 +140,7 @@ export default function PortalInvoiceDetailPage() {
           </dl>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Amounts</h3>
           <dl className="mt-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -151,7 +151,7 @@ export default function PortalInvoiceDetailPage() {
               <dt className="text-[13px] text-slate-500">Tax</dt>
               <dd className="text-sm font-mono text-slate-900">{formatCurrency(invoice.taxAmount)}</dd>
             </div>
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+            <div className="flex items-center justify-between border-t border-slate-50 pt-3">
               <dt className="text-sm font-semibold text-slate-900">Total</dt>
               <dd className="text-base font-bold font-mono text-slate-900">
                 {formatCurrency(invoice.totalAmount)}
@@ -162,30 +162,30 @@ export default function PortalInvoiceDetailPage() {
       </div>
 
       {/* Line items */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-50">
           <h3 className="text-base font-semibold text-slate-900">Line Items</h3>
         </div>
         <table className="w-full border-separate border-spacing-0">
           <thead>
-            <tr className="bg-slate-50">
-              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+            <tr className="bg-slate-50/50">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Description
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Qty
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Rate
               </th>
-              <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Amount
               </th>
             </tr>
           </thead>
           <tbody>
             {invoice.lineItems.map((item) => (
-              <tr key={item.id} className="border-b border-slate-100">
+              <tr key={item.id} className="border-b border-slate-50">
                 <td className="px-6 py-3 text-[13px] text-slate-700">{item.description}</td>
                 <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
                   {item.quantity}
@@ -204,14 +204,14 @@ export default function PortalInvoiceDetailPage() {
 
       {/* Notes */}
       {invoice.notes && (
-        <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Notes</h3>
           <p className="mt-2 text-[13px] text-slate-600">{invoice.notes}</p>
         </div>
       )}
 
       {/* Timeline */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">Status History</h3>
         <div className="mt-4">
           <InvoiceTimeline history={invoice.statusHistory} />

@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'outline';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -18,6 +18,8 @@ const variantClasses: Record<ButtonVariant, string> = {
     'bg-transparent text-slate-600 border-transparent hover:bg-slate-100',
   destructive:
     'bg-error-600 text-white border-transparent hover:bg-error-700',
+  outline:
+    'bg-transparent text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -42,7 +44,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
-        className={`inline-flex items-center justify-center font-semibold rounded-md
+        className={`inline-flex items-center justify-center font-medium rounded-lg
           transition-all duration-150
           focus-visible:outline-none focus-visible:shadow-ring
           active:scale-[0.98]

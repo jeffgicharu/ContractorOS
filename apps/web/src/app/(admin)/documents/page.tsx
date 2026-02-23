@@ -46,7 +46,7 @@ export default function DocumentVaultPage() {
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">
         Document Vault
       </h1>
 
@@ -81,7 +81,7 @@ export default function DocumentVaultPage() {
       </div>
 
       {/* Table */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -93,20 +93,20 @@ export default function DocumentVaultPage() {
         ) : (
           <table className="w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-slate-50">
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <tr className="bg-slate-50/50">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Contractor
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   W-9 / W-8BEN
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Contract
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Expiring Docs
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Compliant
                 </th>
               </tr>
@@ -121,7 +121,7 @@ export default function DocumentVaultPage() {
                   <tr
                     key={entry.contractorId}
                     onClick={() => router.push(`/contractors/${entry.contractorId}?tab=Documents`)}
-                    className="h-12 cursor-pointer border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                    className="h-12 cursor-pointer border-b border-slate-50 hover:bg-slate-50 transition-colors"
                   >
                     <td className="px-4 text-[13px] font-medium text-slate-900">
                       {entry.contractorName}
@@ -146,11 +146,11 @@ export default function DocumentVaultPage() {
                     </td>
                     <td className="px-4">
                       {entry.isCompliant ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-sm bg-success-50 text-success-700">
+                        <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-md bg-success-50 text-success-700">
                           Yes
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-sm bg-error-50 text-error-700">
+                        <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-md bg-error-50 text-error-700">
                           No
                         </span>
                       )}

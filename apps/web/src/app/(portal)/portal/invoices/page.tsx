@@ -79,7 +79,7 @@ export default function PortalInvoicesPage() {
       </div>
 
       {/* Table */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -98,20 +98,20 @@ export default function PortalInvoicesPage() {
         ) : (
           <table className="w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-slate-50">
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <tr className="bg-slate-50/50">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Invoice #
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Period
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Status
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Amount
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Due Date
                 </th>
               </tr>
@@ -121,7 +121,7 @@ export default function PortalInvoicesPage() {
                 <tr
                   key={inv.id}
                   onClick={() => router.push(`/portal/invoices/${inv.id}`)}
-                  className="h-12 cursor-pointer border-b border-slate-100 hover:bg-slate-50 transition-colors"
+                  className="h-12 cursor-pointer border-b border-slate-50 hover:bg-slate-50 transition-colors"
                 >
                   <td className="px-4 text-[13px] font-mono font-medium text-slate-900">
                     {inv.invoiceNumber}
@@ -156,7 +156,7 @@ export default function PortalInvoicesPage() {
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
             >
               Previous
             </button>
@@ -164,7 +164,7 @@ export default function PortalInvoicesPage() {
               type="button"
               onClick={() => setPage((p) => p + 1)}
               disabled={page >= meta.totalPages}
-              className="rounded-md border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
             >
               Next
             </button>

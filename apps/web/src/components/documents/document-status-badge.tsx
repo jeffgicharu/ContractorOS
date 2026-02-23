@@ -37,7 +37,7 @@ export function DocumentStatusBadge({ status }: DocumentStatusBadgeProps) {
   const extraClasses = status === 'missing' ? 'border border-error-300' : '';
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-sm ${config.bg} ${config.text} ${extraClasses}`}
+      className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md ${config.bg} ${config.text} ${extraClasses}`}
     >
       {config.label}
     </span>

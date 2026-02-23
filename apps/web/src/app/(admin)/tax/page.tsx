@@ -34,13 +34,13 @@ export default function TaxReadinessPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           1099 Readiness
         </h1>
         <select
           value={year}
           onChange={(e) => setYear(parseInt(e.target.value, 10))}
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
         >
           {[currentYear, currentYear - 1, currentYear - 2].map((y) => (
             <option key={y} value={y}>{y}</option>
@@ -50,22 +50,22 @@ export default function TaxReadinessPage() {
 
       {/* Summary cards */}
       <div className="mt-6 grid grid-cols-3 gap-4">
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
+        <div className="rounded-xl shadow-xs border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Requiring 1099</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{requiring1099.length}</p>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
+        <div className="rounded-xl shadow-xs border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Ready</p>
           <p className="mt-1 text-2xl font-bold text-success-600">{ready.length}</p>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
+        <div className="rounded-xl shadow-xs border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Not Ready</p>
           <p className="mt-1 text-2xl font-bold text-error-600">{notReady.length}</p>
         </div>
       </div>
 
       {/* Table */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -77,27 +77,27 @@ export default function TaxReadinessPage() {
         ) : (
           <table className="w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-slate-50">
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <tr className="bg-slate-50/50">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Contractor
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   YTD Payments
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   W-9 Status
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Requires 1099
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Ready
                 </th>
               </tr>
             </thead>
             <tbody>
               {entries.map((entry) => (
-                <tr key={entry.contractorId} className="h-12 border-b border-slate-100">
+                <tr key={entry.contractorId} className="h-12 border-b border-slate-50">
                   <td className="px-4 text-[13px] font-medium text-slate-900">
                     {entry.contractorName}
                   </td>
@@ -116,11 +116,11 @@ export default function TaxReadinessPage() {
                   </td>
                   <td className="px-4">
                     {entry.isReady ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-sm bg-success-50 text-success-700">
+                      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md bg-success-50 text-success-700">
                         Ready
                       </span>
                     ) : entry.requires1099 ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-sm bg-error-50 text-error-700">
+                      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md bg-error-50 text-error-700">
                         Not Ready
                       </span>
                     ) : (

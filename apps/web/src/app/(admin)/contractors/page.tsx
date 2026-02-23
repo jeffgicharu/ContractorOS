@@ -96,7 +96,7 @@ export default function ContractorListPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Contractors
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -122,7 +122,7 @@ export default function ContractorListPage() {
         <select
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value)}
-          className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900
+          className="h-9 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900
             transition-[border-color,box-shadow] duration-150 ease-out
             hover:border-slate-400
             focus:border-brand-500 focus:shadow-ring focus:outline-none"
@@ -136,33 +136,33 @@ export default function ContractorListPage() {
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
+      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
         <table className="w-full border-separate border-spacing-0">
           <thead>
             <tr>
               <th
-                className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-600 border-b border-slate-200 cursor-pointer select-none"
+                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none"
                 onClick={() => handleSort('first_name')}
               >
                 Name <SortIcon field="first_name" />
               </th>
               <th
-                className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-600 border-b border-slate-200 cursor-pointer select-none"
+                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none"
                 onClick={() => handleSort('email')}
               >
                 Email <SortIcon field="email" />
               </th>
               <th
-                className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-600 border-b border-slate-200 cursor-pointer select-none"
+                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none"
                 onClick={() => handleSort('status')}
               >
                 Status <SortIcon field="status" />
               </th>
-              <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-600 border-b border-slate-200">
+              <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
                 Type
               </th>
               <th
-                className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-600 border-b border-slate-200 cursor-pointer select-none"
+                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none"
                 onClick={() => handleSort('created_at')}
               >
                 Created <SortIcon field="created_at" />
@@ -193,7 +193,7 @@ export default function ContractorListPage() {
                   key={contractor.id}
                   className="group hover:bg-slate-50 transition-colors"
                 >
-                  <td className="px-4 py-3 text-[13px] text-slate-900 border-b border-slate-100">
+                  <td className="px-4 py-3 text-[13px] text-slate-900 border-b border-slate-50">
                     <Link
                       href={`/contractors/${contractor.id}`}
                       className="font-medium text-slate-900 hover:text-brand-600"
@@ -201,16 +201,16 @@ export default function ContractorListPage() {
                       {contractor.firstName} {contractor.lastName}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-100">
+                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50">
                     {contractor.email}
                   </td>
-                  <td className="px-4 py-3 border-b border-slate-100">
+                  <td className="px-4 py-3 border-b border-slate-50">
                     <ContractorStatusBadge status={contractor.status} />
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-100 capitalize">
+                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50 capitalize">
                     {contractor.type}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-100">
+                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50">
                     {formatDate(contractor.createdAt)}
                   </td>
                 </tr>

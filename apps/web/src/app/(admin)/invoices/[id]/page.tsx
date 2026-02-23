@@ -97,7 +97,7 @@ export default function InvoiceDetailPage() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-[30px] font-bold leading-tight font-mono text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight font-mono text-slate-900">
               {invoice.invoiceNumber}
             </h1>
             <InvoiceStatusBadge status={invoice.status as InvoiceStatus} />
@@ -165,7 +165,7 @@ export default function InvoiceDetailPage() {
 
       {/* Info grid */}
       <div className="mt-6 grid grid-cols-3 gap-4">
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Details</h3>
           <dl className="mt-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -193,7 +193,7 @@ export default function InvoiceDetailPage() {
           </dl>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Amounts</h3>
           <dl className="mt-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -204,14 +204,14 @@ export default function InvoiceDetailPage() {
               <dt className="text-[13px] text-slate-500">Tax</dt>
               <dd className="text-sm font-mono text-slate-900">{formatCurrency(invoice.taxAmount)}</dd>
             </div>
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+            <div className="flex items-center justify-between border-t border-slate-50 pt-3">
               <dt className="text-sm font-semibold text-slate-900">Total</dt>
               <dd className="text-base font-bold font-mono text-slate-900">{formatCurrency(invoice.totalAmount)}</dd>
             </div>
           </dl>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Approval</h3>
           <div className="mt-4 space-y-3">
             {invoice.approvalSteps.length === 0 ? (
@@ -241,30 +241,30 @@ export default function InvoiceDetailPage() {
       </div>
 
       {/* Line items table */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-50">
           <h3 className="text-base font-semibold text-slate-900">Line Items</h3>
         </div>
         <table className="w-full border-separate border-spacing-0">
           <thead>
-            <tr className="bg-slate-50">
-              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+            <tr className="bg-slate-50/50">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Description
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Qty
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Unit Price
               </th>
-              <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Amount
               </th>
             </tr>
           </thead>
           <tbody>
             {invoice.lineItems.map((item) => (
-              <tr key={item.id} className="border-b border-slate-100">
+              <tr key={item.id} className="border-b border-slate-50">
                 <td className="px-6 py-3 text-[13px] text-slate-700">{item.description}</td>
                 <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
                   {item.quantity}
@@ -283,14 +283,14 @@ export default function InvoiceDetailPage() {
 
       {/* Notes */}
       {invoice.notes && (
-        <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Notes</h3>
           <p className="mt-2 text-[13px] text-slate-600">{invoice.notes}</p>
         </div>
       )}
 
       {/* Timeline */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">Status History</h3>
         <div className="mt-4">
           <InvoiceTimeline history={invoice.statusHistory} />
@@ -305,7 +305,7 @@ export default function InvoiceDetailPage() {
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
             placeholder="Reason for rejection..."
-            className="mt-4 w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+            className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
             rows={3}
           />
           <div className="mt-4 flex justify-end gap-2">
@@ -333,7 +333,7 @@ export default function InvoiceDetailPage() {
             value={disputeReason}
             onChange={(e) => setDisputeReason(e.target.value)}
             placeholder="Reason for dispute..."
-            className="mt-4 w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+            className="mt-4 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
             rows={3}
           />
           <div className="mt-4 flex justify-end gap-2">
@@ -362,7 +362,7 @@ export default function InvoiceDetailPage() {
               type="date"
               value={paymentDate}
               onChange={(e) => setPaymentDate(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+              className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
             />
           </label>
           <div className="mt-4 flex justify-end gap-2">
@@ -416,7 +416,7 @@ function Modal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-lg">
+      <div className="relative z-10 w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-lg">
         {children}
       </div>
     </div>

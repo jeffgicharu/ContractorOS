@@ -44,7 +44,7 @@ export function RiskLevelBadge({ level, score }: RiskLevelBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-sm border ${config.bg} ${config.border} ${config.text}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium rounded-md border ${config.bg} ${config.border} ${config.text}`}
     >
       <span className={`h-2 w-2 rounded-full ${config.dot}`} />
       {config.label}

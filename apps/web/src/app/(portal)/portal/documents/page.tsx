@@ -89,14 +89,14 @@ export default function PortalDocumentsPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           My Documents
         </h1>
         {contractorId && (
           <button
             type="button"
             onClick={() => setShowUpload(true)}
-            className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           >
             Upload Document
           </button>
@@ -105,7 +105,7 @@ export default function PortalDocumentsPage() {
 
       {/* Alert banners */}
       {missingDocs.length > 0 && (
-        <div className="mt-4 rounded-md bg-error-50 border border-error-200 px-4 py-3">
+        <div className="mt-4 rounded-lg bg-error-50 border border-error-200 px-4 py-3">
           <p className="text-sm font-medium text-error-800">
             Missing required documents:{' '}
             {missingDocs.map((t) => DOCUMENT_TYPE_LABELS[t]).join(', ')}
@@ -117,7 +117,7 @@ export default function PortalDocumentsPage() {
       )}
 
       {(expiredDocs.length > 0 || expiringDocs.length > 0) && (
-        <div className="mt-3 rounded-md bg-warning-50 border border-warning-200 px-4 py-3">
+        <div className="mt-3 rounded-lg bg-warning-50 border border-warning-200 px-4 py-3">
           {expiredDocs.length > 0 && (
             <p className="text-sm font-medium text-warning-800">
               Expired documents:{' '}
@@ -134,7 +134,7 @@ export default function PortalDocumentsPage() {
       )}
 
       {/* Documents table */}
-      <div className="mt-6 rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
         {documents.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-sm text-slate-500">No documents uploaded yet.</p>
@@ -142,30 +142,30 @@ export default function PortalDocumentsPage() {
         ) : (
           <table className="w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-slate-50">
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+              <tr className="bg-slate-50/50">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Type
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   File Name
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Status
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Uploaded
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Expires
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
               {documents.map((doc) => (
-                <tr key={doc.id} className="h-12 border-b border-slate-100">
+                <tr key={doc.id} className="h-12 border-b border-slate-50">
                   <td className="px-4 text-[13px] font-medium text-slate-900">
                     {DOCUMENT_TYPE_LABELS[doc.documentType as TaxDocumentType] ?? doc.documentType}
                   </td>

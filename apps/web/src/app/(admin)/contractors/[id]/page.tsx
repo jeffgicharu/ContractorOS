@@ -87,7 +87,7 @@ export default function ContractorDetailPage() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               {contractor.firstName} {contractor.lastName}
             </h1>
             <ContractorStatusBadge status={contractor.status} variant="pill" />
@@ -170,7 +170,7 @@ function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* Onboarding Progress */}
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">Onboarding</h3>
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm">
@@ -223,7 +223,7 @@ function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
       </div>
 
       {/* Risk Assessment */}
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">
           Risk Assessment
         </h3>
@@ -245,7 +245,7 @@ function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
       </div>
 
       {/* Quick Stats */}
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">Summary</h3>
         <dl className="mt-4 space-y-3">
           <div className="flex items-center justify-between">
@@ -276,7 +276,7 @@ function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
       </div>
 
       {/* Document Status */}
-      <div className="col-span-2 rounded-lg border border-slate-200 bg-white p-6">
+      <div className="col-span-2 rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">
           Document Status
         </h3>
@@ -322,7 +322,7 @@ function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
       </div>
 
       {/* Contact Info */}
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">Contact</h3>
         <dl className="mt-4 space-y-3">
           <div>

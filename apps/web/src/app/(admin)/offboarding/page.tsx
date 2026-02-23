@@ -64,7 +64,7 @@ export default function OffboardingPage() {
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">
         Offboarding Workflows
       </h1>
       <p className="mt-1 text-sm text-slate-500">
@@ -102,31 +102,31 @@ export default function OffboardingPage() {
             <p className="text-sm text-slate-500">{error}</p>
           </div>
         ) : workflows.length === 0 ? (
-          <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
             <p className="text-sm text-slate-400">No offboarding workflows found.</p>
           </div>
         ) : (
           <>
-            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                  <tr className="border-b border-slate-200 bg-slate-50/50">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Contractor
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Reason
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Progress
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Effective Date
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Created
                     </th>
                   </tr>
@@ -135,7 +135,7 @@ export default function OffboardingPage() {
                   {workflows.map((w) => (
                     <tr
                       key={w.id}
-                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                      className="border-b border-slate-50 last:border-0 hover:bg-slate-50"
                     >
                       <td className="px-4 py-3">
                         <Link
@@ -187,7 +187,7 @@ export default function OffboardingPage() {
                     type="button"
                     disabled={meta.page <= 1}
                     onClick={() => setMeta((prev) => ({ ...prev, page: prev.page - 1 }))}
-                    className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                   >
                     Previous
                   </button>
@@ -195,7 +195,7 @@ export default function OffboardingPage() {
                     type="button"
                     disabled={meta.page >= meta.totalPages}
                     onClick={() => setMeta((prev) => ({ ...prev, page: prev.page + 1 }))}
-                    className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                   >
                     Next
                   </button>

@@ -104,40 +104,40 @@ export default function PortalDashboardPage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[30px] font-bold leading-tight text-slate-900">Contractor Portal</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Contractor Portal</h1>
         <p className="mt-1 text-sm text-slate-500">Welcome back{user ? `, ${user.firstName}` : ''}</p>
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-28 animate-pulse rounded-lg border border-slate-200 bg-slate-50" />
+            <div key={i} className="h-28 animate-pulse rounded-xl border border-slate-200 bg-slate-50" />
           ))}
         </div>
-        <div className="mt-6 h-72 animate-pulse rounded-lg border border-slate-200 bg-slate-50" />
+        <div className="mt-6 h-72 animate-pulse rounded-xl border border-slate-200 bg-slate-50" />
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">Contractor Portal</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Contractor Portal</h1>
       <p className="mt-1 text-sm text-slate-500">Welcome back{user ? `, ${user.firstName}` : ''}</p>
 
       {/* Stats Cards */}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
           <p className="text-sm font-medium text-slate-500">Pending Invoices</p>
           <p className="mt-2 text-3xl font-bold text-slate-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
             {stats?.pendingInvoices ?? 0}
           </p>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
           <p className="text-sm font-medium text-slate-500">Total Paid YTD</p>
           <p className="mt-2 text-3xl font-bold text-slate-900" style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'JetBrains Mono, monospace' }}>
             ${(stats?.totalPaidYtd ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
           </p>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
           <p className="text-sm font-medium text-slate-500">Total Invoices</p>
           <p className="mt-2 text-3xl font-bold text-slate-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
             {stats?.totalInvoices ?? 0}
@@ -146,7 +146,7 @@ export default function PortalDashboardPage() {
       </div>
 
       {/* Earnings Chart */}
-      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
         <h2 className="text-sm font-semibold text-slate-900">Monthly Earnings</h2>
         <p className="mt-1 text-xs text-slate-400">Last 6 months of paid invoices</p>
         {earnings.length > 0 ? (
@@ -177,7 +177,7 @@ export default function PortalDashboardPage() {
       </div>
 
       {/* Recent Invoices */}
-      <div className="mt-8 rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="mt-8 rounded-xl border border-slate-200 bg-white shadow-xs">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <h2 className="text-sm font-semibold text-slate-900">Recent Invoices</h2>
           <Link href="/portal/invoices" className="text-xs font-medium text-brand-600 hover:text-brand-700">
@@ -188,11 +188,11 @@ export default function PortalDashboardPage() {
         {recentInvoices.length > 0 ? (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
-                <th className="px-6 py-2 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">Invoice #</th>
-                <th className="px-6 py-2 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">Amount</th>
-                <th className="px-6 py-2 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">Status</th>
-                <th className="px-6 py-2 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">Date</th>
+              <tr className="border-b border-slate-50 bg-slate-50/50">
+                <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Invoice #</th>
+                <th className="px-6 py-2 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Amount</th>
+                <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Status</th>
+                <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -211,7 +211,7 @@ export default function PortalDashboardPage() {
                     ${inv.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </td>
                   <td className="px-6 py-3">
-                    <span className={`rounded-sm px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[inv.status] ?? 'bg-slate-100 text-slate-600'}`}>
+                    <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[inv.status] ?? 'bg-slate-100 text-slate-600'}`}>
                       {inv.status.replace(/_/g, ' ')}
                     </span>
                   </td>
@@ -231,13 +231,13 @@ export default function PortalDashboardPage() {
 
       {/* Quick Actions */}
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link href="/portal/invoices/new" className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
+        <Link href="/portal/invoices/new" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-brand-700">
           Submit Invoice
         </Link>
-        <Link href="/portal/documents" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+        <Link href="/portal/documents" className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 shadow-xs hover:bg-slate-50">
           Upload Document
         </Link>
-        <Link href="/portal/invoices" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+        <Link href="/portal/invoices" className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 shadow-xs hover:bg-slate-50">
           View Invoices
         </Link>
       </div>

@@ -110,7 +110,7 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Settings
         </h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -125,7 +125,7 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">
         Settings
       </h1>
       <p className="mt-1 text-sm text-slate-500">
@@ -133,26 +133,26 @@ export default function SettingsPage() {
       </p>
 
       {!isAdmin && (
-        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
           Only admins can modify organization settings.
         </div>
       )}
 
       {error && (
-        <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="mt-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+        <div className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
           {success}
         </div>
       )}
 
-      <form onSubmit={handleSave} className="mt-8 max-w-2xl space-y-8">
+      <form onSubmit={handleSave} className="mt-8 space-y-6">
         {/* Organization Info */}
-        <section>
+        <section className="rounded-xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">
             Organization
           </h2>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={!isAdmin}
-                className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
+                className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
                 required
               />
             </div>
@@ -190,10 +190,8 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        <hr className="border-slate-200" />
-
         {/* Invoice Defaults */}
-        <section>
+        <section className="rounded-xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">
             Invoice Defaults
           </h2>
@@ -214,7 +212,7 @@ export default function SettingsPage() {
                 value={paymentTerms}
                 onChange={(e) => setPaymentTerms(e.target.value)}
                 disabled={!isAdmin}
-                className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
+                className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
               >
                 {PAYMENT_TERMS_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -236,7 +234,7 @@ export default function SettingsPage() {
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
                 disabled={!isAdmin}
-                className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
+                className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
               >
                 {CURRENCY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -248,10 +246,8 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        <hr className="border-slate-200" />
-
         {/* Reminders */}
-        <section>
+        <section className="rounded-xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">
             Reminders
           </h2>
@@ -273,7 +269,7 @@ export default function SettingsPage() {
               onChange={(e) => setReminderDays(e.target.value)}
               disabled={!isAdmin}
               placeholder="7, 3, 1"
-              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
+              className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
             />
             <p className="mt-1 text-xs text-slate-400">
               e.g. &quot;7, 3, 1&quot; sends reminders 7, 3, and 1 day(s) before due date
@@ -281,11 +277,9 @@ export default function SettingsPage() {
           </div>
         </section>
 
-        <hr className="border-slate-200" />
-
         {/* Meta info */}
         {org && (
-          <section>
+          <section className="rounded-xl border border-slate-200 bg-white p-6">
             <h2 className="text-lg font-semibold text-slate-900">
               Info
             </h2>
@@ -311,23 +305,25 @@ export default function SettingsPage() {
         )}
 
         {isAdmin && (
-          <div className="flex gap-3 pt-4">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50"
-            >
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </button>
-            <button
-              type="button"
-              onClick={loadSettings}
-              disabled={isSaving}
-              className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50"
-            >
-              Reset
-            </button>
-          </div>
+          <section className="rounded-xl border border-slate-200 bg-white p-6">
+            <div className="flex items-center gap-3">
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-xs hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button
+                type="button"
+                onClick={loadSettings}
+                disabled={isSaving}
+                className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-xs hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50"
+              >
+                Reset
+              </button>
+            </div>
+          </section>
         )}
       </form>
     </div>

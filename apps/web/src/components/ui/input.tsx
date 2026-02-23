@@ -22,14 +22,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
-          className={`block w-full h-9 px-3 text-sm text-slate-900 bg-white
-            border rounded-md
+          className={`block w-full h-10 px-3 text-sm text-slate-900 bg-white
+            border rounded-lg
             transition-[border-color,box-shadow] duration-150 ease-out
             placeholder:text-slate-400
-            hover:border-slate-400
+            hover:border-slate-300
             focus:border-brand-500 focus:shadow-ring focus:outline-none
             disabled:opacity-50 disabled:cursor-not-allowed
-            ${error ? 'border-error-500 focus:shadow-ring-error' : 'border-slate-300'}
+            ${error ? 'border-error-500 focus:shadow-ring-error' : 'border-slate-200'}
             ${className}`}
           {...props}
         />

@@ -38,7 +38,7 @@ export default function OnboardingPipelinePage() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Onboarding Pipeline
           </h1>
           <p className="mt-1 text-sm text-slate-500">

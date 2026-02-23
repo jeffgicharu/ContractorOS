@@ -99,7 +99,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Profile
         </h1>
         <div className="mt-8 flex items-center justify-center py-20">
@@ -112,10 +112,10 @@ export default function ProfilePage() {
   if (error) {
     return (
       <div>
-        <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Profile
         </h1>
-        <div className="mt-8 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mt-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       </div>
@@ -124,7 +124,7 @@ export default function ProfilePage() {
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">
         Profile
       </h1>
       <p className="mt-1 text-sm text-slate-500">
@@ -135,7 +135,7 @@ export default function ProfilePage() {
         {/* Profile Card */}
         <div className="lg:col-span-2 space-y-6">
           {/* Personal Information */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
             <h2 className="text-lg font-semibold text-slate-900">
               Personal Information
             </h2>
@@ -178,7 +178,7 @@ export default function ProfilePage() {
                 </label>
                 <p className="mt-1">
                   <span
-                    className={`rounded-sm px-2 py-0.5 text-xs font-medium capitalize ${
+                    className={`rounded-md px-2 py-0.5 text-xs font-medium capitalize ${
                       STATUS_COLORS[profile?.status ?? ''] ??
                       'bg-slate-100 text-slate-600'
                     }`}
@@ -205,12 +205,12 @@ export default function ProfilePage() {
           </div>
 
           {/* Document Status */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
             <h2 className="text-lg font-semibold text-slate-900">
               Compliance Status
             </h2>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-md border border-slate-100 p-4">
+              <div className="rounded-lg border border-slate-100 p-4">
                 <p className="text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   W-9 on File
                 </p>
@@ -222,7 +222,7 @@ export default function ProfilePage() {
                   )}
                 </p>
               </div>
-              <div className="rounded-md border border-slate-100 p-4">
+              <div className="rounded-lg border border-slate-100 p-4">
                 <p className="text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Contract
                 </p>
@@ -234,7 +234,7 @@ export default function ProfilePage() {
                   )}
                 </p>
               </div>
-              <div className="rounded-md border border-slate-100 p-4">
+              <div className="rounded-lg border border-slate-100 p-4">
                 <p className="text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Expiring Documents
                 </p>
@@ -246,18 +246,18 @@ export default function ProfilePage() {
           </div>
 
           {/* Change Password */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
             <h2 className="text-lg font-semibold text-slate-900">
               Change Password
             </h2>
 
             {passwordError && (
-              <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+              <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
                 {passwordError}
               </div>
             )}
             {passwordSuccess && (
-              <div className="mt-3 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700">
+              <div className="mt-3 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700">
                 {passwordSuccess}
               </div>
             )}
@@ -276,7 +276,7 @@ export default function ProfilePage() {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   required
-                  className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
               <div>
@@ -293,7 +293,7 @@ export default function ProfilePage() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
               <div>
@@ -310,13 +310,13 @@ export default function ProfilePage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
               <button
                 type="submit"
                 disabled={isChangingPassword}
-                className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50"
+                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-xs hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50"
               >
                 {isChangingPassword ? 'Changing...' : 'Change Password'}
               </button>
@@ -327,7 +327,7 @@ export default function ProfilePage() {
         {/* Sidebar Stats */}
         <div className="space-y-6">
           {/* Avatar + Name */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm text-center">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs text-center">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-brand-500 text-2xl font-bold text-white">
               {profile?.firstName?.[0]}
               {profile?.lastName?.[0]}
@@ -338,7 +338,7 @@ export default function ProfilePage() {
             <p className="text-sm text-slate-500">{user?.email}</p>
             <p className="mt-1">
               <span
-                className={`rounded-sm px-2 py-0.5 text-xs font-medium capitalize ${
+                className={`rounded-md px-2 py-0.5 text-xs font-medium capitalize ${
                   STATUS_COLORS[profile?.status ?? ''] ??
                   'bg-slate-100 text-slate-600'
                 }`}
@@ -349,7 +349,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
             <h3 className="text-sm font-semibold text-slate-900">
               Quick Stats
             </h3>
@@ -388,7 +388,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Contractor ID */}
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
             <h3 className="text-sm font-semibold text-slate-900">
               Contractor ID
             </h3>

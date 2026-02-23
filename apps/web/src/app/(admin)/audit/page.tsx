@@ -81,7 +81,7 @@ export default function AuditPage() {
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">
         Audit Log
       </h1>
       <p className="mt-1 text-sm text-slate-500">
@@ -102,29 +102,29 @@ export default function AuditPage() {
             <p className="text-sm text-slate-500">{error}</p>
           </div>
         ) : events.length === 0 ? (
-          <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
             <p className="text-sm text-slate-400">No audit events found.</p>
           </div>
         ) : (
           <>
-            <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
+                  <tr className="border-b border-slate-200 bg-slate-50/50">
                     <th className="w-8 px-4 py-3" />
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Timestamp
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       User
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Entity
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Action
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Entity ID
                     </th>
                   </tr>
@@ -133,7 +133,7 @@ export default function AuditPage() {
                   {events.map((event) => (
                     <Fragment key={event.id}>
                       <tr
-                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50 cursor-pointer"
+                        className="border-b border-slate-50 last:border-0 hover:bg-slate-50 cursor-pointer"
                         onClick={() =>
                           setExpandedId(expandedId === event.id ? null : event.id)
                         }
@@ -158,7 +158,7 @@ export default function AuditPage() {
                           {event.userEmail ?? event.userId ?? '—'}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="rounded-sm bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                             {event.entityType}
                           </span>
                         </td>
@@ -170,7 +170,7 @@ export default function AuditPage() {
                         </td>
                       </tr>
                       {expandedId === event.id && (
-                        <tr key={`${event.id}-diff`} className="border-b border-slate-100">
+                        <tr key={`${event.id}-diff`} className="border-b border-slate-50">
                           <td colSpan={6} className="bg-slate-50 px-8 py-4">
                             <AuditDiffViewer
                               oldValues={event.oldValues}
@@ -195,7 +195,7 @@ export default function AuditPage() {
                     type="button"
                     disabled={meta.page <= 1}
                     onClick={() => setMeta((prev) => ({ ...prev, page: prev.page - 1 }))}
-                    className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                   >
                     Previous
                   </button>
@@ -203,7 +203,7 @@ export default function AuditPage() {
                     type="button"
                     disabled={meta.page >= meta.totalPages}
                     onClick={() => setMeta((prev) => ({ ...prev, page: prev.page + 1 }))}
-                    className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                   >
                     Next
                   </button>
@@ -232,7 +232,7 @@ function ActionBadge({ action }: { action: string }) {
   const color = colorMap[action] ?? 'bg-slate-100 text-slate-600';
 
   return (
-    <span className={`rounded-sm px-2 py-0.5 text-xs font-medium ${color}`}>
+    <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${color}`}>
       {action}
     </span>
   );

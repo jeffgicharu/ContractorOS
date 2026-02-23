@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Users, FileText, ShieldAlert, CheckCircle } from 'lucide-react';
 import { api } from '@/lib/api-client';
+import { StatCardGroup } from '@/components/ui/stat-card';
 import {
   BarChart,
   Bar,
@@ -160,16 +162,16 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div>
-        <h1 className="text-[30px] font-bold leading-tight text-slate-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">Overview of your contractor operations</p>
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-32 animate-pulse rounded-lg border border-slate-200 bg-slate-50" />
+            <div key={i} className="h-32 animate-pulse rounded-xl border border-slate-200 bg-slate-50" />
           ))}
         </div>
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="h-72 animate-pulse rounded-lg border border-slate-200 bg-slate-50" />
-          <div className="h-72 animate-pulse rounded-lg border border-slate-200 bg-slate-50" />
+          <div className="h-72 animate-pulse rounded-xl border border-slate-200 bg-slate-50" />
+          <div className="h-72 animate-pulse rounded-xl border border-slate-200 bg-slate-50" />
         </div>
       </div>
     );
@@ -177,49 +179,25 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">Dashboard</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard</h1>
       <p className="mt-1 text-sm text-slate-500">Overview of your contractor operations</p>
 
       {/* Stats Cards */}
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link href="/contractors" className="group rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <p className="text-sm font-medium text-slate-500">Active Contractors</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {stats?.activeContractors ?? 0}
-          </p>
-          <p className="mt-1 text-xs text-brand-600 opacity-0 transition-opacity group-hover:opacity-100">View all &rarr;</p>
-        </Link>
-
-        <Link href="/invoices" className="group rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <p className="text-sm font-medium text-slate-500">Pending Invoices</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {stats?.pendingInvoices ?? 0}
-          </p>
-          <p className="mt-1 text-xs text-brand-600 opacity-0 transition-opacity group-hover:opacity-100">Review &rarr;</p>
-        </Link>
-
-        <Link href="/classification" className="group rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <p className="text-sm font-medium text-slate-500">Risk Alerts</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {(stats?.riskSummary?.high ?? 0) + (stats?.riskSummary?.critical ?? 0)}
-          </p>
-          <p className="mt-1 text-xs text-slate-400">High + Critical risk</p>
-        </Link>
-
-        <Link href="/documents" className="group rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-          <p className="text-sm font-medium text-slate-500">Document Compliance</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {stats?.complianceRate ?? 0}%
-          </p>
-          <p className="mt-1 text-xs text-brand-600 opacity-0 transition-opacity group-hover:opacity-100">View report &rarr;</p>
-        </Link>
-      </div>
+      <StatCardGroup
+        stats={[
+          { label: 'Active Contractors', value: stats?.activeContractors ?? 0, icon: Users, iconBg: 'bg-brand-50', iconColor: 'text-brand-500' },
+          { label: 'Pending Invoices', value: stats?.pendingInvoices ?? 0, icon: FileText, iconBg: 'bg-warning-50', iconColor: 'text-warning-500' },
+          { label: 'Risk Alerts', value: (stats?.riskSummary?.high ?? 0) + (stats?.riskSummary?.critical ?? 0), icon: ShieldAlert, iconBg: 'bg-error-50', iconColor: 'text-error-500' },
+          { label: 'Compliance Rate', value: `${stats?.complianceRate ?? 0}%`, icon: CheckCircle, iconBg: 'bg-success-50', iconColor: 'text-success-500' },
+        ]}
+        className="mt-8"
+      />
 
       {/* Charts Row 1: Revenue + Invoice Breakdown */}
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Monthly Revenue - takes 2 cols */}
-        <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
-          <h2 className="text-sm font-semibold text-slate-900">Monthly Revenue</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs lg:col-span-2">
+          <h2 className="text-sm font-medium text-slate-900">Monthly Revenue</h2>
           <p className="mt-1 text-xs text-slate-400">Last 6 months of paid invoices</p>
           {charts?.monthlyRevenue && charts.monthlyRevenue.length > 0 ? (
             <div className="mt-4 h-64">
@@ -250,8 +228,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Invoice Status Breakdown - Donut */}
-        <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Invoice Status</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+          <h2 className="text-sm font-medium text-slate-900">Invoice Status</h2>
           <p className="mt-1 text-xs text-slate-400">Current distribution</p>
           {charts?.invoiceBreakdown && charts.invoiceBreakdown.length > 0 ? (
             <div className="mt-4 h-64">
@@ -293,8 +271,8 @@ export default function DashboardPage() {
       {/* Charts Row 2: Contractor Breakdown + Risk Distribution */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Contractor Status Breakdown */}
-        <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Contractor Status</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+          <h2 className="text-sm font-medium text-slate-900">Contractor Status</h2>
           <p className="mt-1 text-xs text-slate-400">Breakdown by lifecycle stage</p>
           {charts?.contractorBreakdown && charts.contractorBreakdown.length > 0 ? (
             <div className="mt-4 h-64">
@@ -332,8 +310,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Risk Distribution + Top Risk */}
-        <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Risk Distribution</h2>
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+          <h2 className="text-sm font-medium text-slate-900">Risk Distribution</h2>
           <p className="mt-1 text-xs text-slate-400">Classification risk levels</p>
           {stats?.riskSummary && stats.riskSummary.total > 0 ? (
             <div className="mt-4">
@@ -357,7 +335,7 @@ export default function DashboardPage() {
 
               {stats.topRiskContractors.length > 0 && (
                 <div className="mt-6 border-t border-slate-100 pt-4">
-                  <h3 className="text-xs font-semibold uppercase tracking-[0.05em] text-slate-400">Top Risk</h3>
+                  <h3 className="text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Top Risk</h3>
                   <div className="mt-2 space-y-2">
                     {stats.topRiskContractors.map((c) => (
                       <Link
@@ -368,7 +346,7 @@ export default function DashboardPage() {
                         <span className="text-sm text-slate-700">{c.contractorName}</span>
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs text-slate-500" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.overallScore}</span>
-                          <span className={`rounded-sm px-2 py-0.5 text-xs font-medium ${RISK_COLORS[c.overallRisk] ?? 'bg-slate-100 text-slate-600'}`}>
+                          <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${RISK_COLORS[c.overallRisk] ?? 'bg-slate-100 text-slate-600'}`}>
                             {c.overallRisk}
                           </span>
                         </div>
@@ -387,22 +365,22 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-slate-900">Quick Actions</h2>
+      <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
+        <h2 className="text-sm font-medium text-slate-900">Quick Actions</h2>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/contractors/new" className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
+          <Link href="/contractors/new" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
             Invite Contractor
           </Link>
-          <Link href="/invoices" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <Link href="/invoices" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
             Review Invoices
           </Link>
-          <Link href="/onboarding" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <Link href="/onboarding" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
             Onboarding Pipeline
           </Link>
-          <Link href="/documents" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <Link href="/documents" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
             Document Vault
           </Link>
-          <Link href="/classification" className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <Link href="/classification" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
             Risk Dashboard
           </Link>
         </div>

@@ -55,7 +55,7 @@ export default function PortalTimeEntriesPage() {
     <div>
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Time Entries
           </h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -74,7 +74,7 @@ export default function PortalTimeEntriesPage() {
             type="date"
             value={dateFrom}
             onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
-            className="h-8 px-2 text-sm border border-slate-300 rounded-md focus:border-brand-500 focus:outline-none"
+            className="h-8 px-2 text-sm border border-slate-200 rounded-lg focus:border-brand-500 focus:outline-none"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export default function PortalTimeEntriesPage() {
             type="date"
             value={dateTo}
             onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
-            className="h-8 px-2 text-sm border border-slate-300 rounded-md focus:border-brand-500 focus:outline-none"
+            className="h-8 px-2 text-sm border border-slate-200 rounded-lg focus:border-brand-500 focus:outline-none"
           />
         </div>
         {(dateFrom || dateTo) && (
@@ -107,24 +107,24 @@ export default function PortalTimeEntriesPage() {
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
         </div>
       ) : entries.length === 0 ? (
-        <div className="mt-6 rounded-lg border border-slate-200 bg-white p-8 text-center">
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-8 text-center">
           <p className="text-sm text-slate-500">No time entries yet. Click "Log Time" to get started.</p>
         </div>
       ) : (
-        <div className="mt-4 rounded-lg border border-slate-200 bg-white overflow-hidden">
+        <div className="mt-4 rounded-xl border border-slate-200 bg-white overflow-hidden">
           <table className="w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-slate-50">
-                <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500 border-b border-slate-200">
+              <tr className="bg-slate-50/50">
+                <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
                   Date
                 </th>
-                <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500 border-b border-slate-200">
+                <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
                   Hours
                 </th>
-                <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.05em] text-slate-500 border-b border-slate-200">
+                <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
                   Description
                 </th>
-                <th className="sticky top-0 z-10 bg-slate-50 px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.05em] text-slate-500 border-b border-slate-200">
+                <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
                   Actions
                 </th>
               </tr>
@@ -132,16 +132,16 @@ export default function PortalTimeEntriesPage() {
             <tbody>
               {entries.map((entry) => (
                 <tr key={entry.id} className="group hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-3 text-[13px] text-slate-900 border-b border-slate-100">
+                  <td className="px-4 py-3 text-[13px] text-slate-900 border-b border-slate-50">
                     {formatDate(entry.entryDate)}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-right font-mono text-slate-900 border-b border-slate-100" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  <td className="px-4 py-3 text-[13px] text-right font-mono text-slate-900 border-b border-slate-50" style={{ fontVariantNumeric: 'tabular-nums' }}>
                     {entry.hours.toFixed(1)}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-600 border-b border-slate-100">
+                  <td className="px-4 py-3 text-[13px] text-slate-600 border-b border-slate-50">
                     {entry.description}
                   </td>
-                  <td className="px-4 py-3 text-right border-b border-slate-100">
+                  <td className="px-4 py-3 text-right border-b border-slate-50">
                     <button
                       type="button"
                       onClick={() => handleDelete(entry.id)}
@@ -168,7 +168,7 @@ export default function PortalTimeEntriesPage() {
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -176,7 +176,7 @@ export default function PortalTimeEntriesPage() {
               type="button"
               onClick={() => setPage((p) => p + 1)}
               disabled={page >= meta.totalPages}
-              className="px-3 py-1.5 text-sm border border-slate-200 rounded-md hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>

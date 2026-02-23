@@ -59,7 +59,7 @@ export function InvoiceStatusBadge({ status }: InvoiceStatusBadgeProps) {
   const config = STATUS_CONFIG[status];
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-sm ${config.bg} ${config.text}`}
+      className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md ${config.bg} ${config.text}`}
     >
       {config.label}
     </span>

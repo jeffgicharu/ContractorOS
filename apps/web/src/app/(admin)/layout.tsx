@@ -31,11 +31,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex flex-1 flex-col pl-64">
-        <Header />
-        <main className="flex-1 px-8 py-6">
-          <div className="mx-auto max-w-[1280px]">{children}</div>
-        </main>
+      <div className="flex flex-1 flex-col pl-[240px]">
+        <div className="relative z-10 flex min-h-screen flex-1 flex-col rounded-l-[20px] bg-slate-50 shadow-[inset_1px_0_0_0_rgba(0,0,0,0.04)]">
+          <Header />
+          <main className="flex-1 px-8 py-8">
+            <div className="mx-auto max-w-[1280px]">{children}</div>
+          </main>
+        </div>
       </div>
     </div>
   );

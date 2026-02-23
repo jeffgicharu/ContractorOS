@@ -57,7 +57,7 @@ export default function LoginPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {apiError && (
-        <div className="rounded-md bg-error-50 border border-error-200 px-4 py-3">
+        <div className="rounded-lg bg-error-50 border border-error-200 px-4 py-3">
           <p className="text-sm text-error-700">{apiError}</p>
         </div>
       )}

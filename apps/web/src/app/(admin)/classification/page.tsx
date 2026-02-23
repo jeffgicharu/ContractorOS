@@ -51,7 +51,7 @@ export default function ClassificationPage() {
 
   return (
     <div>
-      <h1 className="text-[30px] font-bold leading-tight text-slate-900">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900">
         Classification Risk Monitor
       </h1>
       <p className="mt-1 text-sm text-slate-500">
@@ -66,7 +66,7 @@ export default function ClassificationPage() {
           return (
             <div
               key={level}
-              className={`rounded-lg border border-slate-200 ${config.bg} p-5`}
+              className={`rounded-xl border border-slate-200 ${config.bg} p-5`}
             >
               <div className="text-xs font-medium uppercase tracking-[0.05em] text-slate-500">
                 {config.label} Risk
@@ -83,7 +83,7 @@ export default function ClassificationPage() {
       {summary.total > 0 && (
         <div className="mt-6">
           <h2 className="text-base font-semibold text-slate-900">Risk Distribution</h2>
-          <div className="mt-3 flex h-8 overflow-hidden rounded-md">
+          <div className="mt-3 flex h-8 overflow-hidden rounded-lg">
             {(['low', 'medium', 'high', 'critical'] as const).map((level) => {
               const count = summary[level];
               if (count === 0) return null;
@@ -106,7 +106,7 @@ export default function ClassificationPage() {
               const config = RISK_COLORS[level]!;
               return (
                 <div key={level} className="flex items-center gap-1.5 text-xs text-slate-500">
-                  <span className={`h-2.5 w-2.5 rounded-sm ${config.bar}`} />
+                  <span className={`h-2.5 w-2.5 rounded-md ${config.bar}`} />
                   {config.label} ({summary[level]})
                 </div>
               );
@@ -119,7 +119,7 @@ export default function ClassificationPage() {
       <div className="mt-8">
         <h2 className="text-base font-semibold text-slate-900">Top Risk Contractors</h2>
         {topRiskContractors.length === 0 ? (
-          <div className="mt-3 rounded-lg border border-slate-200 bg-white p-6 text-center">
+          <div className="mt-3 rounded-xl border border-slate-200 bg-white p-6 text-center">
             <p className="text-sm text-slate-400">No contractors have been assessed yet.</p>
           </div>
         ) : (
