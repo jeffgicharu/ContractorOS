@@ -67,7 +67,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   const breadcrumbs = useBreadcrumbs();
 
   return (
-    <header className="flex h-10 items-center justify-between px-4 pt-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-20 flex h-14 items-center justify-between bg-slate-50 px-4 sm:px-6 lg:px-8">
       {/* Left: Hamburger + Breadcrumbs */}
       <div className="flex min-w-0 flex-1 items-center gap-2">
         {onMenuToggle && (
