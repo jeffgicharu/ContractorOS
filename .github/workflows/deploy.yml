@@ -57,11 +57,12 @@ jobs:
             --include='apps/api/src/' \
             --include='apps/api/src/database/' \
             --include='apps/api/src/database/migrations/***' \
+            --include='apps/api/src/database/seeds/***' \
             --include='apps/web/' \
             --include='apps/web/.next/***' \
             --include='apps/web/public/***' \
             --include='apps/web/package.json' \
-            --include='apps/web/next.config.ts' \
+            --include='apps/web/next.config.mjs' \
             --include='packages/***' \
             --include='package.json' \
             --include='pnpm-lock.yaml' \
@@ -80,6 +81,10 @@ jobs:
           script: |
             set -e
             cd /REDACTED_PATH/current
+
+            # Symlink env files for dotenv
+            ln -sf /REDACTED_PATH/.env.api apps/api/.env
+            ln -sf /REDACTED_PATH/.env.web apps/web/.env
 
             # Install production dependencies
             pnpm install --frozen-lockfile --prod
