@@ -108,13 +108,13 @@ export default function OffboardingPage() {
         ) : (
           <>
             <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-              <table className="min-w-[700px] w-full">
+              <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/50">
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Contractor
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                       Reason
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -123,10 +123,10 @@ export default function OffboardingPage() {
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Progress
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                       Effective Date
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                       Created
                     </th>
                   </tr>
@@ -145,7 +145,7 @@ export default function OffboardingPage() {
                           {w.contractorName}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-[13px] text-slate-600">
+                      <td className="px-4 py-3 text-[13px] text-slate-600 hidden sm:table-cell">
                         {REASON_LABELS[w.reason] ?? w.reason}
                       </td>
                       <td className="px-4 py-3">
@@ -164,10 +164,10 @@ export default function OffboardingPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-[13px] text-slate-600">
+                      <td className="px-4 py-3 text-[13px] text-slate-600 hidden sm:table-cell">
                         {formatDate(w.effectiveDate)}
                       </td>
-                      <td className="px-4 py-3 text-[13px] text-slate-500">
+                      <td className="px-4 py-3 text-[13px] text-slate-500 hidden sm:table-cell">
                         {formatDate(w.createdAt)}
                       </td>
                     </tr>

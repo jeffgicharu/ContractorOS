@@ -137,7 +137,7 @@ export default function ContractorListPage() {
 
       {/* Table */}
       <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <table className="min-w-[640px] w-full border-separate border-spacing-0">
+        <table className="w-full border-separate border-spacing-0">
           <thead>
             <tr>
               <th
@@ -147,7 +147,7 @@ export default function ContractorListPage() {
                 Name <SortIcon field="first_name" />
               </th>
               <th
-                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none"
+                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none hidden sm:table-cell"
                 onClick={() => handleSort('email')}
               >
                 Email <SortIcon field="email" />
@@ -158,11 +158,11 @@ export default function ContractorListPage() {
               >
                 Status <SortIcon field="status" />
               </th>
-              <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
+              <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 hidden sm:table-cell">
                 Type
               </th>
               <th
-                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none"
+                className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 cursor-pointer select-none hidden sm:table-cell"
                 onClick={() => handleSort('created_at')}
               >
                 Created <SortIcon field="created_at" />
@@ -201,16 +201,16 @@ export default function ContractorListPage() {
                       {contractor.firstName} {contractor.lastName}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50">
+                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50 hidden sm:table-cell">
                     {contractor.email}
                   </td>
                   <td className="px-4 py-3 border-b border-slate-50">
                     <ContractorStatusBadge status={contractor.status} />
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50 capitalize">
+                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50 capitalize hidden sm:table-cell">
                     {contractor.type}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50">
+                  <td className="px-4 py-3 text-[13px] text-slate-500 border-b border-slate-50 hidden sm:table-cell">
                     {formatDate(contractor.createdAt)}
                   </td>
                 </tr>

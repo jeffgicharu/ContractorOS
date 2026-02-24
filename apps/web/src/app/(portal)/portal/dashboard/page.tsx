@@ -186,13 +186,13 @@ export default function PortalDashboardPage() {
         </div>
 
         {recentInvoices.length > 0 ? (
-          <table className="min-w-[500px] w-full">
+          <table className="w-full">
             <thead>
               <tr className="border-b border-slate-50 bg-slate-50/50">
                 <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Invoice #</th>
                 <th className="px-6 py-2 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Amount</th>
                 <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Status</th>
-                <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Date</th>
+                <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">Date</th>
               </tr>
             </thead>
             <tbody>
@@ -215,7 +215,7 @@ export default function PortalDashboardPage() {
                       {inv.status.replace(/_/g, ' ')}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-sm text-slate-500">
+                  <td className="px-6 py-3 text-sm text-slate-500 hidden sm:table-cell">
                     {new Date(inv.submittedAt ?? inv.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </td>
                 </tr>

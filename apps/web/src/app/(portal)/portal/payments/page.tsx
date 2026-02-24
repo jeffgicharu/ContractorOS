@@ -136,19 +136,19 @@ export default function PortalPaymentsPage() {
 
       {/* Payments Table */}
       <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
-        <table className="min-w-[500px] w-full">
+        <table className="w-full">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/50">
               <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Invoice
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                 Period
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                 Due Date
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -191,13 +191,13 @@ export default function PortalPaymentsPage() {
                       {inv.invoiceNumber}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-600">
+                  <td className="px-4 py-3 text-[13px] text-slate-600 hidden sm:table-cell">
                     {formatDate(inv.periodStart)} – {formatDate(inv.periodEnd)}
                   </td>
                   <td className="px-4 py-3">
                     <InvoiceStatusBadge status={inv.status} />
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-600">
+                  <td className="px-4 py-3 text-[13px] text-slate-600 hidden sm:table-cell">
                     {formatDate(inv.dueDate)}
                   </td>
                   <td

@@ -245,16 +245,16 @@ export default function InvoiceDetailPage() {
         <div className="px-6 py-4 border-b border-slate-50">
           <h3 className="text-base font-semibold text-slate-900">Line Items</h3>
         </div>
-        <table className="min-w-[600px] w-full border-separate border-spacing-0">
+        <table className="w-full border-separate border-spacing-0">
           <thead>
             <tr className="bg-slate-50/50">
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Description
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                 Qty
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                 Unit Price
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -266,10 +266,10 @@ export default function InvoiceDetailPage() {
             {invoice.lineItems.map((item) => (
               <tr key={item.id} className="border-b border-slate-50">
                 <td className="px-6 py-3 text-[13px] text-slate-700">{item.description}</td>
-                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
+                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700 hidden sm:table-cell">
                   {item.quantity}
                 </td>
-                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
+                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700 hidden sm:table-cell">
                   {formatCurrency(item.unitPrice)}
                 </td>
                 <td className="px-6 py-3 text-right text-[13px] font-mono font-medium text-slate-900">

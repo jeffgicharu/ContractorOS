@@ -91,7 +91,7 @@ export default function DocumentVaultPage() {
             <p className="text-sm text-slate-500">No contractors match this filter.</p>
           </div>
         ) : (
-          <table className="min-w-[640px] w-full border-separate border-spacing-0">
+          <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -100,10 +100,10 @@ export default function DocumentVaultPage() {
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   W-9 / W-8BEN
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   Contract
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   Expiring Docs
                 </th>
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -132,10 +132,10 @@ export default function DocumentVaultPage() {
                     <td className="px-4">
                       <DocumentStatusBadge status={hasTaxForm ? 'current' : 'missing'} />
                     </td>
-                    <td className="px-4">
+                    <td className="px-4 hidden sm:table-cell">
                       <DocumentStatusBadge status={hasContract ? 'current' : 'missing'} />
                     </td>
-                    <td className="px-4 text-[13px] text-slate-600">
+                    <td className="px-4 text-[13px] text-slate-600 hidden sm:table-cell">
                       {entry.expiringDocuments.length > 0 ? (
                         <span className="text-warning-600 font-medium">
                           {entry.expiringDocuments.map((d) => getDocTypeLabel(d.type)).join(', ')}

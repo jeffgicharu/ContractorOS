@@ -75,7 +75,7 @@ export default function TaxReadinessPage() {
             <p className="text-sm text-slate-500">No domestic contractors found.</p>
           </div>
         ) : (
-          <table className="min-w-[640px] w-full border-separate border-spacing-0">
+          <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -87,7 +87,7 @@ export default function TaxReadinessPage() {
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   W-9 Status
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   Requires 1099
                 </th>
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -107,7 +107,7 @@ export default function TaxReadinessPage() {
                   <td className="px-4">
                     <DocumentStatusBadge status={entry.hasCurrentW9 ? 'current' : 'missing'} />
                   </td>
-                  <td className="px-4 text-[13px] text-slate-600">
+                  <td className="px-4 text-[13px] text-slate-600 hidden sm:table-cell">
                     {entry.requires1099 ? (
                       <span className="font-medium text-slate-900">Yes</span>
                     ) : (

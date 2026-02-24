@@ -112,7 +112,7 @@ export default function PortalTimeEntriesPage() {
         </div>
       ) : (
         <div className="mt-4 rounded-xl border border-slate-200 bg-white overflow-x-auto">
-          <table className="min-w-[500px] w-full border-separate border-spacing-0">
+          <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
@@ -121,7 +121,7 @@ export default function PortalTimeEntriesPage() {
                 <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
                   Hours
                 </th>
-                <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
+                <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200 hidden sm:table-cell">
                   Description
                 </th>
                 <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">
@@ -138,7 +138,7 @@ export default function PortalTimeEntriesPage() {
                   <td className="px-4 py-3 text-[13px] text-right font-mono text-slate-900 border-b border-slate-50" style={{ fontVariantNumeric: 'tabular-nums' }}>
                     {entry.hours.toFixed(1)}
                   </td>
-                  <td className="px-4 py-3 text-[13px] text-slate-600 border-b border-slate-50">
+                  <td className="px-4 py-3 text-[13px] text-slate-600 border-b border-slate-50 hidden sm:table-cell">
                     {entry.description}
                   </td>
                   <td className="px-4 py-3 text-right border-b border-slate-50">

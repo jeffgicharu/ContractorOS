@@ -89,7 +89,7 @@ export default function InvoicesPage() {
             <p className="text-sm text-slate-500">No invoices found.</p>
           </div>
         ) : (
-          <table className="min-w-[700px] w-full border-separate border-spacing-0">
+          <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -104,10 +104,10 @@ export default function InvoicesPage() {
                 <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Amount
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   Submitted
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   Due Date
                 </th>
               </tr>
@@ -131,10 +131,10 @@ export default function InvoicesPage() {
                   <td className="px-4 text-right text-[13px] font-mono text-slate-900">
                     {formatCurrency(inv.totalAmount)}
                   </td>
-                  <td className="px-4 text-[13px] text-slate-600">
+                  <td className="px-4 text-[13px] text-slate-600 hidden sm:table-cell">
                     {formatDate(inv.submittedAt)}
                   </td>
-                  <td className="px-4 text-[13px] text-slate-600">
+                  <td className="px-4 text-[13px] text-slate-600 hidden sm:table-cell">
                     {formatDate(inv.dueDate)}
                   </td>
                 </tr>
