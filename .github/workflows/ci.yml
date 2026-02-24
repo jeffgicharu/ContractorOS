@@ -196,6 +196,9 @@ jobs:
           npx wait-on http://localhost:3001/api/v1/health http://localhost:3000 --timeout 60000 || true
           sleep 5
 
+      - name: Install Cypress binary
+        run: npx cypress install
+
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
