@@ -105,7 +105,7 @@ export function NotificationDropdown() {
             {unreadCount > 0 && (
               <button
                 type="button"
-                onClick={markAllRead}
+                onClick={() => void markAllRead()}
                 className="text-xs text-brand-500 hover:text-brand-600"
               >
                 Mark all read
@@ -126,7 +126,7 @@ export function NotificationDropdown() {
                   className={`flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 ${
                     !n.readAt ? 'bg-blue-50/40' : ''
                   }`}
-                  onClick={() => handleNotificationClick(n)}
+                  onClick={() => void handleNotificationClick(n)}
                 >
                   <span
                     className={`mt-1 h-2 w-2 flex-shrink-0 rounded-full ${

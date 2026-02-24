@@ -92,7 +92,7 @@ export function ChecklistCard({ workflowId, items, isEditable, onUpdated }: Chec
                     ? 'cursor-pointer hover:bg-slate-50'
                     : ''
               }`}
-              onClick={() => !isNotApplicable && toggleItem(item)}
+              onClick={() => { if (!isNotApplicable) void toggleItem(item); }}
             >
               <span
                 className={`flex h-5 w-5 items-center justify-center rounded text-[11px] font-bold ${iconConfig.className} ${

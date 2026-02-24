@@ -15,7 +15,7 @@ interface TimeEntryFormProps {
 }
 
 export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
-  const [engagements, setEngagements] = useState<Engagement[]>([]);
+  const [engagements] = useState<Engagement[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -84,7 +84,7 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-4">
           <div>
             <label htmlFor="engagementId" className="block text-sm font-medium text-slate-700 mb-1.5">
               Engagement

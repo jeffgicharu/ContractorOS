@@ -86,7 +86,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
     }
   }
 
-  const json = await response.json();
+  const json: unknown = await response.json();
 
   if (!response.ok) {
     throw new ApiClientError(response.status, (json as ApiError).error);
@@ -133,7 +133,7 @@ export const api = {
       }
     }
 
-    const json = await response.json();
+    const json: unknown = await response.json();
     if (!response.ok) {
       throw new ApiClientError(response.status, (json as ApiError).error);
     }
@@ -153,7 +153,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const json = await response.json();
+      const json: unknown = await response.json();
       throw new ApiClientError(response.status, (json as ApiError).error);
     }
 

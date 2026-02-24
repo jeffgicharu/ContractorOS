@@ -33,7 +33,7 @@ export function TimeEntriesTab({ contractorId }: TimeEntriesTabProps) {
   }, [contractorId, page]);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
 
   if (isLoading) {

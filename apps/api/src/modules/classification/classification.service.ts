@@ -6,6 +6,7 @@ import type {
   ClassificationDashboard,
   FactorCategory,
   FactorSource,
+  NotificationType,
 } from '@contractor-os/shared';
 import { FactorCategory as FC } from '@contractor-os/shared';
 import { ClassificationRepository } from './classification.repository';
@@ -74,7 +75,7 @@ export class ClassificationService {
     if (previousRisk && previousRisk !== overallRisk) {
       this.notificationsService.createForAdmins(
         orgId,
-        'classification_risk_change' as import('@contractor-os/shared').NotificationType,
+        'classification_risk_change' as NotificationType,
         'Risk Level Changed',
         `Contractor risk level changed from ${previousRisk} to ${overallRisk}`,
         { contractorId, oldRisk: previousRisk, newRisk: overallRisk, score: overallScore },

@@ -10,6 +10,7 @@ import {
   type InitiateOffboardingInput,
   type OffboardingStatus,
   type ChecklistStatus,
+  type NotificationType,
   ChecklistItemType,
   OFFBOARDING_TRANSITIONS,
   CONTRACTOR_TRANSITIONS,
@@ -78,7 +79,7 @@ export class OffboardingService {
     const contractorName = `${contractor.first_name} ${contractor.last_name}`;
     this.notificationsService.createForAdmins(
       orgId,
-      'offboarding_started' as import('@contractor-os/shared').NotificationType,
+      'offboarding_started' as NotificationType,
       'Offboarding Started',
       `Offboarding initiated for ${contractorName}`,
       { workflowId: workflow.id, contractorId, contractorName },
@@ -88,7 +89,7 @@ export class OffboardingService {
     if (contractorUserId) {
       this.notificationsService.create(
         contractorUserId,
-        'offboarding_started' as import('@contractor-os/shared').NotificationType,
+        'offboarding_started' as NotificationType,
         'Offboarding Notice',
         `Your offboarding process has been initiated`,
         { workflowId: workflow.id },

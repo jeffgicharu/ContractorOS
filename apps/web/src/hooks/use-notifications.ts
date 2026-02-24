@@ -60,8 +60,8 @@ export function useNotifications() {
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
-    intervalRef.current = setInterval(fetchNotifications, POLL_INTERVAL);
+    void fetchNotifications();
+    intervalRef.current = setInterval(() => void fetchNotifications(), POLL_INTERVAL);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
