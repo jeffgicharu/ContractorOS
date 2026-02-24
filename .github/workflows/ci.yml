@@ -169,6 +169,9 @@ jobs:
           JWT_EXPIRES_IN: 15m
         run: pnpm --filter @contractor-os/api seed
 
+      - name: Build shared package
+        run: pnpm --filter @contractor-os/shared build
+
       - name: Start API server
         env:
           DATABASE_HOST: localhost
@@ -180,9 +183,6 @@ jobs:
           JWT_EXPIRES_IN: 15m
           PORT: 3001
         run: pnpm --filter @contractor-os/api dev &
-
-      - name: Build shared package
-        run: pnpm --filter @contractor-os/shared build
 
       - name: Build and start web app
         env:
@@ -199,7 +199,7 @@ jobs:
         run: pnpm --filter @contractor-os/web exec cypress install
 
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           working-directory: apps/web
           install: false
