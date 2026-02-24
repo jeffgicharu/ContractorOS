@@ -16,7 +16,7 @@ interface RiskScoreGaugeProps {
 }
 
 export function RiskScoreGauge({ score, riskLevel, size = 180 }: RiskScoreGaugeProps) {
-  const config = GAUGE_COLORS[riskLevel] ?? GAUGE_COLORS.low;
+  const config = (GAUGE_COLORS[riskLevel] ?? GAUGE_COLORS['low'])!;
   const center = size / 2;
   const radius = (size - 20) / 2;
   const circumference = 2 * Math.PI * radius;

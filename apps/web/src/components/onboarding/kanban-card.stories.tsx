@@ -16,8 +16,8 @@ const baseContractor = {
   firstName: 'Jane',
   lastName: 'Smith',
   email: 'jane.smith@example.com',
-  status: ContractorStatus.ONBOARDING,
-  type: ContractorType.INDIVIDUAL,
+  status: ContractorStatus.INVITE_SENT,
+  type: ContractorType.DOMESTIC,
   activatedAt: null,
   createdAt: new Date().toISOString(),
 };

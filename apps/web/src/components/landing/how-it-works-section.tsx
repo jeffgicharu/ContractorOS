@@ -78,7 +78,7 @@ export function HowItWorksSection() {
     return () => clearInterval(timer);
   }, [isInView, advance, activeStep]);
 
-  const currentStep = STEPS[activeStep];
+  const currentStep = STEPS[activeStep]!;
 
   return (
     <section

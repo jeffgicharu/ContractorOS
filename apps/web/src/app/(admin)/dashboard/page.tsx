@@ -213,7 +213,7 @@ export default function DashboardPage() {
                   <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
                   <YAxis tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={formatCurrency} />
                   <Tooltip
-                    formatter={(value: number | undefined) => [`$${(value ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Revenue']}
+                    formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Revenue']}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px' }}
                   />
                   <Area type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={2} fill="url(#revenueGradient)" />
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number, name: string) => [value, formatStatus(name)]}
+                    formatter={(value, name) => [Number(value ?? 0), formatStatus(String(name))]}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px' }}
                   />
                   <Legend
@@ -290,8 +290,8 @@ export default function DashboardPage() {
                     tickFormatter={formatStatus}
                   />
                   <Tooltip
-                    formatter={(value: number, _name: string) => [value, 'Count']}
-                    labelFormatter={formatStatus}
+                    formatter={(value) => [Number(value ?? 0), 'Count']}
+                    labelFormatter={(label) => formatStatus(String(label))}
                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px' }}
                   />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>

@@ -162,7 +162,7 @@ export default function PortalDashboardPage() {
                   tickFormatter={(v: number) => v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`}
                 />
                 <Tooltip
-                  formatter={(value: number) => [`$${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Earnings']}
+                  formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Earnings']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px' }}
                 />
                 <Bar dataKey="total" fill="#6366f1" radius={[4, 4, 0, 0]} />
