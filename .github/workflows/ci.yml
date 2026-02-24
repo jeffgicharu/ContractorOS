@@ -174,19 +174,24 @@ jobs:
           NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
         run: pnpm build
 
-      - name: Run Cypress tests
-        uses: cypress-io/github-action@v7
-        with:
-          working-directory: apps/web
-          install: false
-          start: pnpm --filter @contractor-os/api start, pnpm --filter @contractor-os/web start
-          wait-on: 'http://localhost:3001/api/v1/health, http://localhost:3000'
-          wait-on-timeout: 120
+      - name: Start API server
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/contractor_os_e2e
           JWT_SECRET: ci-test-secret
           JWT_EXPIRES_IN: 15m
           PORT: 3001
+        run: pnpm --filter @contractor-os/api start &
+
+      - name: Start web server
+        run: pnpm --filter @contractor-os/web start &
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v7
+        with:
+          working-directory: apps/web
+          install: false
+          wait-on: 'http://localhost:3001/api/v1/health, http://localhost:3000'
+          wait-on-timeout: 120
 
       - name: Upload Cypress artifacts
         uses: actions/upload-artifact@v4
