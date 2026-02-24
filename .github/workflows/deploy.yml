@@ -3,6 +3,13 @@ name: Deploy
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: 'Run database seed after migration'
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy-production
@@ -58,6 +65,7 @@ jobs:
             --include='apps/api/src/database/' \
             --include='apps/api/src/database/migrations/***' \
             --include='apps/api/src/database/seeds/***' \
+            --include='apps/api/src/config/***' \
             --include='apps/web/' \
             --include='apps/web/.next/***' \
             --include='apps/web/public/***' \
@@ -74,10 +82,13 @@ jobs:
 
       - name: Install deps, migrate, restart
         uses: appleboy/ssh-action@v1
+        env:
+          SEED: ${{ github.event.inputs.seed }}
         with:
           host: REDACTED_HOST
           username: deploy
           key: ${{ secrets.VPS_SSH_KEY }}
+          envs: SEED
           script: |
             set -e
             cd /REDACTED_PATH/current
@@ -92,6 +103,12 @@ jobs:
             # Run database migrations
             set -a && source /REDACTED_PATH/.env.api && set +a
             pnpm --filter @contractor-os/api migrate:up
+
+            # Seed database (only when triggered manually with seed=true)
+            if [ "$SEED" = "true" ]; then
+              echo "Running database seed..."
+              pnpm --filter @contractor-os/api seed
+            fi
 
             # Restart PM2 processes
             pm2 startOrRestart ecosystem.config.cjs --env production
