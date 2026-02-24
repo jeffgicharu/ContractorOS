@@ -164,7 +164,7 @@ export default function InvoiceDetailPage() {
       </div>
 
       {/* Info grid */}
-      <div className="mt-6 grid grid-cols-3 gap-4">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Details</h3>
           <dl className="mt-4 space-y-3">

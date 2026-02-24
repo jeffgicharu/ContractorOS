@@ -95,7 +95,7 @@ export default function InvoicesPage() {
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Invoice #
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   Contractor
                 </th>
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -122,7 +122,7 @@ export default function InvoicesPage() {
                   <td className="px-4 text-[13px] font-mono font-medium text-slate-900">
                     {inv.invoiceNumber}
                   </td>
-                  <td className="px-4 text-[13px] text-slate-700">
+                  <td className="px-4 text-[13px] text-slate-700 hidden sm:table-cell">
                     {inv.contractorName}
                   </td>
                   <td className="px-4">

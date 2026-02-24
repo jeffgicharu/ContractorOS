@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div className="flex flex-1 flex-col pl-0 lg:pl-[240px]">
         <div className="relative z-10 flex min-h-screen flex-1 flex-col lg:rounded-l-[20px] bg-slate-50 shadow-[inset_1px_0_0_0_rgba(0,0,0,0.04)]">
           <Header onMenuToggle={handleMenuToggle} />
-          <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          <main className="flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
             <div className="mx-auto max-w-[1280px]">{children}</div>
           </main>
         </div>

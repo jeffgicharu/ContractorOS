@@ -84,7 +84,7 @@ export default function TaxReadinessPage() {
                 <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   YTD Payments
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   W-9 Status
                 </th>
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
@@ -104,7 +104,7 @@ export default function TaxReadinessPage() {
                   <td className="px-4 text-right text-[13px] font-mono text-slate-900" style={{ fontVariantNumeric: 'tabular-nums' }}>
                     {formatCurrency(entry.ytdPayments)}
                   </td>
-                  <td className="px-4">
+                  <td className="px-4 hidden sm:table-cell">
                     <DocumentStatusBadge status={entry.hasCurrentW9 ? 'current' : 'missing'} />
                   </td>
                   <td className="px-4 text-[13px] text-slate-600 hidden sm:table-cell">
