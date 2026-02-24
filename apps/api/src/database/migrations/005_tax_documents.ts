@@ -1,7 +1,7 @@
-import { Pool } from 'pg';
+import type { MigrationBuilder } from 'node-pg-migrate';
 
-export async function up(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function up(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     -- Document type enum
     CREATE TYPE tax_document_type AS ENUM (
       'w9',
@@ -46,8 +46,8 @@ export async function up(pool: Pool): Promise<void> {
   `);
 }
 
-export async function down(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     DROP TABLE IF EXISTS tax_documents CASCADE;
     DROP TYPE IF EXISTS tax_document_type;
   `);

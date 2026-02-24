@@ -1,7 +1,7 @@
-import { Pool } from 'pg';
+import type { MigrationBuilder } from 'node-pg-migrate';
 
-export async function up(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function up(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     -- Invoice status enum
     CREATE TYPE invoice_status AS ENUM (
       'draft', 'submitted', 'under_review', 'approved',
@@ -95,8 +95,8 @@ export async function up(pool: Pool): Promise<void> {
   `);
 }
 
-export async function down(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     DROP TABLE IF EXISTS approval_steps CASCADE;
     DROP TABLE IF EXISTS invoice_status_history CASCADE;
     DROP TABLE IF EXISTS invoice_line_items CASCADE;

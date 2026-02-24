@@ -1,7 +1,7 @@
-import { Pool } from 'pg';
+import type { MigrationBuilder } from 'node-pg-migrate';
 
-export async function up(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function up(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     -- Risk level enum
     CREATE TYPE risk_level AS ENUM ('low', 'medium', 'high', 'critical');
 
@@ -109,8 +109,8 @@ export async function up(pool: Pool): Promise<void> {
   `);
 }
 
-export async function down(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     DROP MATERIALIZED VIEW IF EXISTS mv_classification_risk_summary CASCADE;
     DROP TABLE IF EXISTS classification_factors CASCADE;
     DROP TABLE IF EXISTS classification_assessments CASCADE;

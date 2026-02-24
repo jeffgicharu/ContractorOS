@@ -1,7 +1,7 @@
-import { Pool } from 'pg';
+import type { MigrationBuilder } from 'node-pg-migrate';
 
-export async function up(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function up(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     -- Offboarding status enum
     CREATE TYPE offboarding_status AS ENUM (
       'initiated', 'in_progress', 'pending_final_invoice', 'completed', 'cancelled'
@@ -86,8 +86,8 @@ export async function up(pool: Pool): Promise<void> {
   `);
 }
 
-export async function down(pool: Pool): Promise<void> {
-  await pool.query(`
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(`
     DROP TABLE IF EXISTS equipment CASCADE;
     DROP TABLE IF EXISTS offboarding_checklist_items CASCADE;
     DROP TABLE IF EXISTS offboarding_workflows CASCADE;
