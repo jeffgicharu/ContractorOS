@@ -12,16 +12,17 @@ Cypress.Commands.add('login', (email: string, password: string) => {
   loginViaUI(email, password);
 });
 
-// Programmatic login via API request — avoids React hydration timing issues
-// that cause empty form state when Cypress types before onChange is attached.
+// Programmatic login via API request — sets the httpOnly refresh token cookie
+// without loading a page. Each test then visits its own page, and the
+// AuthProvider restores the session via the refresh cookie on first load.
+// This avoids both hydration timing issues and refresh-token rotation races
+// that occur when loginAs* visits a page before the test body does.
 Cypress.Commands.add('loginAsAdmin', () => {
   cy.request({
     method: 'POST',
     url: `${API_BASE}/auth/login`,
     body: { email: 'admin@acme-corp.com', password: 'Password1' },
   });
-  cy.visit('/dashboard');
-  cy.url({ timeout: 15000 }).should('include', '/dashboard');
 });
 
 Cypress.Commands.add('loginAsContractor', () => {
@@ -30,6 +31,4 @@ Cypress.Commands.add('loginAsContractor', () => {
     url: `${API_BASE}/auth/login`,
     body: { email: 'john.smith@example.com', password: 'Password1' },
   });
-  cy.visit('/portal');
-  cy.url({ timeout: 15000 }).should('include', '/portal');
 });
