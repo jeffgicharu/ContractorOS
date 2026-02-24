@@ -14,7 +14,6 @@
     "migrate:down": "node --import tsx node_modules/node-pg-migrate/bin/node-pg-migrate.js down --migrations-dir src/database/migrations",
     "migrate:create": "node-pg-migrate create --migrations-dir src/database/migrations --tsconfig tsconfig.json",
     "seed": "tsx src/database/seeds/seed.ts",
-    "seed:demo": "tsx src/database/seeds/demo-seed.ts",
     "clean": "rm -rf dist"
   },
   "dependencies": {
