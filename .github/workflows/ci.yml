@@ -197,7 +197,7 @@ jobs:
           sleep 5
 
       - name: Install Cypress binary
-        run: npx cypress install
+        run: pnpm --filter @contractor-os/web exec cypress install
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v6
