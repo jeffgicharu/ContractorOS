@@ -15,7 +15,7 @@ module.exports = {
       name: 'contractoros-web',
       cwd: '/REDACTED_PATH/current/apps/web',
       script: 'node_modules/.bin/next',
-      args: 'start --port 3000',
+      args: 'start --port 3002',
       env_file: '/REDACTED_PATH/.env.web',
       node_args: '--max-old-space-size=768',
       instances: 1,
