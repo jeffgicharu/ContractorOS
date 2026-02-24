@@ -18,8 +18,7 @@ interface StatCardGroupProps {
 export function StatCardGroup({ stats, className = '' }: StatCardGroupProps) {
   return (
     <div
-      className={`grid rounded-xl border border-slate-200 bg-white shadow-xs ${className}`}
-      style={{ gridTemplateColumns: `repeat(${stats.length}, 1fr)` }}
+      className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-slate-200 bg-white shadow-xs ${className}`}
     >
       {stats.map((stat, i) => {
         const Icon = stat.icon;
@@ -27,7 +26,7 @@ export function StatCardGroup({ stats, className = '' }: StatCardGroupProps) {
           <div
             key={stat.label}
             className={`flex items-center gap-4 px-6 py-5 ${
-              i > 0 ? 'border-l border-slate-100' : ''
+              i > 0 ? 'border-t sm:border-t-0 sm:border-l border-slate-100' : ''
             }`}
           >
             {Icon && (

@@ -134,13 +134,13 @@ export default function PortalDocumentsPage() {
       )}
 
       {/* Documents table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
         {documents.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-sm text-slate-500">No documents uploaded yet.</p>
           </div>
         ) : (
-          <table className="w-full border-separate border-spacing-0">
+          <table className="min-w-[700px] w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">

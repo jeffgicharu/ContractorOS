@@ -107,8 +107,8 @@ export default function AuditPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-              <table className="w-full">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+              <table className="min-w-[700px] w-full">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/50">
                     <th className="w-8 px-4 py-3" />

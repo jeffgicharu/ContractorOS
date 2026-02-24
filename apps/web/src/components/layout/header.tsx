@@ -3,7 +3,7 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRight, Search } from 'lucide-react';
+import { ChevronRight, Menu, Search } from 'lucide-react';
 import { NotificationDropdown } from '@/components/notifications/notification-dropdown';
 
 const PATH_LABELS: Record<string, string> = {
@@ -59,34 +59,48 @@ function useBreadcrumbs() {
   return crumbs;
 }
 
-export function Header() {
+interface HeaderProps {
+  onMenuToggle?: () => void;
+}
+
+export function Header({ onMenuToggle }: HeaderProps) {
   const breadcrumbs = useBreadcrumbs();
 
   return (
-    <header className="flex h-10 items-center justify-between px-8 pt-4">
-      {/* Left: Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 text-[13px]">
-        {breadcrumbs.map((crumb, i) => (
-          <Fragment key={crumb.href}>
-            {i > 0 && (
-              <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            )}
-            {i === breadcrumbs.length - 1 ? (
-              <span className="font-medium text-slate-900">{crumb.label}</span>
-            ) : (
-              <Link
-                href={crumb.href}
-                className="text-slate-400 transition-colors hover:text-slate-600"
-              >
-                {crumb.label}
-              </Link>
-            )}
-          </Fragment>
-        ))}
-      </nav>
+    <header className="flex h-10 items-center justify-between px-4 pt-4 sm:px-6 lg:px-8">
+      {/* Left: Hamburger + Breadcrumbs */}
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        {onMenuToggle && (
+          <button
+            onClick={onMenuToggle}
+            className="shrink-0 rounded-lg p-2 text-slate-500 transition-colors hover:bg-white/60 hover:text-slate-700 lg:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        )}
+        <nav className="flex min-w-0 items-center gap-1.5 overflow-hidden text-[13px]">
+          {breadcrumbs.map((crumb, i) => (
+            <Fragment key={crumb.href}>
+              {i > 0 && (
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300" />
+              )}
+              {i === breadcrumbs.length - 1 ? (
+                <span className="truncate font-medium text-slate-900">{crumb.label}</span>
+              ) : (
+                <Link
+                  href={crumb.href}
+                  className="shrink-0 text-slate-400 transition-colors hover:text-slate-600"
+                >
+                  {crumb.label}
+                </Link>
+              )}
+            </Fragment>
+          ))}
+        </nav>
+      </div>
 
       {/* Right: Action icons */}
-      <div className="flex items-center gap-1">
+      <div className="flex shrink-0 items-center gap-1">
         <button className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/60 hover:text-slate-600">
           <Search className="h-[18px] w-[18px]" />
         </button>

@@ -53,7 +53,7 @@ export default function PortalTimeEntriesPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Time Entries
@@ -66,7 +66,7 @@ export default function PortalTimeEntriesPage() {
       </div>
 
       {/* Filters */}
-      <div className="mt-6 flex items-center gap-4">
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-2">
           <label htmlFor="dateFrom" className="text-sm text-slate-600">From</label>
           <input
@@ -111,8 +111,8 @@ export default function PortalTimeEntriesPage() {
           <p className="text-sm text-slate-500">No time entries yet. Click "Log Time" to get started.</p>
         </div>
       ) : (
-        <div className="mt-4 rounded-xl border border-slate-200 bg-white overflow-hidden">
-          <table className="w-full border-separate border-spacing-0">
+        <div className="mt-4 rounded-xl border border-slate-200 bg-white overflow-x-auto">
+          <table className="min-w-[500px] w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 bg-slate-50/50 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 border-b border-slate-200">

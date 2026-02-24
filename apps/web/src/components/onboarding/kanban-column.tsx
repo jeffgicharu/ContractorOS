@@ -9,7 +9,7 @@ interface KanbanColumnProps {
 
 export function KanbanColumn({ title, color, count, children }: KanbanColumnProps) {
   return (
-    <div className="flex flex-1 flex-col rounded-lg bg-white border border-slate-200 overflow-hidden">
+    <div className="flex w-[260px] shrink-0 lg:w-auto lg:flex-1 flex-col rounded-lg bg-white border border-slate-200 overflow-hidden">
       <div
         className="border-b border-slate-200 px-3 py-3"
         style={{ borderTopWidth: '3px', borderTopColor: color, borderTopStyle: 'solid' }}

@@ -17,11 +17,11 @@ interface KanbanBoardProps {
 export function KanbanBoard({ contractors, isLoading }: KanbanBoardProps) {
   if (isLoading) {
     return (
-      <div className="flex gap-3">
+      <div className="flex gap-3 overflow-x-auto pb-4">
         {COLUMNS.map((col) => (
           <div
             key={col.status}
-            className="flex-1 rounded-lg border border-slate-200 bg-white"
+            className="w-[260px] shrink-0 lg:w-auto lg:flex-1 rounded-lg border border-slate-200 bg-white"
             style={{ borderTopWidth: '3px', borderTopColor: col.color, borderTopStyle: 'solid' }}
           >
             <div className="border-b border-slate-200 px-3 py-3">
@@ -48,7 +48,7 @@ export function KanbanBoard({ contractors, isLoading }: KanbanBoardProps) {
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 overflow-x-auto pb-4">
       {COLUMNS.map((col) => {
         const items = grouped.get(col.status) ?? [];
         return (

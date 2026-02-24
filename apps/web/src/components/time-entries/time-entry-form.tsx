@@ -75,7 +75,7 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+      <div className="mx-4 w-full max-w-md rounded-lg bg-white p-4 shadow-xl max-h-[90vh] overflow-y-auto sm:mx-auto sm:p-6">
         <h2 className="text-lg font-semibold text-slate-900">Log Time</h2>
 
         {error && (

@@ -114,7 +114,7 @@ export default function PortalPaymentsPage() {
 
       {/* Status Tabs */}
       <div className="mt-8 border-b border-slate-200">
-        <nav className="-mb-px flex gap-6">
+        <nav className="-mb-px flex gap-6 overflow-x-auto scrollbar-hide">
           {STATUS_TABS.map((tab) => (
             <button
               key={tab.value}
@@ -122,7 +122,7 @@ export default function PortalPaymentsPage() {
                 setStatusFilter(tab.value);
                 setPage(1);
               }}
-              className={`border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
                 statusFilter === tab.value
                   ? 'border-brand-500 text-brand-600'
                   : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
@@ -135,8 +135,8 @@ export default function PortalPaymentsPage() {
       </div>
 
       {/* Payments Table */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
-        <table className="w-full">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+        <table className="min-w-[500px] w-full">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/50">
               <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">

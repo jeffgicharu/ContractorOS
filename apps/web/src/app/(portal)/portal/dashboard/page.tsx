@@ -154,7 +154,7 @@ export default function PortalDashboardPage() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={earnings}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
                 <YAxis
                   tick={{ fontSize: 12, fill: '#64748b' }}
                   axisLine={false}
@@ -177,7 +177,7 @@ export default function PortalDashboardPage() {
       </div>
 
       {/* Recent Invoices */}
-      <div className="mt-8 rounded-xl border border-slate-200 bg-white shadow-xs">
+      <div className="mt-8 rounded-xl border border-slate-200 bg-white shadow-xs overflow-x-auto">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <h2 className="text-sm font-semibold text-slate-900">Recent Invoices</h2>
           <Link href="/portal/invoices" className="text-xs font-medium text-brand-600 hover:text-brand-700">
@@ -186,7 +186,7 @@ export default function PortalDashboardPage() {
         </div>
 
         {recentInvoices.length > 0 ? (
-          <table className="w-full">
+          <table className="min-w-[500px] w-full">
             <thead>
               <tr className="border-b border-slate-50 bg-slate-50/50">
                 <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Invoice #</th>

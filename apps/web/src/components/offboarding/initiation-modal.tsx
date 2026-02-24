@@ -50,7 +50,7 @@ export function InitiationModal({ contractorName, onConfirm, onClose }: Initiati
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+      <div className="relative mx-4 w-full max-w-md rounded-lg bg-white p-4 shadow-xl max-h-[90vh] overflow-y-auto sm:mx-auto sm:p-6">
         <h2 className="text-lg font-semibold text-slate-900">Offboard Contractor</h2>
         <p className="mt-1 text-sm text-slate-500">
           Initiate offboarding for <span className="font-medium text-slate-700">{contractorName}</span>.

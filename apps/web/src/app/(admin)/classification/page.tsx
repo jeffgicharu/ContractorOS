@@ -59,7 +59,7 @@ export default function ClassificationPage() {
       </p>
 
       {/* Summary cards */}
-      <div className="mt-6 grid grid-cols-4 gap-4">
+      <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
         {(['low', 'medium', 'high', 'critical'] as const).map((level) => {
           const config = RISK_COLORS[level]!;
           const count = summary[level];
@@ -123,7 +123,7 @@ export default function ClassificationPage() {
             <p className="text-sm text-slate-400">No contractors have been assessed yet.</p>
           </div>
         ) : (
-          <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {topRiskContractors.map((c) => (
               <RiskSummaryCard
                 key={c.contractorId}

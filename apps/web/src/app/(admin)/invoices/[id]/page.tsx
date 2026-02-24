@@ -241,11 +241,11 @@ export default function InvoiceDetailPage() {
       </div>
 
       {/* Line items table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
         <div className="px-6 py-4 border-b border-slate-50">
           <h3 className="text-base font-semibold text-slate-900">Line Items</h3>
         </div>
-        <table className="w-full border-separate border-spacing-0">
+        <table className="min-w-[600px] w-full border-separate border-spacing-0">
           <thead>
             <tr className="bg-slate-50/50">
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">

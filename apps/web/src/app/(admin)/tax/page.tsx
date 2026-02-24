@@ -33,7 +33,7 @@ export default function TaxReadinessPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           1099 Readiness
         </h1>
@@ -49,7 +49,7 @@ export default function TaxReadinessPage() {
       </div>
 
       {/* Summary cards */}
-      <div className="mt-6 grid grid-cols-3 gap-4">
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-xl shadow-xs border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Requiring 1099</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{requiring1099.length}</p>
@@ -65,7 +65,7 @@ export default function TaxReadinessPage() {
       </div>
 
       {/* Table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -75,7 +75,7 @@ export default function TaxReadinessPage() {
             <p className="text-sm text-slate-500">No domestic contractors found.</p>
           </div>
         ) : (
-          <table className="w-full border-separate border-spacing-0">
+          <table className="min-w-[640px] w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">

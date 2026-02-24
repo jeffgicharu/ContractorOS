@@ -73,13 +73,13 @@ export default function OffboardingPage() {
 
       {/* Status filter tabs */}
       <div className="mt-6 border-b border-slate-200">
-        <nav className="-mb-px flex gap-6">
+        <nav className="-mb-px flex gap-6 overflow-x-auto scrollbar-hide">
           {STATUS_TABS.map((tab) => (
             <button
               key={tab.value}
               type="button"
               onClick={() => handleStatusChange(tab.value)}
-              className={`pb-3 text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 pb-3 text-sm font-medium transition-colors ${
                 statusFilter === tab.value
                   ? 'border-b-2 border-brand-500 text-brand-600'
                   : 'text-slate-500 hover:text-slate-700'
@@ -107,8 +107,8 @@ export default function OffboardingPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-              <table className="w-full">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+              <table className="min-w-[700px] w-full">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/50">
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">

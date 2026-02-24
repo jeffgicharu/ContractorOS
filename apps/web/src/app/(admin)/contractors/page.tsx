@@ -94,7 +94,7 @@ export default function ContractorListPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Contractors
@@ -111,7 +111,7 @@ export default function ContractorListPage() {
       </div>
 
       {/* Filters */}
-      <div className="mt-6 flex items-center gap-3">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="flex-1 max-w-sm">
           <Input
             placeholder="Search by name or email..."
@@ -136,8 +136,8 @@ export default function ContractorListPage() {
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <table className="w-full border-separate border-spacing-0">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+        <table className="min-w-[640px] w-full border-separate border-spacing-0">
           <thead>
             <tr>
               <th

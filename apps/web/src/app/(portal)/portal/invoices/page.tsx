@@ -48,7 +48,7 @@ export default function PortalInvoicesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-slate-900">My Invoices</h1>
         <Button size="sm" onClick={() => router.push('/portal/invoices/new')}>
           Create Invoice
@@ -57,7 +57,7 @@ export default function PortalInvoicesPage() {
 
       {/* Status tabs */}
       <div className="mt-6 border-b border-slate-200">
-        <nav className="-mb-px flex gap-6">
+        <nav className="-mb-px flex gap-6 overflow-x-auto scrollbar-hide">
           {STATUS_TABS.map((tab) => (
             <button
               key={tab.value}
@@ -66,7 +66,7 @@ export default function PortalInvoicesPage() {
                 setStatusFilter(tab.value);
                 setPage(1);
               }}
-              className={`pb-3 text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 pb-3 text-sm font-medium transition-colors ${
                 statusFilter === tab.value
                   ? 'border-b-2 border-brand-500 text-brand-600'
                   : 'text-slate-500 hover:text-slate-700'
@@ -79,7 +79,7 @@ export default function PortalInvoicesPage() {
       </div>
 
       {/* Table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -96,7 +96,7 @@ export default function PortalInvoicesPage() {
             </Button>
           </div>
         ) : (
-          <table className="w-full border-separate border-spacing-0">
+          <table className="min-w-[600px] w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">

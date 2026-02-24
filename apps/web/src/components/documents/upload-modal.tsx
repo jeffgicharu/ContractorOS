@@ -52,8 +52,8 @@ export function UploadModal({ contractorId, onClose, onUploaded }: UploadModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+      <div className="mx-4 w-full max-w-md rounded-lg bg-white shadow-xl max-h-[90vh] overflow-y-auto sm:mx-auto">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 sm:px-6">
           <h2 className="text-lg font-semibold text-slate-900">Upload Document</h2>
           <button
             type="button"
@@ -66,7 +66,7 @@ export function UploadModal({ contractorId, onClose, onUploaded }: UploadModalPr
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           {error && (
             <div className="rounded-md bg-error-50 border border-error-200 px-4 py-3 text-sm text-error-700">
               {error}

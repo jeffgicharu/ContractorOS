@@ -84,7 +84,7 @@ export default function ContractorDetailPage() {
       </nav>
 
       {/* Page header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -120,13 +120,13 @@ export default function ContractorDetailPage() {
 
       {/* Tabs */}
       <div className="mt-6 border-b border-slate-200">
-        <nav className="-mb-px flex gap-6">
+        <nav className="-mb-px flex gap-6 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => (
             <button
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap shrink-0 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab
                   ? 'border-b-2 border-brand-500 text-brand-600'
                   : 'text-slate-500 hover:text-slate-700'

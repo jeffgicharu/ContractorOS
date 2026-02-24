@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Sidebar } from '@/components/layout/sidebar';
@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/header';
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -20,6 +21,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     }
   }, [user, isLoading, router]);
 
+  const handleMenuToggle = useCallback(() => {
+    setSidebarOpen((prev) => !prev);
+  }, []);
+
+  const handleSidebarClose = useCallback(() => {
+    setSidebarOpen(false);
+  }, []);
+
   if (isLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -30,11 +39,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex flex-1 flex-col pl-[240px]">
-        <div className="relative z-10 flex min-h-screen flex-1 flex-col rounded-l-[20px] bg-slate-50 shadow-[inset_1px_0_0_0_rgba(0,0,0,0.04)]">
-          <Header />
-          <main className="flex-1 px-8 py-8">
+      <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
+      <div className="flex flex-1 flex-col pl-0 lg:pl-[240px]">
+        <div className="relative z-10 flex min-h-screen flex-1 flex-col lg:rounded-l-[20px] bg-slate-50 shadow-[inset_1px_0_0_0_rgba(0,0,0,0.04)]">
+          <Header onMenuToggle={handleMenuToggle} />
+          <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
             <div className="mx-auto max-w-[1280px]">{children}</div>
           </main>
         </div>
