@@ -181,6 +181,9 @@ jobs:
           PORT: 3001
         run: pnpm --filter @contractor-os/api start:dev &
 
+      - name: Build shared package
+        run: pnpm --filter @contractor-os/shared build
+
       - name: Build and start web app
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
