@@ -19,14 +19,14 @@ describe('Contractor Lifecycle', () => {
 
   it('navigates to contractor detail page', () => {
     cy.visit('/contractors');
-    // Click first contractor link
-    cy.get('table tbody tr').first().click();
+    // Click first contractor name link
+    cy.get('table tbody tr').first().find('a').first().click();
     cy.url().should('match', /\/contractors\/[a-f0-9-]+/);
   });
 
   it('shows contractor detail with tabs', () => {
     cy.visit('/contractors');
-    cy.get('table tbody tr').first().click();
+    cy.get('table tbody tr').first().find('a').first().click();
     // Contractor detail should have tabs
     cy.contains('Engagements').should('exist');
     cy.contains('Invoices').should('exist');

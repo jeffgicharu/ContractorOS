@@ -16,9 +16,11 @@ import { OrganizationsModule } from './modules/organizations/organizations.modul
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CorrelationIdInterceptor } from './common/interceptors/correlation-id.interceptor';
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [ScheduleModule.forRoot(), DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule, InvoicesModule, DocumentsModule, ClassificationModule, OffboardingModule, NotificationsModule, AuditModule, OrganizationsModule],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_FILTER,

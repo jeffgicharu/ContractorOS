@@ -23,13 +23,13 @@ describe('Offboarding', () => {
 
   it('navigates to offboarding detail', () => {
     cy.visit('/offboarding');
-    cy.get('table tbody tr').first().click();
+    cy.get('table tbody tr').first().find('a').first().click();
     cy.url().should('match', /\/offboarding\/[a-f0-9-]+/);
   });
 
   it('shows checklist on offboarding detail page', () => {
     cy.visit('/offboarding');
-    cy.get('table tbody tr').first().click();
+    cy.get('table tbody tr').first().find('a').first().click();
     cy.contains('Checklist').should('be.visible');
     // Should show checklist items
     cy.contains(/revoke|retrieve|process|archive/i).should('exist');

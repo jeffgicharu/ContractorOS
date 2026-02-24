@@ -120,7 +120,6 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [lint-typecheck-test]
-    continue-on-error: true
 
     services:
       postgres:
@@ -180,7 +179,7 @@ jobs:
           JWT_SECRET: ci-test-secret
           JWT_EXPIRES_IN: 15m
           PORT: 3001
-        run: pnpm --filter @contractor-os/api start:dev &
+        run: pnpm --filter @contractor-os/api dev &
 
       - name: Build shared package
         run: pnpm --filter @contractor-os/shared build
@@ -194,8 +193,7 @@ jobs:
 
       - name: Wait for services
         run: |
-          npx wait-on http://localhost:3001/api/v1/health http://localhost:3000 --timeout 60000 || true
-          sleep 5
+          npx wait-on http://localhost:3001/api/v1/health http://localhost:3000 --timeout 60000
 
       - name: Install Cypress binary
         run: pnpm --filter @contractor-os/web exec cypress install
