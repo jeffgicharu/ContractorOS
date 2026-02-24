@@ -186,7 +186,7 @@ jobs:
         run: pnpm --filter @contractor-os/web start &
 
       - name: Install Cypress binary
-        run: pnpm exec cypress install
+        run: pnpm --filter @contractor-os/web exec cypress install
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v7
