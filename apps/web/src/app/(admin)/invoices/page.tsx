@@ -101,7 +101,7 @@ export default function InvoicesPage() {
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Status
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   Amount
                 </th>
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
@@ -128,7 +128,7 @@ export default function InvoicesPage() {
                   <td className="px-4">
                     <InvoiceStatusBadge status={inv.status as InvoiceStatus} />
                   </td>
-                  <td className="px-4 text-right text-[13px] font-mono text-slate-900">
+                  <td className="px-4 text-right text-[13px] font-mono text-slate-900 hidden sm:table-cell">
                     {formatCurrency(inv.totalAmount)}
                   </td>
                   <td className="px-4 text-[13px] text-slate-600 hidden sm:table-cell">

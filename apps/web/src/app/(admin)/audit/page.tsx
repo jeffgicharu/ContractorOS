@@ -111,8 +111,8 @@ export default function AuditPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/50">
-                    <th className="w-8 px-4 py-3" />
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                    <th className="w-8 px-4 py-3 hidden sm:table-cell" />
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                       Timestamp
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
@@ -138,7 +138,7 @@ export default function AuditPage() {
                           setExpandedId(expandedId === event.id ? null : event.id)
                         }
                       >
-                        <td className="px-4 py-3 text-slate-400">
+                        <td className="px-4 py-3 text-slate-400 hidden sm:table-cell">
                           <svg
                             width="16"
                             height="16"
@@ -151,7 +151,7 @@ export default function AuditPage() {
                             <path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.5" />
                           </svg>
                         </td>
-                        <td className="px-4 py-3 text-[13px] text-slate-600" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        <td className="px-4 py-3 text-[13px] text-slate-600 hidden sm:table-cell" style={{ fontVariantNumeric: 'tabular-nums' }}>
                           {formatTimestamp(event.createdAt)}
                         </td>
                         <td className="px-4 py-3 text-[13px] text-slate-600 hidden sm:table-cell">

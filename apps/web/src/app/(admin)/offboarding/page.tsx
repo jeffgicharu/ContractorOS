@@ -120,7 +120,7 @@ export default function OffboardingPage() {
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                       Progress
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
@@ -151,7 +151,7 @@ export default function OffboardingPage() {
                       <td className="px-4 py-3">
                         <OffboardingStatusBadge status={w.status as OffboardingStatus} variant="pill" />
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 hidden sm:table-cell">
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-16 rounded-full bg-slate-100">
                             <div

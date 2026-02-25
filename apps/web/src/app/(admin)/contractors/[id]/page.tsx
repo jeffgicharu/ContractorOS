@@ -168,7 +168,7 @@ export default function ContractorDetailPage() {
 
 function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {/* Onboarding Progress */}
       <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">Onboarding</h3>
@@ -276,11 +276,11 @@ function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
       </div>
 
       {/* Document Status */}
-      <div className="col-span-2 rounded-xl border border-slate-200 bg-white p-6">
+      <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-base font-semibold text-slate-900">
           Document Status
         </h3>
-        <div className="mt-4 flex gap-6">
+        <div className="mt-4 flex flex-wrap gap-4 sm:gap-6">
           <div className="flex items-center gap-2">
             <span
               className={`h-2 w-2 rounded-full ${

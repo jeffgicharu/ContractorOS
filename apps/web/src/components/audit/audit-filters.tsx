@@ -43,7 +43,7 @@ export function AuditFilters({ filters, onChange }: AuditFiltersProps) {
   const hasFilters = Object.values(filters).some(Boolean);
 
   return (
-    <div className="flex flex-wrap items-end gap-3 rounded-lg border border-slate-200 bg-white p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:flex-row sm:flex-wrap sm:items-end">
       <div className="flex flex-col gap-1">
         <label className="text-xs font-medium text-slate-500">Entity Type</label>
         <select

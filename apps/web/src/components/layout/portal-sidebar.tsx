@@ -77,7 +77,7 @@ export function PortalSidebar({ isOpen, onClose }: PortalSidebarProps) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600">
             <span className="text-sm font-bold text-white">C</span>
           </div>
-          <Link href="/portal/dashboard" className="text-[15px] font-bold text-slate-900">
+          <Link href="/" className="text-[15px] font-bold text-slate-900">
             ContractorOS
           </Link>
         </div>

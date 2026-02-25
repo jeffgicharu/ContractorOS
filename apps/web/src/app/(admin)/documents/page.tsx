@@ -97,7 +97,7 @@ export default function DocumentVaultPage() {
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                   Contractor
                 </th>
-                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+                <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                   W-9 / W-8BEN
                 </th>
                 <th className="sticky top-0 z-10 px-4 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
@@ -129,7 +129,7 @@ export default function DocumentVaultPage() {
                         {entry.contractorType === 'foreign' ? 'Foreign' : 'Domestic'}
                       </span>
                     </td>
-                    <td className="px-4">
+                    <td className="px-4 hidden sm:table-cell">
                       <DocumentStatusBadge status={hasTaxForm ? 'current' : 'missing'} />
                     </td>
                     <td className="px-4 hidden sm:table-cell">
