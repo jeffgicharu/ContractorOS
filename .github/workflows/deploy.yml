@@ -51,7 +51,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H REDACTED_HOST >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: Rsync to VPS
         run: |
@@ -78,30 +78,30 @@ jobs:
             --include='ecosystem.config.cjs' \
             --include='tsconfig.base.json' \
             --exclude='*' \
-            ./ deploy@REDACTED_HOST:/REDACTED_PATH/current/
+            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.DEPLOY_PATH }}/current/
 
       - name: Install deps, migrate, restart
         uses: appleboy/ssh-action@v1
         env:
           SEED: ${{ github.event.inputs.seed }}
         with:
-          host: REDACTED_HOST
-          username: deploy
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           envs: SEED
           script: |
             set -e
-            cd /REDACTED_PATH/current
+            cd ${{ secrets.DEPLOY_PATH }}/current
 
             # Symlink env files for dotenv
-            ln -sf /REDACTED_PATH/.env.api apps/api/.env
-            ln -sf /REDACTED_PATH/.env.web apps/web/.env
+            ln -sf ${{ secrets.DEPLOY_PATH }}/.env.api apps/api/.env
+            ln -sf ${{ secrets.DEPLOY_PATH }}/.env.web apps/web/.env
 
             # Install production dependencies
             pnpm install --frozen-lockfile --prod
 
             # Run database migrations
-            set -a && source /REDACTED_PATH/.env.api && set +a
+            set -a && source ${{ secrets.DEPLOY_PATH }}/.env.api && set +a
             pnpm --filter @contractor-os/api migrate:up
 
             # Seed database (only when triggered manually with seed=true)

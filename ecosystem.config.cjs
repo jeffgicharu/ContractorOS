@@ -1,8 +1,11 @@
+const path = require('path');
+const BASE = process.env.DEPLOY_PATH || path.resolve(__dirname);
+
 module.exports = {
   apps: [
     {
       name: 'contractoros-api',
-      cwd: '/REDACTED_PATH/current/apps/api',
+      cwd: path.join(BASE, 'apps/api'),
       script: 'dist/main.js',
       node_args: '--max-old-space-size=512',
       exec_mode: 'fork',
@@ -13,7 +16,7 @@ module.exports = {
     },
     {
       name: 'contractoros-web',
-      cwd: '/REDACTED_PATH/current/apps/web',
+      cwd: path.join(BASE, 'apps/web'),
       script: 'node_modules/next/dist/bin/next',
       args: 'start --port 3002',
       node_args: '--max-old-space-size=768',
