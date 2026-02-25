@@ -108,7 +108,7 @@ export default function CreateInvoicePage() {
         {/* Basic info */}
         <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h2 className="text-base font-semibold text-slate-900">Invoice Details</h2>
-          <div className="mt-4 grid grid-cols-2 gap-4">
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-slate-700">
                 Engagement
@@ -163,7 +163,7 @@ export default function CreateInvoicePage() {
                 />
               </label>
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-slate-700">
                 Notes
                 <textarea
@@ -192,11 +192,9 @@ export default function CreateInvoicePage() {
           </div>
           <div className="mt-4 space-y-3">
             {lineItems.map((item, idx) => (
-              <div key={idx} className="grid grid-cols-12 gap-3 items-end">
-                <div className="col-span-5">
-                  {idx === 0 && (
-                    <span className="text-xs font-medium text-slate-500">Description</span>
-                  )}
+              <div key={idx} className="grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-end">
+                <div className="sm:col-span-5">
+                  <span className="text-xs font-medium text-slate-500">Description</span>
                   <input
                     type="text"
                     value={item.description}
@@ -206,10 +204,8 @@ export default function CreateInvoicePage() {
                     className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                   />
                 </div>
-                <div className="col-span-2">
-                  {idx === 0 && (
-                    <span className="text-xs font-medium text-slate-500">Quantity</span>
-                  )}
+                <div className="sm:col-span-2">
+                  <span className="text-xs font-medium text-slate-500">Quantity</span>
                   <input
                     type="number"
                     step="0.01"
@@ -221,10 +217,8 @@ export default function CreateInvoicePage() {
                     className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-right font-mono"
                   />
                 </div>
-                <div className="col-span-2">
-                  {idx === 0 && (
-                    <span className="text-xs font-medium text-slate-500">Unit Price</span>
-                  )}
+                <div className="sm:col-span-2">
+                  <span className="text-xs font-medium text-slate-500">Unit Price</span>
                   <input
                     type="number"
                     step="0.01"
@@ -236,17 +230,15 @@ export default function CreateInvoicePage() {
                     className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-right font-mono"
                   />
                 </div>
-                <div className="col-span-2 text-right">
-                  {idx === 0 && (
-                    <span className="text-xs font-medium text-slate-500">Amount</span>
-                  )}
+                <div className="sm:col-span-2 text-right">
+                  <span className="text-xs font-medium text-slate-500">Amount</span>
                   <div className="mt-1 py-2 text-sm font-mono font-medium text-slate-900">
                     {formatCurrency(
                       (parseFloat(item.quantity) || 0) * (parseFloat(item.unitPrice) || 0),
                     )}
                   </div>
                 </div>
-                <div className="col-span-1">
+                <div className="sm:col-span-1">
                   {lineItems.length > 1 && (
                     <button
                       type="button"

@@ -88,7 +88,7 @@ export default function PortalDocumentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           My Documents
         </h1>

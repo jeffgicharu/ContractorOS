@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
@@ -58,6 +59,15 @@ export function PortalSidebar({ isOpen, onClose }: PortalSidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -69,7 +79,7 @@ export function PortalSidebar({ isOpen, onClose }: PortalSidebarProps) {
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-screen w-64 flex-col bg-gradient-to-b from-[#f0f2ff] via-[#f7f8fc] to-[#f4f5f8] transition-transform duration-300 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-gradient-to-b from-[#f0f2ff] via-[#f7f8fc] to-[#f4f5f8] transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >

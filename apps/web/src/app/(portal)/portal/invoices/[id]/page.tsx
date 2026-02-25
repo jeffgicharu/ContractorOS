@@ -85,7 +85,7 @@ export default function PortalInvoiceDetailPage() {
       </nav>
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold font-mono text-slate-900">
@@ -119,7 +119,7 @@ export default function PortalInvoiceDetailPage() {
       </div>
 
       {/* Info cards */}
-      <div className="mt-6 grid grid-cols-2 gap-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-6">
           <h3 className="text-base font-semibold text-slate-900">Details</h3>
           <dl className="mt-4 space-y-3">
@@ -172,10 +172,10 @@ export default function PortalInvoiceDetailPage() {
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Description
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                 Qty
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
                 Rate
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -187,10 +187,10 @@ export default function PortalInvoiceDetailPage() {
             {invoice.lineItems.map((item) => (
               <tr key={item.id} className="border-b border-slate-50">
                 <td className="px-6 py-3 text-[13px] text-slate-700">{item.description}</td>
-                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
+                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700 hidden sm:table-cell">
                   {item.quantity}
                 </td>
-                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
+                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700 hidden sm:table-cell">
                   {formatCurrency(item.unitPrice)}
                 </td>
                 <td className="px-6 py-3 text-right text-[13px] font-mono font-medium text-slate-900">
