@@ -93,8 +93,36 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Story */}
+      {/* Product demo */}
       <section className="bg-slate-50/80 py-24 lg:py-32">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8">
+          <SectionWrapper>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="mb-3 text-sm font-semibold text-brand-600">See it in action</p>
+              <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                A full walkthrough in 60 seconds
+              </h2>
+              <p className="mt-4 text-[16px] leading-relaxed text-slate-500">
+                Admin dashboard, contractor management, invoices, classification
+                risk scoring, and the contractor self-service portal.
+              </p>
+            </div>
+          </SectionWrapper>
+          <SectionWrapper delay={0.2}>
+            <div className="mt-12">
+              <BrowserFrame
+                src="/demo.gif"
+                alt="ContractorOS product walkthrough — admin dashboard, invoices, classification risk, and contractor portal"
+                className="shadow-2xl"
+                unoptimized
+              />
+            </div>
+          </SectionWrapper>
+        </div>
+      </section>
+
+      {/* Story */}
+      <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <SectionWrapper>
             <h2 className="font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
@@ -122,7 +150,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-24 lg:py-32">
+      <section className="bg-slate-50/80 py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <SectionWrapper>
             <div className="mx-auto max-w-2xl text-center">
@@ -157,7 +185,7 @@ export default function AboutPage() {
       </section>
 
       {/* Tech stack */}
-      <section className="bg-slate-50/80 py-24 lg:py-32">
+      <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <SectionWrapper>

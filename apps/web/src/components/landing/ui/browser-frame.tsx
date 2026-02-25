@@ -7,6 +7,7 @@ interface BrowserFrameProps {
   alt: string;
   className?: string;
   priority?: boolean;
+  unoptimized?: boolean;
 }
 
 export function BrowserFrame({
@@ -14,6 +15,7 @@ export function BrowserFrame({
   alt,
   className = '',
   priority = false,
+  unoptimized = false,
 }: BrowserFrameProps) {
   return (
     <div
@@ -41,6 +43,7 @@ export function BrowserFrame({
           height={900}
           quality={90}
           priority={priority}
+          unoptimized={unoptimized}
           className="block w-full"
         />
       </div>
