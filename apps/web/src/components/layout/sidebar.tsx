@@ -107,10 +107,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </Link>
         </div>
 
-        <nav className="flex-1 overflow-y-auto pl-3 pr-6 py-4">
-          {NAV_GROUPS.map((group) => (
+        <nav className="flex-1 overflow-y-auto pl-3 pr-6 pt-1 pb-4">
+          {NAV_GROUPS.map((group, groupIdx) => (
             <div key={group.title} className="mb-1">
-              <p className="px-3 pb-2 pt-5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <p className={`px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 ${groupIdx === 0 ? 'pt-2' : 'pt-5'}`}>
                 {group.title}
               </p>
               {group.items

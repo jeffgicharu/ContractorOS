@@ -41,7 +41,7 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen">
       <PortalSidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
       <div className="flex min-w-0 flex-1 flex-col pl-0 lg:pl-[240px]">
-        <div className="relative z-10 flex min-h-screen flex-1 flex-col lg:rounded-l-[20px] bg-slate-50 shadow-[inset_1px_0_0_0_rgba(0,0,0,0.04)]">
+        <div className="relative z-10 flex min-h-screen flex-1 flex-col lg:rounded-l-[20px] lg:border-l lg:border-slate-200/60 bg-slate-50">
           <Header onMenuToggle={handleMenuToggle} />
           <main className="flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
             <div className="mx-auto max-w-[1280px]">{children}</div>
