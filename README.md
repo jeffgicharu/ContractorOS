@@ -13,7 +13,7 @@
 
 Built for operations leads, finance teams, and HR admins at companies managing 20–200 contractors.
 
-[Live Demo](https://contractoros.jeffgicharu.com) &middot; [Getting Started](#getting-started) &middot; [Architecture](#architecture)
+<a href="https://contractoros.jeffgicharu.com" target="_blank">Live Demo</a> &middot; [Getting Started](#getting-started) &middot; [Architecture](#architecture)
 
 </div>
 
