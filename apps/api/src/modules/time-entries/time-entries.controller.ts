@@ -10,7 +10,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import {
   createTimeEntrySchema,
@@ -35,10 +34,9 @@ export class TimeEntriesController {
 
   @Post()
   @Roles(UserRole.CONTRACTOR)
-  @UsePipes(new ZodValidationPipe(createTimeEntrySchema))
   async create(
     @CurrentUser() user: JwtPayload,
-    @Body() body: CreateTimeEntryInput,
+    @Body(new ZodValidationPipe(createTimeEntrySchema)) body: CreateTimeEntryInput,
   ) {
     const result = await this.timeEntriesService.create(user.sub, body);
     return { data: result };

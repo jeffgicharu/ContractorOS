@@ -9,7 +9,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UsePipes,
 } from '@nestjs/common';
 import {
   createContractorSchema,
@@ -43,10 +42,9 @@ export class ContractorsController {
 
   @Post()
   @Roles(UserRole.ADMIN)
-  @UsePipes(new ZodValidationPipe(createContractorSchema))
   async create(
     @CurrentUser() user: JwtPayload,
-    @Body() body: CreateContractorInput,
+    @Body(new ZodValidationPipe(createContractorSchema)) body: CreateContractorInput,
   ) {
     const result = await this.contractorsService.create(user.orgId, body);
     return { data: result };
@@ -81,11 +79,10 @@ export class ContractorsController {
 
   @Patch(':id')
   @Roles(UserRole.ADMIN)
-  @UsePipes(new ZodValidationPipe(updateContractorSchema))
   async update(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
-    @Body() body: UpdateContractorInput,
+    @Body(new ZodValidationPipe(updateContractorSchema)) body: UpdateContractorInput,
   ) {
     const result = await this.contractorsService.update(user.orgId, id, body);
     return { data: result };
@@ -104,10 +101,9 @@ export class ContractorsController {
 
   @Post('bulk-invite')
   @Roles(UserRole.ADMIN)
-  @UsePipes(new ZodValidationPipe(bulkInviteSchema))
   async bulkInvite(
     @CurrentUser() user: JwtPayload,
-    @Body() body: BulkInviteInput,
+    @Body(new ZodValidationPipe(bulkInviteSchema)) body: BulkInviteInput,
   ) {
     const result = await this.contractorsService.bulkInvite(user.orgId, body);
     return { data: result };
