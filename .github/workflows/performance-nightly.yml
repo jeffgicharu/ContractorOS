@@ -68,7 +68,7 @@ jobs:
       - name: Seed perf data
         env:
           DATABASE_URL: postgresql://contractor_os:contractor_os@localhost:5434/contractor_os_perf
-        run: pnpm --filter @contractor-os/api exec tsx performance/seed-perf-data.ts
+        run: pnpm --filter @contractor-os/api exec tsx ${{ github.workspace }}/performance/seed-perf-data.ts
 
       - name: Start api
         env:
