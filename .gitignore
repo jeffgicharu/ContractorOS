@@ -28,6 +28,12 @@ coverage-combined/
 reports/mutation/
 .stryker-tmp/
 
+# Performance test reports + raw results
+performance/results/
+
+# Stryker mutation testing artefacts
+.stryker-tmp/
+
 # Logs
 *.log
 
