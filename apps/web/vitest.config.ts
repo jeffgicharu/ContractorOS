@@ -58,6 +58,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // Bypass the built dist/ output of @contractor-os/shared and resolve
+      // imports straight to the package's TypeScript source. This mirrors the
+      // moduleNameMapper used in apps/api/jest.config.ts and means the web
+      // suite does not depend on a successful build of the shared package
+      // (which is the order CI runs jobs in).
+      '@contractor-os/shared': path.resolve(__dirname, '../../packages/shared/src'),
     },
   },
 });
