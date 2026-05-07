@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "test:pact": "vitest run --config test/pact/vitest.config.ts",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "cypress:open": "cypress open",
@@ -29,6 +30,7 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@pact-foundation/pact": "^16.4.0",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/nextjs": "^8.6.17",
     "@storybook/react": "^8.6.17",
