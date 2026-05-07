@@ -23,6 +23,8 @@ Thumbs.db
 
 # Test
 coverage/
+coverage-integration/
+coverage-combined/
 
 # Logs
 *.log

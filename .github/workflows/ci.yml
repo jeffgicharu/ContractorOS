@@ -3,6 +3,8 @@ name: CI
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
   workflow_call:
 
 concurrency:
@@ -113,6 +115,51 @@ jobs:
           JWT_SECRET: ci-test-secret
           JWT_EXPIRES_IN: 15m
         run: pnpm --filter @contractor-os/api seed
+
+  api-integration:
+    name: API Integration Tests (Testcontainers)
+    runs-on: ubuntu-latest
+    # ubuntu-latest GitHub-hosted runners ship with Docker pre-installed and
+    # running, which is what Testcontainers needs to spin up the ephemeral
+    # postgres:16-alpine container. No `services:` block is needed here — the
+    # integration suite manages its own DB lifecycle in test/setup/global-setup.ts.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run combined unit + integration suite with coverage
+        run: pnpm --filter @contractor-os/api test:all:cov
+
+      - name: Upload JUnit results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-integration-junit
+          path: apps/api/coverage-integration/junit.xml
+          retention-days: 7
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-coverage
+          path: |
+            apps/api/coverage
+            apps/api/coverage-integration
+          retention-days: 7
 
   e2e-tests:
     name: E2E Tests
