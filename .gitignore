@@ -34,6 +34,12 @@ performance/results/
 # Stryker mutation testing artefacts
 .stryker-tmp/
 
+# Performance test results (from PR #13's k6 suite)
+performance/results/
+
+# OWASP ZAP scan results (from .github/workflows/dast-zap.yml)
+security/zap/
+
 # Logs
 *.log
 

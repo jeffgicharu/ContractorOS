@@ -1,0 +1,70 @@
+name: Dependency Scan (Snyk)
+
+# Snyk dependency scanning across the workspace.
+#
+# To enable: visit https://app.snyk.io, create an account, and grab a
+# personal API token from Settings → General → Auth Token. Set it as the
+# repository secret SNYK_TOKEN. Until then, this workflow no-ops with an
+# explanatory message and the dependency-audit.yml fallback runs in
+# parallel so the repo never goes unscanned.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 4 * * 1' # weekly Monday 04:23 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: snyk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  snyk:
+    name: snyk test --severity-threshold=high
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Snyk token
+        id: token
+        run: |
+          if [ -z "${{ secrets.SNYK_TOKEN }}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::SNYK_TOKEN not configured — Snyk scan skipped. Falling back to pnpm audit (dependency-audit.yml)."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Snyk CLI
+        if: steps.token.outputs.configured == 'true'
+        run: npm install -g snyk
+
+      - name: Snyk test
+        if: steps.token.outputs.configured == 'true'
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk test --all-projects --severity-threshold=high
+
+      - name: Snyk monitor (snapshot to dashboard)
+        if: steps.token.outputs.configured == 'true' && github.event_name == 'push'
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk monitor --all-projects
