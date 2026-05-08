@@ -21,7 +21,11 @@ COPY apps/api/ ./apps/api/
 
 RUN pnpm --filter @contractor-os/shared build \
   && pnpm --filter @contractor-os/api build \
-  && pnpm --filter @contractor-os/api --prod deploy /out
+  && pnpm --filter @contractor-os/api --prod --legacy deploy /out
+# `--legacy` is required since pnpm v10: by default, `pnpm deploy` only
+# works for workspaces with `inject-workspace-packages=true`. Until the
+# repo opts into injected workspaces, the legacy non-injected path is
+# the right call here.
 
 # ---
 
