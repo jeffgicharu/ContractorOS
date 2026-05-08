@@ -365,3 +365,21 @@ The gap inventory above informs a set of follow-up improvements grouped by theme
 - **End-to-end coverage** — extend Cypress (or Playwright) over the unflowed flows in §7.1, plus `cypress-axe` accessibility gates and a Chromatic-style visual baseline.
 - **Frontend & shared unit tests** — `apps/web` React Testing Library suites and `packages/shared` Zod / state-machine suites to hit the targets documented in `testing.md`.
 - **Tooling & CI** — consolidate the above into the existing GitHub Actions workflow, add coverage reporting, and document AI-assisted test-generation workflows for the team.
+
+---
+
+## See also
+
+The single index for all quality engineering work in this repo is **[QUALITY_DASHBOARD.md](./QUALITY_DASHBOARD.md)** — coverage, mutation, performance, and security metrics in one place.
+
+| Document | Purpose |
+|---|---|
+| [AUDIT.md](./AUDIT.md) | Baseline assessment that drove the test work |
+| [TEST_STRATEGY.md](./TEST_STRATEGY.md) | Pyramid, coverage targets, CI gates, non-functional budgets |
+| [TEST_PLAN.md](./TEST_PLAN.md) | Scenario list for the highest-value workflow |
+| [QA_BEST_PRACTICES.md](./QA_BEST_PRACTICES.md) | Review checklist, naming, flaky-test policy, mock policy |
+| [CONTRACT_TESTING.md](./CONTRACT_TESTING.md) | Pact consumer-driven contracts between web and api |
+| [MUTATION_TESTING.md](./MUTATION_TESTING.md) | Stryker setup, baselines, top surviving mutants |
+| [PERFORMANCE_TESTING.md](./PERFORMANCE_TESTING.md) | k6 suite, SLO budgets, baseline runs |
+| [SECURITY_TESTING.md](./SECURITY_TESTING.md) | Threat model, CodeQL/Snyk/Trivy/ZAP, custom security suite |
+| [AI_TESTING_PLAYBOOK.md](./AI_TESTING_PLAYBOOK.md) | How AI assistance is used (and not used) when authoring tests |

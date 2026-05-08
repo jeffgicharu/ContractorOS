@@ -105,3 +105,21 @@ The five highest-signal surviving mutants from today's run, with a one-line hypo
 2. Run `pnpm --filter <pkg> test:mutation` and inspect the new mutants in the html report.
 3. Follow the "How to investigate a surviving mutant" loop above.
 4. Once the file's mutation score is at or above the package threshold, leave the threshold alone — the score is included in the global average. If you want to enforce a higher local bar, add a per-file threshold via `thresholds` in `stryker.config.mjs` (Stryker supports it).
+
+---
+
+## See also
+
+The single index for all quality engineering work in this repo is **[QUALITY_DASHBOARD.md](./QUALITY_DASHBOARD.md)** — coverage, mutation, performance, and security metrics in one place.
+
+| Document | Purpose |
+|---|---|
+| [AUDIT.md](./AUDIT.md) | Baseline assessment that drove the test work |
+| [TEST_STRATEGY.md](./TEST_STRATEGY.md) | Pyramid, coverage targets, CI gates, non-functional budgets |
+| [TEST_PLAN.md](./TEST_PLAN.md) | Scenario list for the highest-value workflow |
+| [QA_BEST_PRACTICES.md](./QA_BEST_PRACTICES.md) | Review checklist, naming, flaky-test policy, mock policy |
+| [CONTRACT_TESTING.md](./CONTRACT_TESTING.md) | Pact consumer-driven contracts between web and api |
+| [MUTATION_TESTING.md](./MUTATION_TESTING.md) | Stryker setup, baselines, top surviving mutants |
+| [PERFORMANCE_TESTING.md](./PERFORMANCE_TESTING.md) | k6 suite, SLO budgets, baseline runs |
+| [SECURITY_TESTING.md](./SECURITY_TESTING.md) | Threat model, CodeQL/Snyk/Trivy/ZAP, custom security suite |
+| [AI_TESTING_PLAYBOOK.md](./AI_TESTING_PLAYBOOK.md) | How AI assistance is used (and not used) when authoring tests |

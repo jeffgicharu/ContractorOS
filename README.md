@@ -204,18 +204,36 @@ The API runs on `http://localhost:3001` and the frontend on `http://localhost:30
 ## Testing
 
 ```bash
-# Unit tests (362 tests)
+# Unit tests
 pnpm test
 
-# Integration tests (real PostgreSQL)
-pnpm test:integration
+# Integration tests (Testcontainers Postgres)
+pnpm --filter @contractor-os/api test:integration
 
-# E2E tests (Cypress — 5 suites, 26 tests)
+# E2E tests (Cypress)
 pnpm --filter @contractor-os/web cypress:run
 
 # Component stories
 pnpm --filter @contractor-os/web storybook
 ```
+
+## Quality Engineering
+
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=github-actions&logoColor=white)](./.github/workflows/ci.yml)
+[![Coverage api](https://img.shields.io/badge/coverage_api-72.23%25-brightgreen)](./QUALITY_DASHBOARD.md)
+[![Coverage web](https://img.shields.io/badge/coverage_web-98.64%25-brightgreen)](./QUALITY_DASHBOARD.md)
+[![Coverage shared](https://img.shields.io/badge/coverage_shared-100%25-brightgreen)](./QUALITY_DASHBOARD.md)
+[![Mutation api](https://img.shields.io/badge/mutation_api-57.78%25-orange)](./MUTATION_TESTING.md)
+
+ContractorOS is actively closing quality gaps documented in [AUDIT.md](./AUDIT.md). The current state of every quality metric — coverage, mutation, performance, security — lives in **[QUALITY_DASHBOARD.md](./QUALITY_DASHBOARD.md)**.
+
+Per-discipline documentation:
+- [TEST_STRATEGY.md](./TEST_STRATEGY.md) — pyramid, per-package coverage targets, CI gates, non-functional budgets
+- [QA_BEST_PRACTICES.md](./QA_BEST_PRACTICES.md) — code-review checklist, BDD test naming, flaky-test policy, mock-vs-real policy
+- [SECURITY_TESTING.md](./SECURITY_TESTING.md) — threat model, SAST + dependency + container + DAST + custom suite, OWASP Top 10 mapping
+- [AI_TESTING_PLAYBOOK.md](./AI_TESTING_PLAYBOOK.md) — how AI assistance is used (and where it's not) when authoring tests in this repo
+
+Open quality issues — including the gaps the strategy targets close — are listed in [QUALITY_DASHBOARD.md § Open quality issues](./QUALITY_DASHBOARD.md#open-quality-issues).
 
 ## Project Structure
 
