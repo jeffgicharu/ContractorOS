@@ -81,7 +81,7 @@ jobs:
           # EADDRINUSE on port 3001.
           nohup node apps/api/dist/main.js > /tmp/api.log 2>&1 &
           echo $! > /tmp/api.pid
-          nohup node apps/web/node_modules/next/dist/bin/next start --dir apps/web --port 3000 > /tmp/web.log 2>&1 &
+          (cd apps/web && nohup node ./node_modules/next/dist/bin/next start --port 3000 > /tmp/web.log 2>&1 &)
           echo $! > /tmp/web.pid
 
           for i in $(seq 1 90); do
