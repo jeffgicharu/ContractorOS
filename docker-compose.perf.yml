@@ -1,0 +1,54 @@
+# Performance-test target environment.
+#
+# Bring-up:
+#   pnpm build                                      # one-time host build
+#   docker compose -f docker-compose.perf.yml up -d
+#   pnpm tsx performance/seed-perf-data.ts          # populate at scale
+#
+# Tear-down:
+#   docker compose -f docker-compose.perf.yml down -v
+#
+# The api runs in production mode (`node dist/main.js`). Source is mounted
+# read-only so a host rebuild reflects in the container without rebuilding
+# the image. node_modules is mounted from the host's pnpm-managed
+# workspace because the workspace symlink layout is non-trivial to
+# recreate inside a vanilla node image.
+
+services:
+  perf-postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: contractor_os
+      POSTGRES_PASSWORD: contractor_os
+      POSTGRES_DB: contractor_os_perf
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U contractor_os -d contractor_os_perf"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    tmpfs:
+      - /var/lib/postgresql/data
+    # ^ tmpfs makes the perf DB ephemeral and faster — the seed script
+    #   re-populates from scratch on every run.
+
+  perf-api:
+    image: node:22-alpine
+    working_dir: /workspace/apps/api
+    depends_on:
+      perf-postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://contractor_os:contractor_os@perf-postgres:5432/contractor_os_perf
+      JWT_SECRET: perf-jwt-secret
+      JWT_ACCESS_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 7d
+      PORT: "3001"
+      NODE_ENV: production
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/workspace
+    command: ["node", "dist/main.js"]
