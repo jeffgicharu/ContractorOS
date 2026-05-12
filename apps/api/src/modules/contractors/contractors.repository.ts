@@ -154,20 +154,60 @@ export class ContractorsRepository {
     const contractor = await this.findById(orgId, id);
     if (!contractor) return null;
 
-    // Onboarding steps
-    const { rows: stepRows } = await this.pool.query<{
-      id: string;
-      step_type: string;
-      status: string;
-      completed_at: string | null;
-      data: Record<string, unknown>;
-      created_at: string;
-      updated_at: string;
-    }>(
-      'SELECT id, step_type, status, completed_at, data, created_at, updated_at FROM onboarding_steps WHERE contractor_id = $1 ORDER BY created_at',
-      [id],
-    );
+    // Run the 5 child queries concurrently. Previous implementation
+    // awaited them sequentially, which added one round-trip per
+    // sub-resource (~6× the wall-clock of the slowest fetch). They are
+    // independent reads — there is no ordering constraint.
+    const [stepResult, riskResult, engResult, docResult, payResult] = await Promise.all([
+      this.pool.query<{
+        id: string;
+        step_type: string;
+        status: string;
+        completed_at: string | null;
+        data: Record<string, unknown>;
+        created_at: string;
+        updated_at: string;
+      }>(
+        'SELECT id, step_type, status, completed_at, data, created_at, updated_at FROM onboarding_steps WHERE contractor_id = $1 ORDER BY created_at',
+        [id],
+      ),
+      this.pool.query<{
+        overall_risk: string;
+        overall_score: string;
+        assessed_at: string;
+      }>(
+        `SELECT overall_risk, overall_score, assessed_at
+         FROM classification_assessments
+         WHERE contractor_id = $1
+         ORDER BY assessed_at DESC LIMIT 1`,
+        [id],
+      ).catch(() => ({ rows: [] as never[] })),
+      this.pool.query<{ count: string }>(
+        "SELECT COUNT(*) as count FROM engagements WHERE contractor_id = $1 AND status = 'active'",
+        [id],
+      ),
+      this.pool.query<{
+        has_w9: boolean;
+        has_contract: boolean;
+        expiring: string;
+      }>(
+        `SELECT
+          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'w9' AND is_current = true) as has_w9,
+          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'contract' AND is_current = true) as has_contract,
+          COUNT(*) FILTER (WHERE expires_at IS NOT NULL AND expires_at < now() + INTERVAL '30 days') as expiring
+         FROM tax_documents WHERE contractor_id = $1 AND is_current = true`,
+        [id],
+      ).catch(() => ({ rows: [{ has_w9: false, has_contract: false, expiring: '0' }] })),
+      this.pool.query<{ total: string }>(
+        `SELECT COALESCE(SUM(total_amount), 0) as total
+         FROM invoices
+         WHERE contractor_id = $1 AND status = 'paid'
+           AND EXTRACT(YEAR FROM paid_at) = EXTRACT(YEAR FROM now())`,
+        [id],
+      ).catch(() => ({ rows: [{ total: '0' }] })),
+    ]);
 
+    const stepRows = stepResult.rows;
     const steps = stepRows.map((s) => ({
       id: s.id,
       contractorId: id,
@@ -181,20 +221,7 @@ export class ContractorsRepository {
 
     const completedSteps = steps.filter((s) => s.status === 'completed').length;
 
-    // Latest risk assessment (may not exist yet in Phase 1)
-    const { rows: riskRows } = await this.pool.query<{
-      overall_risk: string;
-      overall_score: string;
-      assessed_at: string;
-    }>(
-      `SELECT overall_risk, overall_score, assessed_at
-       FROM classification_assessments
-       WHERE contractor_id = $1
-       ORDER BY assessed_at DESC LIMIT 1`,
-      [id],
-    ).catch(() => ({ rows: [] as never[] }));
-
-    const riskRow = riskRows[0];
+    const riskRow = riskResult.rows[0];
     const latestRiskAssessment = riskRow
       ? {
           overallRisk: riskRow.overall_risk as NonNullable<ContractorDetail['latestRiskAssessment']>['overallRisk'],
@@ -203,34 +230,9 @@ export class ContractorsRepository {
         }
       : null;
 
-    // Active engagements count
-    const { rows: engRows } = await this.pool.query<{ count: string }>(
-      "SELECT COUNT(*) as count FROM engagements WHERE contractor_id = $1 AND status = 'active'",
-      [id],
-    );
-
-    // Document status (may not exist yet in Phase 1)
-    const { rows: docRows } = await this.pool.query<{
-      has_w9: boolean;
-      has_contract: boolean;
-      expiring: string;
-    }>(
-      `SELECT
-        EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'w9' AND is_current = true) as has_w9,
-        EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'contract' AND is_current = true) as has_contract,
-        COUNT(*) FILTER (WHERE expires_at IS NOT NULL AND expires_at < now() + INTERVAL '30 days') as expiring
-       FROM tax_documents WHERE contractor_id = $1 AND is_current = true`,
-      [id],
-    ).catch(() => ({ rows: [{ has_w9: false, has_contract: false, expiring: '0' }] }));
-
-    // YTD payments (may not exist yet in Phase 1)
-    const { rows: payRows } = await this.pool.query<{ total: string }>(
-      `SELECT COALESCE(SUM(total_amount), 0) as total
-       FROM invoices
-       WHERE contractor_id = $1 AND status = 'paid'
-         AND EXTRACT(YEAR FROM paid_at) = EXTRACT(YEAR FROM now())`,
-      [id],
-    ).catch(() => ({ rows: [{ total: '0' }] }));
+    const engRows = engResult.rows;
+    const docRows = docResult.rows;
+    const payRows = payResult.rows;
 
     const doc = docRows[0] ?? { has_w9: false, has_contract: false, expiring: '0' };
 
