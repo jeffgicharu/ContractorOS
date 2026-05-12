@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import {
   type Engagement,
@@ -38,9 +39,9 @@ export class EngagementsService {
     }
 
     if (contractor.status !== 'active') {
-      throw new BadRequestException({
-        code: 'BAD_REQUEST',
-        message: 'Engagements can only be created for active contractors',
+      throw new UnprocessableEntityException({
+        code: 'CONTRACTOR_NOT_ACTIVE',
+        message: `Engagements can only be created for active contractors; contractor ${contractorId} is currently ${contractor.status}`,
       });
     }
 
