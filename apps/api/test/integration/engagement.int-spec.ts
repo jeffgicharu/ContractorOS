@@ -56,7 +56,9 @@ describe('Integration: Engagement creation', () => {
 
   for (const nonActiveStatus of [
     ContractorStatus.INVITE_SENT,
-    ContractorStatus.PENDING_ONBOARDING,
+    ContractorStatus.TAX_FORM_PENDING,
+    ContractorStatus.CONTRACT_PENDING,
+    ContractorStatus.BANK_DETAILS_PENDING,
     ContractorStatus.SUSPENDED,
     ContractorStatus.OFFBOARDED,
   ] as const) {
