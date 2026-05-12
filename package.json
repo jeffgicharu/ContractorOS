@@ -9,6 +9,7 @@
     "type-check": "turbo type-check",
     "test": "turbo test",
     "test:integration": "turbo test:integration",
+    "test:contracts": "pnpm --filter @contractor-os/web test:pact && pnpm --filter @contractor-os/api test:pact:verify",
     "clean": "turbo clean"
   },
   "pnpm": {

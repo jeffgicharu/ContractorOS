@@ -223,6 +223,40 @@ jobs:
             apps/api/coverage-integration
           retention-days: 7
 
+  contract-tests:
+    name: Contract Tests (Pact)
+    runs-on: ubuntu-latest
+    # ubuntu-latest GitHub-hosted runners ship with Docker pre-installed and
+    # running. The provider verifier spins up an ephemeral postgres:16-alpine
+    # via Testcontainers so no `services:` block is needed here.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run consumer + provider verification
+        run: pnpm test:contracts
+
+      - name: Upload generated pact files
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pact-contracts
+          path: pacts/*.json
+          retention-days: 30
+
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
