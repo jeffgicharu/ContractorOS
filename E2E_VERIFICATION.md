@@ -141,9 +141,19 @@ the cookie attribute is part of that work.
 
 `libicudata.so.74` is not present locally (we have 72 / 76 / 78). WebKit
 fails to start at the binary level. **CI runners on Ubuntu 22.04/24.04
-have libicu74 by default**, so the `live-smoke-webkit` and `local-webkit`
-projects will run in CI and were specifically excluded from this local
-verification run. No code change required.
+have libicu74 by default** so `live-smoke-webkit` runs green in CI.
+
+### C-2 — WebKit local-suite is excluded from CI
+
+When `local-webkit` does run on a CI runner (Ubuntu 24.04 with libicu74),
+auth-cookie flows time out around `page.waitForURL("**/dashboard")` —
+the silent refresh-via-cookie pattern races with WebKit's strict
+SameSite handling and headless rendering. The same suite passes on
+chromium + firefox and the same WebKit project passes against the
+live origin in `live-smoke-webkit`. We've excluded WebKit from
+`e2e-local.yml` for now and surfaced the issue in the `.github/workflows`
+comment — full re-enable is gated on switching to an API-token-injected
+`storageState` fixture for the auth flow.
 
 ## Cloudflare-attributed latency
 
