@@ -42,7 +42,7 @@ jobs:
           scan-type: fs
           scan-ref: '.'
           severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          exit-code: '1'
           ignore-unfixed: true
           format: sarif
           output: trivy-fs-results.sarif
@@ -79,7 +79,7 @@ jobs:
           scan-type: image
           image-ref: contractor-os-api:scan
           severity: 'HIGH,CRITICAL'
-          exit-code: '0'
+          exit-code: '1'
           ignore-unfixed: true
           format: sarif
           output: trivy-image-results.sarif
