@@ -42,6 +42,10 @@ jobs:
       JWT_REFRESH_EXPIRY: 7d
       PORT: '3001'
       NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+      # Disable per-IP rate limiting in the e2e env — the Playwright suite
+      # fires many requests from a single source and would otherwise trip
+      # the production default of 60 req/min.
+      THROTTLE_LIMIT: '0'
 
     steps:
       - name: Checkout

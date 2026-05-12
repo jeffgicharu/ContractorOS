@@ -51,6 +51,15 @@ export async function createTestApp(
   process.env.JWT_REFRESH_EXPIRY = state.jwtRefreshExpiry;
   process.env.NODE_ENV = 'test';
   process.env.PORT = '0';
+  // Disable per-IP rate limiting in integration tests — the suite fires
+  // hundreds of requests in tight loops against a single source address
+  // and would trip the production-default 60 req/min ceiling. Tests
+  // that need the limiter active (e.g. rate-limit.int-spec.ts) set
+  // THROTTLE_LIMIT to a small value in beforeAll BEFORE calling this
+  // fixture; the conditional preserves their override.
+  if (process.env.THROTTLE_LIMIT === undefined) {
+    process.env.THROTTLE_LIMIT = '0';
+  }
 
   let builder = Test.createTestingModule({ imports: [AppModule] });
   if (customize) builder = customize(builder);
