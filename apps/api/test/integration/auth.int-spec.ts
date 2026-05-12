@@ -108,4 +108,53 @@ describe('Integration: Auth', () => {
       })
       .expect(403);
   });
+
+  it('rejects a previously-issued JWT once the user is deactivated, without waiting for expiry', async () => {
+    const org = await createOrg(ctx.pool);
+    const admin = await createUser({
+      pool: ctx.pool,
+      orgId: org.id,
+      role: UserRole.ADMIN,
+      email: 'will-be-deactivated@org.test',
+      password: 'Password1',
+    });
+
+    // Issue a JWT while the account is active.
+    const { accessToken } = await loginAs(ctx.app, admin.email, 'Password1');
+
+    // Sanity: the token works before deactivation.
+    await request(ctx.app.getHttpServer())
+      .get('/api/v1/contractors')
+      .set(authHeader(accessToken))
+      .expect(200);
+
+    // Deactivate the user out-of-band.
+    await ctx.pool.query('UPDATE users SET is_active = false WHERE id = $1', [admin.id]);
+
+    // The very next request with the same JWT must now 401, even though
+    // the token signature is still valid and the exp claim has not passed.
+    const res = await request(ctx.app.getHttpServer())
+      .get('/api/v1/contractors')
+      .set(authHeader(accessToken))
+      .expect(401);
+    expect(res.body.error?.message ?? '').toBeTruthy();
+  });
+
+  it('rejects a JWT whose subject has been deleted', async () => {
+    const org = await createOrg(ctx.pool);
+    const admin = await createUser({
+      pool: ctx.pool,
+      orgId: org.id,
+      role: UserRole.ADMIN,
+      email: 'will-be-deleted@org.test',
+      password: 'Password1',
+    });
+    const { accessToken } = await loginAs(ctx.app, admin.email, 'Password1');
+    await ctx.pool.query('DELETE FROM users WHERE id = $1', [admin.id]);
+
+    await request(ctx.app.getHttpServer())
+      .get('/api/v1/contractors')
+      .set(authHeader(accessToken))
+      .expect(401);
+  });
 });
