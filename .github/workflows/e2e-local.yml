@@ -76,9 +76,12 @@ jobs:
 
       - name: Start api + web and wait for stack
         run: |
-          nohup pnpm --filter @contractor-os/api start > /tmp/api.log 2>&1 &
+          # Direct node invocation avoids pnpm/turbo wrapper races that
+          # caused the api process to be spawned twice and trip
+          # EADDRINUSE on port 3001.
+          nohup node apps/api/dist/main.js > /tmp/api.log 2>&1 &
           echo $! > /tmp/api.pid
-          nohup pnpm --filter @contractor-os/web start > /tmp/web.log 2>&1 &
+          nohup node apps/web/node_modules/next/dist/bin/next start --dir apps/web --port 3000 > /tmp/web.log 2>&1 &
           echo $! > /tmp/web.pid
 
           for i in $(seq 1 90); do
@@ -90,8 +93,8 @@ jobs:
             sleep 1
           done
 
-          echo "===== api.log tail ====="; tail -50 /tmp/api.log || true
-          echo "===== web.log tail ====="; tail -50 /tmp/web.log || true
+          echo "===== api.log tail ====="; tail -80 /tmp/api.log || true
+          echo "===== web.log tail ====="; tail -80 /tmp/web.log || true
           echo "stack failed to come up"
           exit 1
 
