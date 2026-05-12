@@ -3,7 +3,7 @@
 A single-page snapshot of the current state of testing, coverage, mutation, performance, and security across the codebase. Regenerate with `scripts/quality-snapshot.sh`.
 
 <!-- snapshot:start -->
-**Last updated**: 2026-05-08 from commit `d8be71a` on branch `docs/ai-testing-and-quality-dashboard`.
+**Last updated**: 2026-05-12 from commit `169eb87` on branch `main`.
 
 This dashboard reflects the state when all of PRs #2, #3, #4, #7, #8, #9, #13, #17 have landed. Numbers are sourced from the latest test run on each prior PR's branch and rolled up here; running the snapshot script against a fresh `main` after the merges will produce the same numbers within rounding.
 <!-- snapshot:end -->
