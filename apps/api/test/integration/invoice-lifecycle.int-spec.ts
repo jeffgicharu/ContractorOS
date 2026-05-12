@@ -245,16 +245,11 @@ describe('Integration: Invoice state machine', () => {
     const second = await request(ctx.app.getHttpServer())
       .post('/api/v1/invoices')
       .set(authHeader(fx.contractorToken))
-      .send(payload);
-    // Either the system returns 2xx with the same id (full Idempotency-Key
-    // semantics) or any non-2xx because a duplicate natural key is rejected.
-    // What must hold either way: only ONE row exists with this number, and
-    // it is the first one we created.
-    if (second.status >= 200 && second.status < 300) {
-      expect(second.body.data.id).toBe(firstId);
-    } else {
-      expect(second.status).toBeGreaterThanOrEqual(400);
-    }
+      .send(payload)
+      .expect(422);
+
+    expect(second.body.error.code).toBe('DUPLICATE_INVOICE_NUMBER');
+    expect(second.body.error.message).toMatch(/INV-IDEMPO-001/);
 
     const rows = await ctx.pool.query<{ id: string; status: string }>(
       'SELECT id, status FROM invoices WHERE invoice_number = $1',
