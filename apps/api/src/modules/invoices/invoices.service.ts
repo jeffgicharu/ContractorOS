@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import type {
   Invoice,
@@ -68,12 +69,24 @@ export class InvoicesService {
       });
     }
 
-    const invoice = await this.repo.create(
-      engagement.organizationId,
-      contractorId,
-      engagement.id,
-      input,
-    );
+    let invoice: Invoice;
+    try {
+      invoice = await this.repo.create(
+        engagement.organizationId,
+        contractorId,
+        engagement.id,
+        input,
+      );
+    } catch (err: unknown) {
+      // Postgres unique_violation on (organization_id, invoice_number).
+      if (isUniqueViolation(err)) {
+        throw new UnprocessableEntityException({
+          code: 'DUPLICATE_INVOICE_NUMBER',
+          message: `Invoice number ${input.invoiceNumber} already exists for this organization`,
+        });
+      }
+      throw err;
+    }
     this.logger.log(`Invoice created: ${invoice.id} (${invoice.invoiceNumber})`);
     return invoice;
   }
@@ -459,4 +472,14 @@ export class InvoicesService {
 
     return contractor.id;
   }
+}
+
+// Postgres SQLSTATE 23505 = unique_violation. Any pg-driver error
+// surfaces with `code === '23505'`; the constraint name lets us narrow
+// to the (organization_id, invoice_number) UNIQUE if we ever add more
+// uniques to the invoices table.
+function isUniqueViolation(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const { code } = err as { code?: unknown };
+  return code === '23505';
 }
