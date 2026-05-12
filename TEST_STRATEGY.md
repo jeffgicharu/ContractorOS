@@ -256,3 +256,21 @@ The canonical list. If a tool is not in this table, it is not part of the offici
 | **node-pg-migrate** | DB migration smoke (apply on a clean DB, run seed) | CI on every PR (db-migrate-check job) | Backend team |
 
 `pre-commit` is implemented via lint-staged so only the changed files run their relevant gates locally. `pre-push` is reserved for fast tests only (unit + lint + type-check); integration and E2E run in CI.
+
+---
+
+## See also
+
+The single index for all quality engineering work in this repo is **[QUALITY_DASHBOARD.md](./QUALITY_DASHBOARD.md)** — coverage, mutation, performance, and security metrics in one place.
+
+| Document | Purpose |
+|---|---|
+| [AUDIT.md](./AUDIT.md) | Baseline assessment that drove the test work |
+| [TEST_STRATEGY.md](./TEST_STRATEGY.md) | Pyramid, coverage targets, CI gates, non-functional budgets |
+| [TEST_PLAN.md](./TEST_PLAN.md) | Scenario list for the highest-value workflow |
+| [QA_BEST_PRACTICES.md](./QA_BEST_PRACTICES.md) | Review checklist, naming, flaky-test policy, mock policy |
+| [CONTRACT_TESTING.md](./CONTRACT_TESTING.md) | Pact consumer-driven contracts between web and api |
+| [MUTATION_TESTING.md](./MUTATION_TESTING.md) | Stryker setup, baselines, top surviving mutants |
+| [PERFORMANCE_TESTING.md](./PERFORMANCE_TESTING.md) | k6 suite, SLO budgets, baseline runs |
+| [SECURITY_TESTING.md](./SECURITY_TESTING.md) | Threat model, CodeQL/Snyk/Trivy/ZAP, custom security suite |
+| [AI_TESTING_PLAYBOOK.md](./AI_TESTING_PLAYBOOK.md) | How AI assistance is used (and not used) when authoring tests |
