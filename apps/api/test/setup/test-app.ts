@@ -1,5 +1,6 @@
 import { Test, type TestingModuleBuilder } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -55,7 +56,8 @@ export async function createTestApp(
   if (customize) builder = customize(builder);
   const moduleRef = await builder.compile();
 
-  const app = moduleRef.createNestApplication({ logger: false });
+  const app = moduleRef.createNestApplication<NestExpressApplication>({ logger: false });
+  app.disable('x-powered-by');
   app.setGlobalPrefix('api/v1');
   app.use(cookieParser());
   await app.init();
