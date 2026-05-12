@@ -10,6 +10,8 @@
     "test": "turbo test",
     "test:integration": "turbo test:integration",
     "test:contracts": "pnpm --filter @contractor-os/web test:pact && pnpm --filter @contractor-os/api test:pact:verify",
+    "test:mutation:all": "pnpm --filter @contractor-os/shared test:mutation && pnpm --filter @contractor-os/api test:mutation && pnpm --filter @contractor-os/web test:mutation",
+    "test:mutation:changed": "node scripts/mutation-changed.mjs",
     "clean": "turbo clean"
   },
   "pnpm": {

@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, 'test/**']
   push:
     branches: [main]
   workflow_call:
@@ -255,6 +255,47 @@ jobs:
         with:
           name: pact-contracts
           path: pacts/*.json
+          retention-days: 30
+
+  mutation-tests:
+    name: Mutation Tests (Stryker)
+    runs-on: ubuntu-latest
+    # Total wall-clock for the three suites is ~7 minutes (shared 1m12s,
+    # web 1m48s, api 3m43s). That puts us in the < 8 min bracket per the
+    # strategy in MUTATION_TESTING.md, so we run on every PR rather than
+    # gating per changed package or moving to a nightly schedule.
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared package (api jest needs the dist source map)
+        run: pnpm --filter @contractor-os/shared build
+
+      - name: Run mutation tests across shared, api, web
+        run: pnpm test:mutation:all
+
+      - name: Upload mutation reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutation-reports
+          path: |
+            packages/shared/reports/mutation
+            apps/api/reports/mutation
+            apps/web/reports/mutation
           retention-days: 30
 
   e2e-tests:

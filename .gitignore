@@ -25,6 +25,8 @@ Thumbs.db
 coverage/
 coverage-integration/
 coverage-combined/
+reports/mutation/
+.stryker-tmp/
 
 # Logs
 *.log
@@ -38,6 +40,9 @@ cypress/videos/
 
 # Uploads (local file storage for MVP)
 uploads/
+
+# Test artefacts written by LocalFileStorageService unit tests
+apps/api/documents/
 
 # Claude Code
 .claude/
