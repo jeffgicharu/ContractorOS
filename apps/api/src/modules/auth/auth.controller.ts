@@ -128,10 +128,13 @@ export class AuthController {
 
   private setRefreshCookie(res: Response, token: string): void {
     const isProduction = process.env['NODE_ENV'] === 'production';
+    // SameSite=Strict on every environment — the refresh-token cookie
+    // is an authentication credential and must never travel on
+    // cross-site navigations regardless of NODE_ENV.
     res.cookie(REFRESH_COOKIE_NAME, token, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'strict' : 'lax',
+      sameSite: 'strict',
       maxAge: REFRESH_COOKIE_MAX_AGE,
       path: '/',
     });
