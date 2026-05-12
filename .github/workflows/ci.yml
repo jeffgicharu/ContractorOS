@@ -41,6 +41,68 @@ jobs:
       - name: Unit tests
         run: pnpm --filter @contractor-os/api test
 
+  shared-tests:
+    name: Shared Package Tests (Vitest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run shared tests with coverage
+        run: pnpm --filter @contractor-os/shared test:cov
+
+      - name: Upload shared coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-coverage
+          path: packages/shared/coverage
+          retention-days: 7
+
+  web-tests:
+    name: Web Component Tests (Vitest + RTL)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run web tests with coverage
+        run: pnpm --filter @contractor-os/web test:cov
+
+      - name: Upload web coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-coverage
+          path: apps/web/coverage
+          retention-days: 7
+
   storybook-build:
     name: Storybook Build
     runs-on: ubuntu-latest
