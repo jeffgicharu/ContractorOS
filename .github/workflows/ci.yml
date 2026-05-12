@@ -360,6 +360,9 @@ jobs:
           PORT: '3001'
           NODE_ENV: production
           CORS_ORIGIN: http://localhost:3000
+          # Disable per-IP rate limiting for the perf smoke — the k6
+          # smoke fires hundreds of requests from a single source.
+          THROTTLE_LIMIT: '0'
         run: |
           pnpm --filter @contractor-os/api start &
           for i in $(seq 1 30); do
@@ -444,6 +447,9 @@ jobs:
           JWT_SECRET: ci-test-secret
           JWT_EXPIRES_IN: 15m
           PORT: 3001
+          # Disable per-IP rate limiting for Cypress E2E — the suite
+          # fires many sequential requests from a single source.
+          THROTTLE_LIMIT: '0'
         run: pnpm --filter @contractor-os/api start &
 
       - name: Start web server
