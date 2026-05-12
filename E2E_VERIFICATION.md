@@ -125,17 +125,17 @@ backlog issues. They are filed as new GitHub issues in deliverable §9.
 Two divergences worth surfacing — they're how local code differs from
 the deployed system, *not* code bugs:
 
-### D-1 — Cookie `SameSite` attribute
+### D-1 — Cookie `SameSite` attribute *(resolved)*
 
 | | Local | Live |
 |---|---|---|
-| `refresh_token` cookie | `SameSite=Lax` | `SameSite=Strict` |
+| `refresh_token` cookie | `SameSite=Strict` | `SameSite=Strict` |
 
-The live deployment was either patched in place or the production build
-hardens the cookie attributes differently. Backlog **issue #16** asks
-for `Strict` everywhere — the live deploy already has it. The fix for
-#16 needs to align the local default; aligning the test annotations on
-the cookie attribute is part of that work.
+Previously local was `Lax`, live was `Strict` (the production build
+toggled on `NODE_ENV`). Fixed in #16 by issuing `Strict` in every
+environment — the refresh-token cookie is an authentication credential
+and must never travel on cross-site navigations regardless of
+`NODE_ENV`. Local and live are now aligned.
 
 ### C-1 — WebKit cannot launch on this dev box
 

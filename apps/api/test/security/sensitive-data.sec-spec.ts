@@ -79,7 +79,7 @@ describe('Security: Sensitive data handling', () => {
     expect(body).not.toMatch(/\$2[abxy]\$/);
   });
 
-  it('refresh-token cookie is HttpOnly and at least SameSite=Lax (FINDING — Strict preferred, see filed issue)', async () => {
+  it('refresh-token cookie is HttpOnly and SameSite=Strict in every environment', async () => {
     const org = await createOrg(ctx.pool);
     const admin = await createUser({
       pool: ctx.pool,
@@ -103,10 +103,9 @@ describe('Security: Sensitive data handling', () => {
     const refresh = cookies.find((c) => c.startsWith('refresh_token='));
     expect(refresh).toBeDefined();
     expect(refresh!).toMatch(/HttpOnly/i);
-    // Today: SameSite=Lax. Strict is preferred and tracked as a
-    // backlog issue. When the api is updated to issue Strict, change
-    // this to /SameSite=Strict/i to lock in the harder default.
-    expect(refresh!).toMatch(/SameSite=(Strict|Lax)/i);
+    // SameSite=Strict in every environment — the cookie is an
+    // authentication credential and must never travel cross-site.
+    expect(refresh!).toMatch(/SameSite=Strict/i);
   });
 
   it('X-Powered-By header is not present on any response', async () => {

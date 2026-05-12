@@ -23,14 +23,13 @@ test('live issue #16 — refresh-token cookie is SameSite=Strict on the live dep
   expect(setCookie).toMatch(/refresh.*SameSite=Strict/i);
 });
 
-// Issue #14 — public-facing posture only: confirm /api/v1/health does
-// NOT expose dependency / version metadata that the dependency-CVE
-// advisories would attach to. Today the body is permissive.
-test.fail('live issue #14 — /health response should not leak server version metadata', async ({ request }) => {
+// Issue #20 — public-facing posture: /api/v1/health must not leak
+// server-fingerprint metadata. After the fix landed and was deployed,
+// `X-Powered-By: Express` is gone. This is now a regression-guard.
+test('live issue #20 — /health response does not leak server-fingerprint metadata', async ({ request }) => {
   const r = await request.get('https://contractoros.jeffgicharu.com/api/v1/health', {
     failOnStatusCode: false,
   });
   const headers = r.headers();
-  // Today there is no `X-Powered-By` stripping. After the fix this should pass.
   expect(headers['x-powered-by']).toBeUndefined();
 });

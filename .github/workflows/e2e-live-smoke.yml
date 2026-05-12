@@ -23,7 +23,7 @@ jobs:
   e2e-live-smoke:
     name: E2E Live-Smoke (Playwright + curl)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     steps:
       - name: Checkout

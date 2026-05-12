@@ -57,8 +57,8 @@ test.skip('issue #15 — a deactivated user keeps API access until their JWT exp
   // Placeholder body — the skip annotation above prevents execution.
 });
 
-// Issue #16 — refresh-token cookie uses SameSite=Lax; Strict is preferred.
-test.fail('issue #16 — refresh-token cookie should be SameSite=Strict', async ({ request }) => {
+// Issue #16 — refresh-token cookie is now SameSite=Strict everywhere.
+test('issue #16 — refresh-token cookie is SameSite=Strict in every environment', async ({ request }) => {
   const r = await request.post('http://localhost:3001/api/v1/auth/login', {
     data: { email: LOCAL_SEED_ADMIN.email, password: LOCAL_SEED_ADMIN.password },
     failOnStatusCode: false,
