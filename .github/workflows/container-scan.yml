@@ -50,7 +50,7 @@ jobs:
           # Skip transitive test-fixture Dockerfiles inside node_modules
           # (e.g. getos/tests/...). They are not our code and not shipped.
           # Real CVEs in node_modules still surface via the pnpm scanner.
-          skip-dirs: 'node_modules,**/node_modules'
+          skip-dirs: node_modules
 
       - name: Upload fs SARIF
         if: always()
