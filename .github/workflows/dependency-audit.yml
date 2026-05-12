@@ -39,5 +39,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Audit (advisory — report high+critical without failing)
-        run: pnpm audit --audit-level=high || true
+      - name: Audit (high+critical fail the build)
+        run: pnpm audit --audit-level=high

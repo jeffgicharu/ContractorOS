@@ -36,7 +36,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Trivy fs scan (secrets + manifest CVEs)
+      # Two passes so the build fails on a clear, human-readable report
+      # AND a SARIF still lands in code-scanning. SARIF format alone
+      # does not echo findings to the job log.
+      - name: Trivy fs scan (table — fail-on-findings)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: '.'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+          scanners: 'vuln,secret,misconfig'
+          # Skip transitive test-fixture Dockerfiles inside node_modules
+          # (e.g. getos/tests/...). They are not our code and not shipped.
+          # Real CVEs in node_modules still surface via the pnpm scanner.
+          skip-dirs: node_modules
+
+      - name: Trivy fs scan (SARIF — code scanning upload)
+        if: always()
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
@@ -47,6 +66,7 @@ jobs:
           format: sarif
           output: trivy-fs-results.sarif
           scanners: 'vuln,secret,misconfig'
+          skip-dirs: node_modules
 
       - name: Upload fs SARIF
         if: always()
@@ -73,7 +93,25 @@ jobs:
           load: true
           tags: contractor-os-api:scan
 
-      - name: Trivy image scan
+      - name: Trivy image scan (table — fail-on-findings)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: contractor-os-api:scan
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          ignore-unfixed: true
+          format: table
+          # The bundled npm CLI inside the node:22-alpine base image
+          # ships with its own picomatch. We do not invoke npm at
+          # runtime (the image runs node directly on dist/main.js), so
+          # the base-image npm tree is not exposed. Skip its node_modules
+          # to keep the gate strict on the app surface that actually
+          # serves traffic.
+          skip-dirs: 'usr/local/lib/node_modules/npm'
+
+      - name: Trivy image scan (SARIF — code scanning upload)
+        if: always()
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: image
@@ -83,6 +121,7 @@ jobs:
           ignore-unfixed: true
           format: sarif
           output: trivy-image-results.sarif
+          skip-dirs: 'usr/local/lib/node_modules/npm'
 
       - name: Upload image SARIF
         if: always()

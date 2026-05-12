@@ -28,7 +28,7 @@
     "@contractor-os/shared": "workspace:*",
     "lucide-react": "^0.575.0",
     "motion": "^12.34.3",
-    "next": "^15.2.0",
+    "next": "^15.5.18",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-parallax-tilt": "^1.7.319",
