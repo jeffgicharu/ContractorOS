@@ -18,6 +18,10 @@
     "storybook:build": "storybook build",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
+    "test:e2e": "playwright test --project=local-chromium --project=local-firefox --project=local-webkit --project=live-smoke-chromium --project=live-smoke-firefox --project=live-smoke-webkit",
+    "test:e2e:local": "playwright test --project=local-chromium --project=local-firefox --project=local-webkit",
+    "test:e2e:live": "playwright test --project=live-smoke-chromium --project=live-smoke-firefox --project=live-smoke-webkit",
+    "test:e2e:ui": "playwright test --ui",
     "clean": "rm -rf .next"
   },
   "dependencies": {
@@ -33,6 +37,7 @@
   },
   "devDependencies": {
     "@pact-foundation/pact": "^16.4.0",
+    "@playwright/test": "^1.60.0",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/nextjs": "^8.6.17",
     "@storybook/react": "^8.6.17",

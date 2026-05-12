@@ -1,0 +1,69 @@
+name: E2E Live-Smoke (Playwright + curl)
+
+# Runs the gentle, read-mostly live-smoke Playwright suite + curl-live
+# sweep against https://contractoros.jeffgicharu.com. The suite uses the
+# stable demo accounts seeded by apps/api/scripts/seed-demo-accounts.ts
+# and the e2e-test-* prefix for any data it creates; a daily cleanup
+# cron on the VPS scrubs the prefix at 03:00 UTC.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *' # daily 06:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-live-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-live-smoke:
+    name: E2E Live-Smoke (Playwright + curl)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers + system deps
+        run: pnpm --filter @contractor-os/web exec playwright install --with-deps chromium firefox webkit
+
+      - name: Run curl-live endpoint sweep
+        run: |
+          mkdir -p e2e-results
+          CURL_OUT=e2e-results/curl-live.md bash scripts/verify-endpoints-live.sh
+
+      - name: Run Playwright live-smoke suite
+        run: pnpm --filter @contractor-os/web exec playwright test --project=live-smoke-chromium --project=live-smoke-firefox --project=live-smoke-webkit
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-live-smoke
+          path: apps/web/playwright-report
+          retention-days: 30
+
+      - name: Upload curl-live results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: curl-live-results
+          path: e2e-results/curl-live.md
+          retention-days: 30

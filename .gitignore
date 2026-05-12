@@ -40,6 +40,11 @@ performance/results/
 # OWASP ZAP scan results (from .github/workflows/dast-zap.yml)
 security/zap/
 
+# Playwright artefacts
+apps/web/test-results/
+apps/web/playwright-report/
+e2e-results/
+
 # Logs
 *.log
 
