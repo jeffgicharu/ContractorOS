@@ -21,16 +21,20 @@ test('accessing a protected route while logged out redirects to /login', async (
   await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
 });
 
-test('logout clears the session and bounces protected routes back to /login', async ({ page }) => {
+test('admin shell exposes a visible logout that clears the session', async ({ page }) => {
   await loginAs(page, LOCAL_SEED_ADMIN.email, LOCAL_SEED_ADMIN.password, 'admin');
 
-  const logout = page.getByRole('button', { name: /log ?out|sign ?out/i }).or(
-    page.getByRole('link', { name: /log ?out|sign ?out/i }),
-  );
-  const hasLogout = await logout.first().isVisible().catch(() => false);
-  test.skip(!hasLogout, 'no visible logout control in the admin shell — see E2E_VERIFICATION.md (new finding)');
+  // The user menu lives in the right-hand corner of the admin header.
+  // Open it and click the explicit "Log out" item.
+  await page.getByRole('button', { name: /account menu/i }).click();
+  const logoutItem = page.getByRole('menuitem', { name: /log out/i });
+  await expect(logoutItem).toBeVisible();
+  await logoutItem.click();
 
-  await logout.first().click();
+  // Land on /login.
+  await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
+
+  // And a subsequent attempt to reach a protected route bounces back.
   await page.goto('/dashboard');
   await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
 });

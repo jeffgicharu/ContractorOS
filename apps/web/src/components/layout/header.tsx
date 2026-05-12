@@ -1,10 +1,11 @@
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { ChevronRight, Menu, Search } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { ChevronRight, LogOut, Menu, Search, User } from 'lucide-react';
 import { NotificationDropdown } from '@/components/notifications/notification-dropdown';
+import { useAuth } from '@/hooks/use-auth';
 
 const PATH_LABELS: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -105,7 +106,89 @@ export function Header({ onMenuToggle }: HeaderProps) {
           <Search className="h-[18px] w-[18px]" />
         </button>
         <NotificationDropdown />
+        <UserMenu />
       </div>
     </header>
+  );
+}
+
+function UserMenu() {
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (!ref.current || !(e.target instanceof Node)) return;
+      if (!ref.current.contains(e.target)) setOpen(false);
+    }
+    if (open) document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [open]);
+
+  async function handleLogout() {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await logout();
+    } finally {
+      setSigningOut(false);
+      setOpen(false);
+      router.push('/login');
+    }
+  }
+
+  const initials = user
+    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || user.email[0]?.toUpperCase()
+    : '?';
+  const label = user ? `${user.firstName} ${user.lastName}`.trim() || user.email : 'Account';
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        aria-label="Account menu"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-[12px] font-semibold text-indigo-700 transition-colors hover:bg-indigo-200"
+      >
+        {initials}
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg"
+        >
+          <div className="border-b border-slate-100 px-4 py-3">
+            <p className="truncate text-[13px] font-medium text-slate-900">{label}</p>
+            {user?.email && (
+              <p className="truncate text-[12px] text-slate-500">{user.email}</p>
+            )}
+          </div>
+          <Link
+            href="/settings"
+            onClick={() => setOpen(false)}
+            role="menuitem"
+            className="flex items-center gap-2 px-4 py-2 text-[13px] text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            <User className="h-3.5 w-3.5 text-slate-400" />
+            Settings
+          </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={signingOut}
+            role="menuitem"
+            className="flex w-full items-center gap-2 px-4 py-2 text-left text-[13px] text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+          >
+            <LogOut className="h-3.5 w-3.5 text-slate-400" />
+            {signingOut ? 'Signing out…' : 'Log out'}
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
