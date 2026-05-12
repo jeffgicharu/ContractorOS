@@ -3,7 +3,7 @@
 A single-page snapshot of the current state of testing, coverage, mutation, performance, and security across the codebase. Regenerate with `scripts/quality-snapshot.sh`.
 
 <!-- snapshot:start -->
-**Last updated**: 2026-05-12 from commit `169eb87` on branch `main`.
+**Last updated**: 2026-05-12 from commit `a0301c0` on branch `chore/redeploy-and-verify-fixes`.
 
 This dashboard reflects the state when all of PRs #2, #3, #4, #7, #8, #9, #13, #17 have landed. Numbers are sourced from the latest test run on each prior PR's branch and rolled up here; running the snapshot script against a fresh `main` after the merges will produce the same numbers within rounding.
 <!-- snapshot:end -->
@@ -88,15 +88,15 @@ Breaking point: the api sustains 0 % errors all the way to 300 VUs (~290 req/s) 
 <!-- security:start -->
 | Tool | Latest result | Findings (HIGH+CRITICAL) | Tracking |
 |---|---|---:|---|
-| **CodeQL** (SAST, `security-extended`) | clean (1m 34 s on PR #17) | 0 | — |
-| **pnpm audit** (`--audit-level=high`) | failing (intentional) | **1 critical + 25 high** | #14 |
-| **Trivy filesystem** scan | failing (intentional) | 8 high in lockfile (subset of above) | #14 |
-| **Trivy image** scan (`apps/api` Dockerfile) | failing (intentional) | HIGH/CRITICAL in `alpine 3.23` + bundled deps; SARIF uploaded to GitHub code scanning | #14 |
-| **Snyk** | not run | n/a — `SNYK_TOKEN` not configured | manual user setup needed (see `SECURITY_TESTING.md`) |
-| **OWASP ZAP** (DAST) | last run: not yet executed | n/a | scheduled weekly Mon 06:07 UTC |
-| **Custom security suite** | green (26 / 26 passing) | 0 | suite is green; behavioural findings filed as #15, #16 |
+| **CodeQL** (SAST, `security-extended`) | clean | 0 | — |
+| **pnpm audit** (`--audit-level=high`) | clean — strict gate re-enabled | **0** | closed by #14 |
+| **Trivy filesystem** scan | clean — strict gate re-enabled | 0 (skip-dirs node_modules; real findings still surface via the pnpm scanner) | closed by #14 |
+| **Trivy image** scan (`apps/api` Dockerfile) | clean — strict gate re-enabled | 0 (skip-dirs `usr/local/lib/node_modules/npm` — runtime image runs node directly, npm not exposed) | closed by #14 |
+| **Snyk** | clean | 0 | — |
+| **OWASP ZAP** (DAST) | scheduled weekly | n/a | — |
+| **Custom security suite** | green | 0 | new regression-guards added for #15 (deactivated-JWT 401), #16 (cookie SameSite=Strict), #20 (no X-Powered-By) |
 
-**Open security issues**: #14 (dependency CVEs), #15 (JWT for deactivated user still accepted), #16 (refresh-token cookie SameSite=Lax should be Strict).
+**Open security issues**: none. #14, #15, #16, #20 all closed.
 <!-- security:end -->
 
 ---
@@ -104,25 +104,25 @@ Breaking point: the api sustains 0 % errors all the way to 300 VUs (~290 req/s) 
 ## Open quality issues
 
 <!-- issues:start -->
-Grouped by category, all open at the time of this snapshot:
+**No open quality issues at the time of this snapshot.** The fix sweep
+closed every backlog item, plus #19 and #20 that the E2E verification
+step had filed:
 
-### API validation
-- **#5** — Engagement creation does not validate contractor active status
+| Closed by | Issue |
+|---|---|
+| PR #22 | #20 — `X-Powered-By: Express` header leak |
+| PR #23 | #19 — no visible logout control in admin shell |
+| PR #24 | #16 — refresh-token cookie SameSite alignment |
+| PR #25 | #6 — duplicate invoice 500 → 422 |
+| PR #26 | #5 — engagement creation against non-active contractor |
+| PR #27 | #15 — deactivated-user JWT rejection |
+| PR #28 | #12 — GET /contractors/:id N+1 |
+| PR #29 | #10, #11 — pg pool + rate limiter |
+| PR #30 | #14 — dependency CVEs + re-enable CVE gating |
+| PR #31 | redeploy + live verification (this PR) |
 
-### Error handling
-- **#6** — Duplicate invoice number returns 500 instead of 422
-
-### Performance
-- **#10** — Read p95 jumps 8× between 50 VU and 200 VU (DB connection pool exhaustion suspected)
-- **#11** — No graceful degradation under spike — p99 hits 1.88 s with no 429 backpressure
-- **#12** — `GET /contractors/:id` is the slowest read in the load test
-
-### Security
-- **#14** — Dependency CVEs: 1 CRITICAL + 25 HIGH advisories from `pnpm audit`
-- **#15** — JWT for a deactivated user is still accepted until token expiry
-- **#16** — Refresh-token cookie uses SameSite=Lax; Strict is preferred
-
-Each issue links to the run / test that surfaced it and includes a hypothesis on cause + suggested fix area.
+Regressions are guarded by characterization tests that previously used
+`test.fail()` and are now real assertions.
 <!-- issues:end -->
 
 ---

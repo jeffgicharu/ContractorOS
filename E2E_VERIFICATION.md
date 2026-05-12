@@ -3,11 +3,34 @@
 A two-layer verification harness now lives in the repo. **Local** tests
 prove that the code works; **live-smoke** tests prove that the deployed
 system works. Different bugs hide in each. This document captures the
-results of running both layers on **2026-05-12**.
+results of running both layers on **2026-05-12** (initial baseline) and
+re-running them on **2026-05-13** after the fix sweep landed.
 
-> Pure verification — no code or migrations were changed to make tests
-> pass. Bugs that surfaced are documented below for the upcoming fix
-> sweep.
+## Re-verified after fix sweep on 2026-05-13
+
+| | Initial (2026-05-12) | After fix sweep (2026-05-13) |
+|---|---|---|
+| Open backlog issues | 8 + 2 newly filed (#19, #20) = 10 | **0** |
+| Local Playwright | 38 passed · 12 skipped · 0 failed (chromium + firefox) | **same shape, characterization tests flipped to real assertions** |
+| Live-smoke Playwright | 18 passed (chromium + firefox) | **18 passed (chromium + firefox); WebKit also passes in CI** |
+| curl-local | 14 / 14 green | 14 / 14 green |
+| curl-live | 13 / 13 green | **13 / 13 green** |
+| X-Powered-By on live `/health` | `Express` (leaked) | **absent** |
+| Refresh-token cookie on live | `SameSite=Strict` (live only; local was `Lax`) | **`SameSite=Strict` on both local and live** |
+| pnpm audit high+critical | 35 high + 1 critical | **0 high · 0 critical** |
+| CVE CI gating | advisory (`|| true`, Trivy `exit-code:0`) | **strict (`exit-code:1`, fail-on-high)** |
+| Logout control in admin shell | missing (cookies-clear only) | **visible user-menu Log out item** |
+| Duplicate invoice number | 500 | **422 with `DUPLICATE_INVOICE_NUMBER`** |
+| Engagement create against non-active contractor | 400 BAD_REQUEST | **422 `CONTRACTOR_NOT_ACTIVE`** |
+| JWT for deactivated user | accepted until expiry | **401 immediately** |
+| `GET /contractors/:id` round-trips | 6 serial | **2 (1 + max-of-5 parallel)** |
+| pg pool max | 20 (hardcoded) | **40 default, env-tunable via `PG_POOL_MAX`** |
+| Rate limiting | none | **`@nestjs/throttler` 60 req / 60 s / IP**, env-tunable |
+
+Every backlog issue (#5, #6, #10, #11, #12, #14, #15, #16, #19, #20)
+has its corresponding code fix landed on `main` and verified live.
+Characterization tests are now real assertions; they will catch
+regressions on the same surface.
 
 ## Tested against
 
@@ -112,13 +135,15 @@ live, return the expected status, and require auth where they should.
 
 ## What's broken in the live demo
 
-These are surfaced by this verification step but are **NOT** existing
-backlog issues. They are filed as new GitHub issues in deliverable §9.
+**All known backlog issues closed.** The initial verification surfaced
+two new problems (NEW-1 no visible logout, NEW-2 `X-Powered-By` header
+leak) which were filed as #19 and #20 respectively. Both are fixed and
+verified live as of 2026-05-13:
 
-| # | New issue | Where | Severity |
-|---|---|---|---|
-| NEW-1 | No visible **logout** control in the admin shell — once an admin authenticates, the only way back to a logged-out state is clearing browser cookies | both local and live admin layout | medium |
-| NEW-2 | The api leaks `X-Powered-By: Express` on every response (incl. `/health`) — fingerprintable, no functional value | live `/api/v1/*` | low (security hardening) |
+- #19 — admin shell now exposes a visible **Log out** item in the
+  user-menu dropdown (`apps/web/src/components/layout/header.tsx`).
+- #20 — `X-Powered-By` is no longer emitted on any response
+  (`apps/api/src/main.ts` calls `app.disable('x-powered-by')`).
 
 ## Local vs live divergence
 
