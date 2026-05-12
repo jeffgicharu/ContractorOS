@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { EngagementsService } from './engagements.service';
 import { EngagementsRepository } from './engagements.repository';
 import { ContractorsRepository } from '../contractors/contractors.repository';
@@ -125,12 +125,12 @@ describe('EngagementsService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw BadRequestException if contractor is not active', async () => {
+    it('should throw UnprocessableEntityException if contractor is not active', async () => {
       contractorsRepo.findById.mockResolvedValue(MOCK_CONTRACTOR_DRAFT);
 
       await expect(
         service.create(ORG_ID, CONTRACTOR_ID, input),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(UnprocessableEntityException);
     });
   });
 

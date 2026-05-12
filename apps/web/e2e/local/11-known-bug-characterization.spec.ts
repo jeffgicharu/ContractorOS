@@ -7,11 +7,11 @@ import { LOCAL_SEED_ADMIN, loginAs } from '../fixtures/auth';
 // CI turns red, and the developer must flip the assertion to the
 // corrected behavior in the same change.
 
-// Issue #5 — Engagement creation does not validate contractor active status.
-// The fix is to reject engagement creation against non-active contractors
-// with a 4xx. Today the api accepts it. The local-suite cannot reliably
-// trigger this without seed manipulation, so we hit the api directly.
-test.fail('issue #5 — engagement creation against a non-active contractor still succeeds', async ({ request, page }) => {
+// Issue #5 — Engagement creation now rejects non-active contractors with
+// 422 + CONTRACTOR_NOT_ACTIVE. Full coverage lives in the api integration
+// suite (apps/api/test/integration/engagement.int-spec.ts). This spec is
+// a thin browser-level regression-guard.
+test('issue #5 — engagement creation against a non-active contractor is rejected with 422', async ({ request, page }) => {
   await loginAs(page, LOCAL_SEED_ADMIN.email, LOCAL_SEED_ADMIN.password, 'admin');
   const token = await page.evaluate(() => {
     return localStorage.getItem('accessToken') ?? sessionStorage.getItem('accessToken') ?? '';
@@ -21,15 +21,16 @@ test.fail('issue #5 — engagement creation against a non-active contractor stil
   });
   const list = await contractors.json().catch(() => ({}));
   const target = list?.data?.[0];
-  test.skip(!target, 'no non-active contractor in local seed — issue #5 characterization needs seed data');
+  test.skip(!target, 'no non-active contractor in local seed — covered by api integration suite');
 
-  const create = await request.post('http://localhost:3001/api/v1/engagements', {
+  const create = await request.post(`http://localhost:3001/api/v1/contractors/${target.id}/engagements`, {
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    data: { contractorId: target.id, title: 'E2E #5 probe', hourlyRate: 100, startDate: '2026-01-01' },
+    data: { title: 'E2E #5 probe', hourlyRate: 100, startDate: '2026-01-01' },
     failOnStatusCode: false,
   });
-  // The fix should make this 422; today it returns 201.
   expect(create.status()).toBe(422);
+  const body = await create.json().catch(() => ({}));
+  expect(body?.error?.code).toBe('CONTRACTOR_NOT_ACTIVE');
 });
 
 // Issue #6 — Duplicate invoice number is now normalized to 422 with a
