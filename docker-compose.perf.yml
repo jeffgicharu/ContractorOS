@@ -1,12 +1,18 @@
-# Performance-test target environment.
+# Performance-test target environment, also reused as a DAST target.
 #
 # Bring-up:
-#   pnpm build                                      # one-time host build
+#   pnpm install
+#   pnpm --filter @contractor-os/shared build
+#   pnpm --filter @contractor-os/api build
 #   docker compose -f docker-compose.perf.yml up -d
 #   pnpm tsx performance/seed-perf-data.ts          # populate at scale
 #
 # Tear-down:
 #   docker compose -f docker-compose.perf.yml down -v
+#
+# Used by:
+#   - performance/k6/* tests
+#   - .github/workflows/dast-zap.yml DAST scan
 #
 # The api runs in production mode (`node dist/main.js`). Source is mounted
 # read-only so a host rebuild reflects in the container without rebuilding

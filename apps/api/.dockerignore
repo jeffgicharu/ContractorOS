@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+coverage-integration
+coverage-combined
+.stryker-tmp
+test
+.env
+.env.*
+*.log
