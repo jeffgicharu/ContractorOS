@@ -31,25 +31,27 @@ function parseNonNegativeInt(raw: string | undefined, fallback: number): number 
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
 
-// Defaults: 60 req/min/IP. Tunable via THROTTLE_TTL (seconds) and
-// THROTTLE_LIMIT (request count). Disabling entirely is supported via
-// THROTTLE_LIMIT=0 — useful for k6 load tests and for the integration
-// suite that fires hundreds of requests in tight loops.
-const THROTTLE_TTL_SECONDS = parsePositiveInt(process.env['THROTTLE_TTL'], 60);
-const THROTTLE_LIMIT = parseNonNegativeInt(process.env['THROTTLE_LIMIT'], 60);
-
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    // THROTTLE_LIMIT=0 effectively disables the limiter by raising the
-    // ceiling far above any plausible per-IP traffic; the integration
-    // suite and k6 load tests rely on this.
-    ThrottlerModule.forRoot([
-      {
-        ttl: THROTTLE_TTL_SECONDS * 1000,
-        limit: THROTTLE_LIMIT === 0 ? Number.MAX_SAFE_INTEGER : THROTTLE_LIMIT,
+    // Throttler defaults: 60 req / 60 s / IP. Tunable via THROTTLE_TTL
+    // (seconds) and THROTTLE_LIMIT (count). Setting THROTTLE_LIMIT=0
+    // raises the ceiling to MAX_SAFE_INTEGER, which effectively disables
+    // the limiter — used by the integration suite and k6 load tests.
+    // `forRootAsync` (not `forRoot`) so the env vars are read at module
+    // instantiation, not at file-evaluation time.
+    ThrottlerModule.forRootAsync({
+      useFactory: () => {
+        const ttlSeconds = parsePositiveInt(process.env['THROTTLE_TTL'], 60);
+        const limit = parseNonNegativeInt(process.env['THROTTLE_LIMIT'], 60);
+        return [
+          {
+            ttl: ttlSeconds * 1000,
+            limit: limit === 0 ? Number.MAX_SAFE_INTEGER : limit,
+          },
+        ];
       },
-    ]),
+    }),
     DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule, InvoicesModule, DocumentsModule, ClassificationModule, OffboardingModule, NotificationsModule, AuditModule, OrganizationsModule,
   ],
   controllers: [HealthController],

@@ -1,46 +1,40 @@
 import request from 'supertest';
-import { Test } from '@nestjs/testing';
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import cookieParser from 'cookie-parser';
+import { createTestApp, type TestAppContext } from '../setup/test-app';
 
-// Build a fresh app *with* the rate limiter enabled (limit=3 / 60 s) and
-// assert that the 4th request from the same IP returns 429. This bypasses
-// the shared test-app fixture because that fixture deliberately disables
-// the limiter for the rest of the integration suite.
+// Forces a fresh app with the rate limiter active (limit=3 / 60 s) and
+// asserts the 4th request from the same IP returns 429. The shared
+// test-app fixture defaults to THROTTLE_LIMIT=0; the override here
+// re-enables it before the app is created so ThrottlerModule.forRootAsync
+// picks up the small ceiling at module-instantiation time.
 
 describe('Integration: Rate limiter (per-IP 429)', () => {
-  beforeAll(() => {
+  let ctx: TestAppContext;
+  let prevLimit: string | undefined;
+  let prevTtl: string | undefined;
+
+  beforeAll(async () => {
+    prevLimit = process.env.THROTTLE_LIMIT;
+    prevTtl = process.env.THROTTLE_TTL;
     process.env.THROTTLE_LIMIT = '3';
     process.env.THROTTLE_TTL = '60';
+    ctx = await createTestApp();
   });
 
-  afterAll(() => {
-    process.env.THROTTLE_LIMIT = '0';
+  afterAll(async () => {
+    await ctx.close();
+    if (prevLimit === undefined) delete process.env.THROTTLE_LIMIT;
+    else process.env.THROTTLE_LIMIT = prevLimit;
+    if (prevTtl === undefined) delete process.env.THROTTLE_TTL;
+    else process.env.THROTTLE_TTL = prevTtl;
   });
 
   it('returns 429 after the configured limit is exceeded by a single IP', async () => {
-    // Force a fresh evaluation of AppModule so the throttler constants
-    // (which read from process.env at module-import time) pick up the
-    // values set in beforeAll above instead of any cached version.
-    jest.resetModules();
-    const { AppModule } = await import('../../src/app.module');
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    const app = moduleRef.createNestApplication<NestExpressApplication>({ logger: false });
-    app.disable('x-powered-by');
-    app.setGlobalPrefix('api/v1');
-    app.use(cookieParser());
-    await app.init();
-
-    try {
-      // Three allowed.
-      for (let i = 0; i < 3; i++) {
-        await request(app.getHttpServer()).get('/api/v1/health').expect(200);
-      }
-      // Fourth must be rate-limited.
-      const blocked = await request(app.getHttpServer()).get('/api/v1/health');
-      expect(blocked.status).toBe(429);
-    } finally {
-      await app.close();
+    // Three allowed.
+    for (let i = 0; i < 3; i++) {
+      await request(ctx.app.getHttpServer()).get('/api/v1/health').expect(200);
     }
+    // Fourth must be rate-limited.
+    const blocked = await request(ctx.app.getHttpServer()).get('/api/v1/health');
+    expect(blocked.status).toBe(429);
   });
 });
