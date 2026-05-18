@@ -192,8 +192,8 @@ export class ContractorsRepository {
         expiring: string;
       }>(
         `SELECT
-          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'w9' AND is_current = true) as has_w9,
-          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'contract' AND is_current = true) as has_contract,
+          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'w9' AND is_current = true AND (expires_at IS NULL OR expires_at > now())) as has_w9,
+          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'contract' AND is_current = true AND (expires_at IS NULL OR expires_at > now())) as has_contract,
           COUNT(*) FILTER (WHERE expires_at IS NOT NULL AND expires_at < now() + INTERVAL '30 days') as expiring
          FROM tax_documents WHERE contractor_id = $1 AND is_current = true`,
         [id],

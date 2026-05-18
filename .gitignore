@@ -69,3 +69,6 @@ CLAUDE.md
 PROJECT_BRIEF.md
 ARCHITECTURE.md
 DESIGN_SYSTEM.md
+
+# playwright-cli local session artifacts
+.playwright-cli/

@@ -9,12 +9,14 @@ import {
   generateEngagement,
   generateTimeEntries,
   generateInvoice,
-  generateDocument,
+  generateContractorDocuments,
+  generateAuditEvents,
   generateNotification,
   randomPick,
   randomBetween,
   randomDateOnly,
 } from './fixtures/generators';
+import type { ComplianceBucket } from './fixtures/generators';
 
 const BCRYPT_ROUNDS = 12;
 const CONTRACTOR_COUNT = 55;
@@ -84,6 +86,15 @@ async function demoSeed() {
       generateContractor(SEED_ORG_ID, i),
     );
     const activeContractorIds: string[] = [];
+    interface OnboardedContractor {
+      id: string;
+      type: 'domestic' | 'foreign';
+      tinLastFour: string | null;
+      name: string;
+      createdAt: string;
+      status: string;
+    }
+    const onboardedContractors: OnboardedContractor[] = [];
 
     for (let ci = 0; ci < contractors.length; ci++) {
       const c = contractors[ci]!;
@@ -133,6 +144,14 @@ async function demoSeed() {
 
       if (c.status === 'active' || c.status === 'suspended') {
         activeContractorIds.push(c.id);
+        onboardedContractors.push({
+          id: c.id,
+          type: c.type,
+          tinLastFour: c.tinLastFour ?? null,
+          name: `${c.firstName} ${c.lastName}`,
+          createdAt,
+          status: c.status,
+        });
       }
     }
     // Link first contractor to user account
@@ -177,6 +196,19 @@ async function demoSeed() {
     console.log(`Inserted ${timeEntryCount} time entries`);
 
     // Invoices — spread across last 6 months for rich chart data
+    const contractorNameById = new Map(
+      onboardedContractors.map((c) => [c.id, c.name] as const),
+    );
+    const invoiceRefs: Array<{
+      id: string;
+      invoiceNumber: string;
+      status: string;
+      contractorName: string;
+      submittedAt: string | null;
+      approvedAt: string | null;
+      scheduledAt: string | null;
+      paidAt: string | null;
+    }> = [];
     let invoiceNum = 0;
     let invoiceCount = 0;
     const PAID_MONTHS = [0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]; // weighted toward recent months
@@ -216,28 +248,75 @@ async function demoSeed() {
           [inv.id],
         );
 
+        invoiceRefs.push({
+          id: inv.id,
+          invoiceNumber: inv.invoiceNumber,
+          status: inv.status,
+          contractorName: contractorNameById.get(eng.contractorId) ?? 'Contractor',
+          submittedAt: inv.submittedAt,
+          approvedAt: inv.approvedAt,
+          scheduledAt: inv.scheduledAt,
+          paidAt: inv.paidAt,
+        });
+
         invoiceCount++;
       }
     }
     console.log(`Inserted ${invoiceCount} invoices`);
 
-    // Documents
+    // Documents — coherent compliance distribution across onboarded contractors.
+    // ~70% fully compliant, ~15% compliant-but-expiring (still compliant, drives
+    // the "expiring soon" alerts), ~15% missing exactly one required document.
+    // The bucket is deterministic by index so the org-wide compliance rate is
+    // stable across reseeds (~85%).
+    function bucketForIndex(i: number): ComplianceBucket {
+      const m = i % 7;
+      if (m === 6) return 'noncompliant';
+      if (m === 5) return 'expiring';
+      return 'compliant';
+    }
     let docCount = 0;
-    for (const cId of activeContractorIds.slice(0, 40)) {
-      const count = randomBetween(1, 3);
-      for (let i = 0; i < count; i++) {
-        const doc = generateDocument(cId, SEED_ORG_ID, SEED_ADMIN_ID, docCount);
+    const complianceTally: Record<ComplianceBucket, number> = {
+      compliant: 0,
+      expiring: 0,
+      noncompliant: 0,
+    };
+    for (let oi = 0; oi < onboardedContractors.length; oi++) {
+      const oc = onboardedContractors[oi]!;
+      const bucket = bucketForIndex(oi);
+      complianceTally[bucket]++;
+      const docs = generateContractorDocuments(
+        oc.id,
+        SEED_ORG_ID,
+        SEED_ADMIN_ID,
+        oc.type,
+        bucket,
+        oi,
+        oc.tinLastFour,
+      );
+      for (const doc of docs) {
         await pool.query(
           `INSERT INTO tax_documents (id, contractor_id, organization_id, document_type, file_path, file_name,
-            file_size_bytes, mime_type, uploaded_by, expires_at, tin_last_four, is_current, version, notes)
-           VALUES ($1,$2,$3,$4::tax_document_type,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+            file_size_bytes, mime_type, uploaded_by, expires_at, tin_last_four, is_current, version, notes, created_at)
+           VALUES ($1,$2,$3,$4::tax_document_type,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
           [doc.id, doc.contractorId, doc.organizationId, doc.documentType, doc.filePath, doc.fileName,
-            doc.fileSizeBytes, doc.mimeType, doc.uploadedBy, doc.expiresAt, doc.tinLastFour, doc.isCurrent, doc.version, doc.notes],
+            doc.fileSizeBytes, doc.mimeType, doc.uploadedBy, doc.expiresAt, doc.tinLastFour, doc.isCurrent, doc.version, doc.notes, doc.createdAt],
         );
         docCount++;
       }
     }
-    console.log(`Inserted ${docCount} documents`);
+    const complianceRate = onboardedContractors.length
+      ? Math.round(
+          ((complianceTally.compliant + complianceTally.expiring) /
+            onboardedContractors.length) *
+            100,
+        )
+      : 0;
+    console.log(
+      `Inserted ${docCount} documents across ${onboardedContractors.length} onboarded contractors ` +
+        `(compliant ${complianceTally.compliant}, expiring ${complianceTally.expiring}, ` +
+        `non-compliant ${complianceTally.noncompliant} → ~${complianceRate}% compliance rate)`,
+    );
 
     // Classification assessments
     let assessmentCount = 0;
@@ -294,8 +373,10 @@ async function demoSeed() {
     const offboardReasons = ['project_completed', 'budget_cut', 'performance', 'mutual_agreement', 'compliance_risk'] as const;
     const offboardStatuses = ['initiated', 'in_progress', 'pending_final_invoice', 'completed', 'cancelled'] as const;
     let offboardCount = 0;
+    const offboardingIds: string[] = [];
     for (const cId of activeContractorIds.slice(0, 5)) {
       const workflowId = randomUUID();
+      offboardingIds.push(workflowId);
       const status = offboardStatuses[offboardCount % offboardStatuses.length]!;
       await pool.query(
         `INSERT INTO offboarding_workflows (id, contractor_id, organization_id, initiated_by, reason, effective_date, status, notes)
@@ -347,6 +428,42 @@ async function demoSeed() {
       );
     }
     console.log(`Inserted ${notifData.length} notifications`);
+
+    // Audit events — a believable activity stream over the trailing ~75 days.
+    const auditEvents = generateAuditEvents(
+      [
+        { id: SEED_ADMIN_ID, email: 'admin@acme-corp.com', role: 'admin' },
+        { id: SEED_MANAGER_ID, email: 'manager@acme-corp.com', role: 'manager' },
+        { id: SEED_CONTRACTOR_USER_ID, email: 'john.smith@example.com', role: 'contractor' },
+      ],
+      onboardedContractors.map((c) => ({
+        id: c.id,
+        name: c.name,
+        createdAt: c.createdAt,
+        status: c.status,
+      })),
+      invoiceRefs,
+      offboardingIds,
+    );
+    for (const ev of auditEvents) {
+      await pool.query(
+        `INSERT INTO audit_events
+          (organization_id, user_id, entity_type, entity_id, action, old_values, new_values, ip_address, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8::inet,$9)`,
+        [
+          SEED_ORG_ID,
+          ev.userId,
+          ev.entityType,
+          ev.entityId,
+          ev.action,
+          ev.oldValues ? JSON.stringify(ev.oldValues) : null,
+          ev.newValues ? JSON.stringify(ev.newValues) : null,
+          ev.ipAddress,
+          ev.createdAt,
+        ],
+      );
+    }
+    console.log(`Inserted ${auditEvents.length} audit events`);
 
     // Refresh materialized view
     await pool.query('REFRESH MATERIALIZED VIEW mv_classification_risk_summary');

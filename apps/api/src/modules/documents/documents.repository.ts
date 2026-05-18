@@ -202,7 +202,7 @@ export class DocumentsRepository {
         STRING_AGG(DISTINCT CASE WHEN d.is_current = true AND d.expires_at IS NOT NULL AND d.expires_at <= NOW() + INTERVAL '30 days' THEN d.document_type::text || ':' || d.expires_at::text END, ',') as expiring_dates
       FROM contractors c
       LEFT JOIN tax_documents d ON d.contractor_id = c.id AND d.organization_id = $1
-      WHERE c.organization_id = $1 AND c.status != 'offboarded'
+      WHERE c.organization_id = $1 AND c.status IN ('active', 'suspended')
       GROUP BY c.id, c.first_name, c.last_name, c.type
       ORDER BY c.last_name, c.first_name`,
       [orgId],

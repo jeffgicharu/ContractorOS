@@ -181,8 +181,13 @@ createdb contractor_os
 # Run migrations (9 migration files covering all tables + indexes)
 pnpm --filter @contractor-os/api migrate:up
 
-# Seed with demo data (55+ contractors, 130+ invoices, 340+ time entries)
+# Seed with demo data (55+ contractors, 130+ invoices, 340+ time entries,
+# a coherent ~85% document-compliance distribution, and a ~5-month audit trail)
 pnpm --filter @contractor-os/api seed
+
+# Restore the stable demo/E2E accounts (idempotent — the full seed above
+# rebuilds every org, so always re-run this immediately after it)
+pnpm --filter @contractor-os/api seed:demo-accounts
 ```
 
 ### Run
