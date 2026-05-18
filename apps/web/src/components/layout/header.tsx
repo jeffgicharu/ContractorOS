@@ -66,6 +66,10 @@ interface HeaderProps {
 
 export function Header({ onMenuToggle }: HeaderProps) {
   const breadcrumbs = useBreadcrumbs();
+  const pathname = usePathname();
+  const isPortal = pathname.startsWith('/portal');
+  const searchHref = isPortal ? '/portal/invoices' : '/contractors';
+  const searchLabel = isPortal ? 'Search invoices' : 'Search contractors';
 
   return (
     <header className="sticky top-0 z-20 flex h-14 items-center justify-between bg-slate-50 px-4 sm:px-6 lg:px-8">
@@ -73,7 +77,9 @@ export function Header({ onMenuToggle }: HeaderProps) {
       <div className="flex min-w-0 flex-1 items-center gap-2">
         {onMenuToggle && (
           <button
+            type="button"
             onClick={onMenuToggle}
+            aria-label="Open navigation menu"
             className="shrink-0 rounded-lg p-2 text-slate-500 transition-colors hover:bg-white/60 hover:text-slate-700 lg:hidden"
           >
             <Menu className="h-5 w-5" />
@@ -102,9 +108,14 @@ export function Header({ onMenuToggle }: HeaderProps) {
 
       {/* Right: Action icons */}
       <div className="flex shrink-0 items-center gap-1">
-        <button className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/60 hover:text-slate-600">
+        <Link
+          href={searchHref}
+          aria-label={searchLabel}
+          title={searchLabel}
+          className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/60 hover:text-slate-600"
+        >
           <Search className="h-[18px] w-[18px]" />
-        </button>
+        </Link>
         <NotificationDropdown />
         <UserMenu />
       </div>
