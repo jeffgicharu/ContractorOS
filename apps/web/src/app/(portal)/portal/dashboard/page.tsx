@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { api } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
 import {
-  BarChart,
-  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -152,21 +152,28 @@ export default function PortalDashboardPage() {
         {earnings.length > 0 ? (
           <div className="mt-4 h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={earnings}>
+              <AreaChart data={earnings}>
+                <defs>
+                  <linearGradient id="earningsGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
                 <YAxis
                   tick={{ fontSize: 12, fill: '#64748b' }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(v: number) => v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`}
+                  width={48}
+                  tickFormatter={(v: number) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
                 />
                 <Tooltip
                   formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Earnings']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13px' }}
                 />
-                <Bar dataKey="total" fill="#6366f1" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                <Area type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={2} fill="url(#earningsGradient)" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         ) : (
