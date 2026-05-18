@@ -14,6 +14,7 @@ import {
   generateNotification,
   randomPick,
   randomBetween,
+  randomBool,
   randomDateOnly,
 } from './fixtures/generators';
 import type { ComplianceBucket } from './fixtures/generators';
@@ -332,7 +333,7 @@ async function demoSeed() {
           randomUUID(), cId, SEED_ORG_ID, riskLevel, score,
           randomBetween(10, 80), JSON.stringify({ behavioral_control: { score: randomBetween(5, 30), max: 40, factors: {} }, financial_control: { score: randomBetween(5, 20), max: 30, factors: {} }, relationship_type: { score: randomBetween(5, 20), max: 30, factors: {} } }),
           randomBetween(10, 80), JSON.stringify({}),
-          randomBetween(10, 80), JSON.stringify({ prong_a: { passed: Math.random() > 0.5, weight: 34, score: randomBetween(0, 34) }, prong_b: { passed: Math.random() > 0.5, weight: 33, score: randomBetween(0, 33) }, prong_c: { passed: Math.random() > 0.5, weight: 33, score: randomBetween(0, 33) } }),
+          randomBetween(10, 80), JSON.stringify({ prong_a: { passed: randomBool(), weight: 34, score: randomBetween(0, 34) }, prong_b: { passed: randomBool(), weight: 33, score: randomBetween(0, 33) }, prong_c: { passed: randomBool(), weight: 33, score: randomBetween(0, 33) } }),
           JSON.stringify({ hoursPerWeek: randomBetween(10, 50) }),
         ],
       );
@@ -349,7 +350,7 @@ async function demoSeed() {
         await pool.query(
           `INSERT INTO classification_factors (contractor_id, category, boolean_value, period_start, period_end, source)
            VALUES ($1, $2::factor_category, $3, $4, $5, $6::factor_source)`,
-          [cId, randomPick(factorCategories), Math.random() > 0.5, '2025-01-01', '2025-12-31', 'manual'],
+          [cId, randomPick(factorCategories), randomBool(), '2025-01-01', '2025-12-31', 'manual'],
         );
         factorCount++;
       }
@@ -391,7 +392,7 @@ async function demoSeed() {
         await pool.query(
           `INSERT INTO offboarding_checklist_items (workflow_id, item_type, status)
            VALUES ($1,$2::checklist_item_type,$3::checklist_status)`,
-          [workflowId, itemType, status === 'completed' ? 'completed' : (Math.random() > 0.6 ? 'completed' : 'pending')],
+          [workflowId, itemType, status === 'completed' ? 'completed' : (randomBool(0.4) ? 'completed' : 'pending')],
         );
       }
       offboardCount++;

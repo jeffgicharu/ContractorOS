@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomInt, randomUUID } from 'crypto';
 
 const FIRST_NAMES = [
   'James', 'Maria', 'Robert', 'Jennifer', 'Michael', 'Linda', 'David', 'Patricia',
@@ -44,18 +44,24 @@ const ENGAGEMENT_TITLES = [
 
 const DOCUMENT_TYPES = ['w9', 'w8ben', 'insurance_certificate', 'nda', 'contract', 'other'] as const;
 
+// Seed data only — crypto.randomInt keeps static analysis happy (no
+// Math.random in a flagged context) and is plenty for fixture generation.
 export function randomPick<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)]!;
+  return arr[randomInt(arr.length)]!;
 }
 
 export function randomBetween(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return randomInt(min, max + 1);
+}
+
+export function randomBool(probabilityTrue = 0.5): boolean {
+  return randomInt(10_000) < Math.round(probabilityTrue * 10_000);
 }
 
 export function randomDate(daysAgoStart: number, daysAgoEnd: number): string {
   const start = Date.now() - daysAgoStart * 86_400_000;
   const end = Date.now() - daysAgoEnd * 86_400_000;
-  return new Date(start + Math.random() * (end - start)).toISOString();
+  return new Date(start + randomInt(Math.max(1, end - start))).toISOString();
 }
 
 export function randomDateOnly(daysAgoStart: number, daysAgoEnd: number): string {
@@ -114,7 +120,7 @@ export function generateTimeEntries(contractorId: string, engagementId: string, 
     contractorId,
     engagementId,
     entryDate: randomDateOnly(90, 1),
-    hours: randomBetween(1, 8) + (Math.random() > 0.5 ? 0.5 : 0),
+    hours: randomBetween(1, 8) + (randomBool() ? 0.5 : 0),
     description: `Work item ${i + 1}`,
   }));
 }
@@ -434,7 +440,7 @@ export function generateAuditEvents(
 
   // Daily-ish staff logins across the trailing 75 days.
   for (let d = 75; d >= 0; d--) {
-    if (Math.random() < 0.28) continue;
+    if (randomBool(0.28)) continue;
     const logins = randomBetween(1, 3);
     for (let i = 0; i < logins; i++) {
       const u = randomPick(staff);
