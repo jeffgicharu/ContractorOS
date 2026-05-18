@@ -4,7 +4,19 @@ name: DAST (OWASP ZAP)
 #
 # Runs on a weekly cron (too slow for every PR) and on manual dispatch.
 # Brings up the perf-target docker compose, applies migrations, starts
-# the api, then runs ZAP's API-aware scan against /api/v1.
+# the api, then runs ZAP's baseline scan against the running service.
+#
+# Result semantics: the job is GREEN when ZAP reports zero new FAIL-level
+# alerts and RED only on a genuine finding. Passive-scan WARN alerts are
+# informational (the `-I` flag keeps them from failing the build).
+#
+# Previously this used the marketplace api-scan action with
+# `format: openapi` pointed at a plain health endpoint. There is no
+# OpenAPI document there to import, so that step always errored on a
+# missing report file ("report_md.md does not exist") and turned a
+# genuinely-passing scan red. We now invoke zap-baseline.py directly so
+# the scan's own exit code is the single source of truth and the report
+# artifact is uploaded by us, not by the action.
 
 on:
   schedule:
@@ -16,8 +28,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  zap-api-scan:
-    name: ZAP API scan
+  zap-baseline-scan:
+    name: ZAP baseline scan
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -57,25 +69,40 @@ jobs:
           echo "api never came up"; docker compose -f docker-compose.perf.yml logs perf-api; exit 1
 
       - name: Run ZAP baseline scan
-        uses: zaproxy/action-baseline@v0.13.0
-        with:
-          target: 'http://localhost:3001/api/v1/health'
-          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-          fail_action: false
-          allow_issue_writing: false
-          artifact_name: 'zap-baseline-report'
-          cmd_options: '-J zap-baseline.json -w zap-baseline.md'
+        run: |
+          mkdir -p zap-out
+          chmod 777 zap-out
+          set +e
+          docker run --rm --network host \
+            -v "$(pwd)/zap-out:/zap/wrk/:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+              -t http://localhost:3001/api/v1/health \
+              -I \
+              -J zap-report.json \
+              -w zap-report.md \
+              -r zap-report.html
+          ZAP_EXIT=$?
+          set -e
+          echo "zap-baseline.py exit code: $ZAP_EXIT"
+          echo "----- ZAP summary -----"
+          grep -E 'FAIL-NEW|WARN-NEW|PASS:' zap-out/zap-report.md || true
+          # With -I, warnings do not fail the scan. A non-zero exit means a
+          # genuine FAIL-level finding — fail the job. Exit 0 = clean/warn only.
+          if [ "$ZAP_EXIT" -ne 0 ]; then
+            echo "::error::ZAP reported FAIL-level alert(s) — see the zap-baseline-report artifact"
+            exit 1
+          fi
+          echo "ZAP baseline scan passed (no new FAIL-level alerts)."
 
-      - name: Run ZAP API scan
-        uses: zaproxy/action-api-scan@v0.9.0
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          target: 'http://localhost:3001/api/v1/health'
-          format: openapi
-          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-          fail_action: false
-          allow_issue_writing: false
-          artifact_name: 'zap-api-scan-report'
-          cmd_options: '-J zap-api-scan.json -w zap-api-scan.md'
+          name: zap-baseline-report
+          path: zap-out/
+          retention-days: 30
+          if-no-files-found: warn
 
       - name: Tear down
         if: always()
