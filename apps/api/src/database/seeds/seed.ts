@@ -29,7 +29,7 @@ const NOTIFICATION_TYPES = [
   'document_expiring',
 ] as const;
 
-async function demoSeed() {
+export async function demoSeed() {
   const config = loadDatabaseConfig();
   const pool = new Pool(config.pool);
 
@@ -326,6 +326,128 @@ async function demoSeed() {
       }
     }
     console.log(`Inserted ${invoiceCount} invoices`);
+
+    // --- Guaranteed Monthly Revenue baseline ----------------------------
+    // The dashboard "Monthly Revenue" chart aggregates paid invoices by
+    // paid_at month over the trailing 6 months (current month + 5 prior;
+    // see DashboardRepository.getMonthlyRevenue). The random distribution
+    // above is realistic for project-based billing but, on some reseeds,
+    // can leave the oldest displayed month at $0 (its paid_at spilling
+    // just outside the window). To make the chart read healthy on EVERY
+    // reseed, deterministically plant a paid-invoice baseline in each of
+    // the 6 displayed months on top of the random invoices.
+    //
+    // Each month's baseline paid_at is pinned to the 15th at noon UTC
+    // (clamped into the past) so it always lands in that month's
+    // date_trunc('month') bucket and inside the dashboard window.
+    //
+    // Documented revenue band (asserted by dashboard-revenue.int-spec.ts):
+    //   floor   = $40,000  — every displayed month is comfortably nonzero
+    //   ceiling = $200,000 — baseline (~$50–64k) plus random top-up stays
+    //                        well under this for an established business
+    //
+    // Indexed oldest → current; gentle bumpiness, current month no higher
+    // than the rest so it never reads as a final-month spike. Every value
+    // is divisible by 400 so each of the 2 invoices/month splits into a
+    // clean (hours × $200) line item.
+    const REVENUE_BASELINE_BY_MONTH = [60000, 53600, 64000, 50400, 58400, 54400];
+    const baselineNow = Date.now();
+    const baselineDate = new Date(baselineNow);
+    const baselinePaidAt = (monthsAgo: number): Date => {
+      const mid = Date.UTC(
+        baselineDate.getUTCFullYear(),
+        baselineDate.getUTCMonth() - monthsAgo,
+        15,
+        12,
+        0,
+        0,
+      );
+      // Never future-dated (matters for the current month early in the month).
+      return new Date(Math.min(mid, baselineNow - 3_600_000));
+    };
+    const baselineEngagements = engagementMap;
+    let baselineInvoiceCount = 0;
+    if (baselineEngagements.length > 0) {
+      for (let m = 0; m < REVENUE_BASELINE_BY_MONTH.length; m++) {
+        const monthsAgo = REVENUE_BASELINE_BY_MONTH.length - 1 - m;
+        const paidAt = baselinePaidAt(monthsAgo);
+        const submittedAt = new Date(paidAt.getTime() - 12 * 86_400_000);
+        const approvedAt = new Date(paidAt.getTime() - 8 * 86_400_000);
+        const scheduledAt = new Date(paidAt.getTime() - 3 * 86_400_000);
+        const periodEnd = new Date(submittedAt.getTime() - 3 * 86_400_000);
+        const periodStart = new Date(periodEnd.getTime() - 30 * 86_400_000);
+        const dueDate = new Date(submittedAt.getTime() + 30 * 86_400_000);
+        const perInvoice = REVENUE_BASELINE_BY_MONTH[m]! / 2;
+        for (let k = 0; k < 2; k++) {
+          invoiceNum++;
+          const eng =
+            baselineEngagements[(m * 2 + k) % baselineEngagements.length]!;
+          const invId = randomUUID();
+          await pool.query(
+            `INSERT INTO invoices (id, contractor_id, engagement_id, organization_id,
+              invoice_number, status, submitted_at, approved_at, scheduled_at, paid_at,
+              due_date, notes, period_start, period_end)
+             VALUES ($1,$2,$3,$4,$5,'paid'::invoice_status,$6,$7,$8,$9,$10,$11,$12,$13)`,
+            [
+              invId, eng.contractorId, eng.id, SEED_ORG_ID,
+              `INV-2026-${String(invoiceNum).padStart(3, '0')}`,
+              submittedAt.toISOString(), approvedAt.toISOString(),
+              scheduledAt.toISOString(), paidAt.toISOString(),
+              dueDate.toISOString().split('T')[0],
+              'Milestone delivery',
+              periodStart.toISOString().split('T')[0],
+              periodEnd.toISOString().split('T')[0],
+            ],
+          );
+          await pool.query(
+            `INSERT INTO invoice_line_items (invoice_id, description, quantity, unit_price, sort_order)
+             VALUES ($1,$2,$3,$4,0)`,
+            [invId, 'Architecture and technical design', perInvoice / 200, 200],
+          );
+          await pool.query(
+            `UPDATE invoices SET
+              subtotal = (SELECT COALESCE(SUM(amount),0) FROM invoice_line_items WHERE invoice_id = $1),
+              total_amount = (SELECT COALESCE(SUM(amount),0) FROM invoice_line_items WHERE invoice_id = $1) + tax_amount
+             WHERE id = $1`,
+            [invId],
+          );
+          const history: Array<[string, string, string]> = [
+            ['draft', 'submitted', submittedAt.toISOString()],
+            ['submitted', 'approved', approvedAt.toISOString()],
+            ['approved', 'scheduled', scheduledAt.toISOString()],
+            ['scheduled', 'paid', paidAt.toISOString()],
+          ];
+          for (const [from, to, at] of history) {
+            await pool.query(
+              `INSERT INTO invoice_status_history (invoice_id, from_status, to_status, changed_by, reason, created_at)
+               VALUES ($1,$2::invoice_status,$3::invoice_status,$4,$5,$6)`,
+              [invId, from, to, to === 'submitted' ? SEED_MANAGER_ID : SEED_ADMIN_ID, null, at],
+            );
+          }
+          await pool.query(
+            `INSERT INTO approval_steps (invoice_id, approver_id, step_order, decision, decided_at, notes, created_at)
+             VALUES ($1,$2,1,'approved'::approval_decision,$3,$4,$5)`,
+            [invId, SEED_ADMIN_ID, approvedAt.toISOString(), 'Approved for payment', submittedAt.toISOString()],
+          );
+          invoiceRefs.push({
+            id: invId,
+            invoiceNumber: `INV-2026-${String(invoiceNum).padStart(3, '0')}`,
+            status: 'paid',
+            contractorName: contractorNameById.get(eng.contractorId) ?? 'Contractor',
+            submittedAt: submittedAt.toISOString(),
+            approvedAt: approvedAt.toISOString(),
+            scheduledAt: scheduledAt.toISOString(),
+            paidAt: paidAt.toISOString(),
+          });
+          invoiceCount++;
+          baselineInvoiceCount++;
+        }
+      }
+    }
+    console.log(
+      `Inserted ${baselineInvoiceCount} baseline paid invoices ` +
+        `(${REVENUE_BASELINE_BY_MONTH.length} months guaranteed in $40k–$200k band)`,
+    );
 
     // Documents — coherent compliance distribution across onboarded contractors.
     // ~70% fully compliant, ~15% compliant-but-expiring (still compliant, drives
@@ -625,7 +747,9 @@ async function demoSeed() {
   }
 }
 
-demoSeed().catch((err) => {
-  console.error('Demo seed failed:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  demoSeed().catch((err) => {
+    console.error('Demo seed failed:', err);
+    process.exit(1);
+  });
+}
