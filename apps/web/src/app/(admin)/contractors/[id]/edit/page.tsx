@@ -6,7 +6,10 @@ import Link from 'next/link';
 import { api, ApiClientError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { ContractorDetail } from '@contractor-os/shared';
+import {
+  updateContractorSchema,
+  type ContractorDetail,
+} from '@contractor-os/shared';
 
 export default function EditContractorPage() {
   const params = useParams<{ id: string }>();
@@ -14,6 +17,7 @@ export default function EditContractorPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loadError, setLoadError] = useState('');
 
   const [firstName, setFirstName] = useState('');
@@ -50,28 +54,43 @@ export default function EditContractorPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setErrors({});
+
+    const fieldErrors: Record<string, string> = {};
+    if (!firstName.trim()) fieldErrors['firstName'] = 'First name is required';
+    if (!lastName.trim()) fieldErrors['lastName'] = 'Last name is required';
+
+    const body: Record<string, unknown> = {
+      firstName,
+      lastName,
+    };
+    body.phone = phone ? phone : null;
+    body.addressLine1 = addressLine1 ? addressLine1 : null;
+    body.addressLine2 = addressLine2 ? addressLine2 : null;
+    body.city = city ? city : null;
+    body.state = state ? state : null;
+    body.zipCode = zipCode ? zipCode : null;
+    if (country) body.country = country;
+
+    const result = updateContractorSchema.safeParse(body);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const field = issue.path[0]?.toString();
+        if (field && !fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const body: Record<string, unknown> = {
-        firstName,
-        lastName,
-      };
-      if (phone) body.phone = phone;
-      else body.phone = null;
-      if (addressLine1) body.addressLine1 = addressLine1;
-      else body.addressLine1 = null;
-      if (addressLine2) body.addressLine2 = addressLine2;
-      else body.addressLine2 = null;
-      if (city) body.city = city;
-      else body.city = null;
-      if (state) body.state = state;
-      else body.state = null;
-      if (zipCode) body.zipCode = zipCode;
-      else body.zipCode = null;
-      if (country) body.country = country;
-
-      await api.patch(`/contractors/${params.id}`, body);
+      await api.patch(`/contractors/${params.id}`, result.data);
       router.push(`/contractors/${params.id}`);
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -128,7 +147,11 @@ export default function EditContractorPage() {
         Edit Contractor
       </h1>
 
-      <form onSubmit={handleSubmit} className="mt-6 max-w-2xl space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="mt-6 max-w-2xl space-y-6"
+        noValidate
+      >
         {error && (
           <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700">
             {error}
@@ -144,14 +167,14 @@ export default function EditContractorPage() {
               name="firstName"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              required
+              error={errors['firstName']}
             />
             <Input
               label="Last Name"
               name="lastName"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              required
+              error={errors['lastName']}
             />
           </div>
         </div>
@@ -167,6 +190,7 @@ export default function EditContractorPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+1 (555) 000-0000"
+              error={errors['phone']}
             />
           </div>
         </div>
@@ -181,6 +205,7 @@ export default function EditContractorPage() {
                 name="addressLine1"
                 value={addressLine1}
                 onChange={(e) => setAddressLine1(e.target.value)}
+                error={errors['addressLine1']}
               />
             </div>
             <div className="sm:col-span-2">
@@ -189,6 +214,7 @@ export default function EditContractorPage() {
                 name="addressLine2"
                 value={addressLine2}
                 onChange={(e) => setAddressLine2(e.target.value)}
+                error={errors['addressLine2']}
               />
             </div>
             <Input
@@ -196,18 +222,21 @@ export default function EditContractorPage() {
               name="city"
               value={city}
               onChange={(e) => setCity(e.target.value)}
+              error={errors['city']}
             />
             <Input
               label="State / Province"
               name="state"
               value={state}
               onChange={(e) => setState(e.target.value)}
+              error={errors['state']}
             />
             <Input
               label="ZIP / Postal Code"
               name="zipCode"
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}
+              error={errors['zipCode']}
             />
             <Input
               label="Country"
@@ -215,6 +244,7 @@ export default function EditContractorPage() {
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               placeholder="US"
+              error={errors['country']}
             />
           </div>
         </div>

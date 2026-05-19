@@ -126,7 +126,7 @@ export default function InviteAcceptPage() {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {apiError && (
           <div className="rounded-lg bg-error-50 border border-error-200 px-4 py-3">
             <p className="text-sm text-error-700">{apiError}</p>

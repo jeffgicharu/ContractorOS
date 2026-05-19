@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { OffboardingReason } from '@contractor-os/shared';
+import {
+  OffboardingReason,
+  initiateOffboardingSchema,
+} from '@contractor-os/shared';
 import { Button } from '@/components/ui/button';
 
 const REASON_LABELS: Record<string, string> = {
@@ -25,16 +28,39 @@ export function InitiationModal({ contractorName, onConfirm, onClose }: Initiati
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!reason || !effectiveDate) {
-      setError('Reason and effective date are required');
+    setError('');
+    setErrors({});
+
+    const fieldErrors: Record<string, string> = {};
+    if (!reason) fieldErrors['reason'] = 'Reason is required';
+    if (!effectiveDate) {
+      fieldErrors['effectiveDate'] = 'Effective date is required';
+    }
+
+    const result = initiateOffboardingSchema.safeParse({
+      reason,
+      effectiveDate,
+      notes: notes || undefined,
+    });
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const field = issue.path[0]?.toString();
+        if (field && !fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
       return;
     }
 
     setIsSubmitting(true);
-    setError('');
     try {
       await onConfirm({
         reason,
@@ -57,7 +83,11 @@ export function InitiationModal({ contractorName, onConfirm, onClose }: Initiati
           This will create a checklist and begin the offboarding workflow.
         </p>
 
-        <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-4">
+        <form
+          onSubmit={(e) => void handleSubmit(e)}
+          className="mt-4 space-y-4"
+          noValidate
+        >
           <div>
             <label className="block text-sm font-medium text-slate-700">
               Reason
@@ -65,7 +95,9 @@ export function InitiationModal({ contractorName, onConfirm, onClose }: Initiati
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              className={`mt-1 w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                errors['reason'] ? 'border-error-500' : 'border-slate-300'
+              }`}
             >
               <option value="">Select a reason...</option>
               {Object.entries(REASON_LABELS).map(([value, label]) => (
@@ -74,6 +106,11 @@ export function InitiationModal({ contractorName, onConfirm, onClose }: Initiati
                 </option>
               ))}
             </select>
+            {errors['reason'] && (
+              <p className="mt-1.5 text-[13px] text-error-600">
+                {errors['reason']}
+              </p>
+            )}
           </div>
 
           <div>
@@ -84,8 +121,17 @@ export function InitiationModal({ contractorName, onConfirm, onClose }: Initiati
               type="date"
               value={effectiveDate}
               onChange={(e) => setEffectiveDate(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              className={`mt-1 w-full rounded-md border px-3 py-2 text-sm text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                errors['effectiveDate']
+                  ? 'border-error-500'
+                  : 'border-slate-300'
+              }`}
             />
+            {errors['effectiveDate'] && (
+              <p className="mt-1.5 text-[13px] text-error-600">
+                {errors['effectiveDate']}
+              </p>
+            )}
           </div>
 
           <div>

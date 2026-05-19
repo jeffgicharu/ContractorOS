@@ -43,6 +43,9 @@ export default function ProfilePage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [passwordFieldErrors, setPasswordFieldErrors] = useState<
+    Record<string, string>
+  >({});
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
@@ -67,14 +70,23 @@ export default function ProfilePage() {
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
     setPasswordError('');
+    setPasswordFieldErrors({});
     setPasswordSuccess('');
 
+    const fieldErrors: Record<string, string> = {};
+    if (!currentPassword) {
+      fieldErrors['currentPassword'] = 'Current password is required';
+    }
     if (newPassword.length < 8) {
-      setPasswordError('New password must be at least 8 characters');
-      return;
+      fieldErrors['newPassword'] =
+        'New password must be at least 8 characters';
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
+      fieldErrors['confirmPassword'] = 'Passwords do not match';
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setPasswordFieldErrors(fieldErrors);
       return;
     }
 
@@ -262,7 +274,11 @@ export default function ProfilePage() {
               </div>
             )}
 
-            <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
+            <form
+              onSubmit={handleChangePassword}
+              className="mt-4 space-y-4"
+              noValidate
+            >
               <div>
                 <label
                   htmlFor="current-password"
@@ -275,9 +291,17 @@ export default function ProfilePage() {
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    passwordFieldErrors['currentPassword']
+                      ? 'border-error-500'
+                      : 'border-slate-200'
+                  }`}
                 />
+                {passwordFieldErrors['currentPassword'] && (
+                  <p className="mt-1.5 text-[13px] text-error-600">
+                    {passwordFieldErrors['currentPassword']}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -291,10 +315,17 @@ export default function ProfilePage() {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    passwordFieldErrors['newPassword']
+                      ? 'border-error-500'
+                      : 'border-slate-200'
+                  }`}
                 />
+                {passwordFieldErrors['newPassword'] && (
+                  <p className="mt-1.5 text-[13px] text-error-600">
+                    {passwordFieldErrors['newPassword']}
+                  </p>
+                )}
               </div>
               <div>
                 <label
@@ -308,10 +339,17 @@ export default function ProfilePage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    passwordFieldErrors['confirmPassword']
+                      ? 'border-error-500'
+                      : 'border-slate-200'
+                  }`}
                 />
+                {passwordFieldErrors['confirmPassword'] && (
+                  <p className="mt-1.5 text-[13px] text-error-600">
+                    {passwordFieldErrors['confirmPassword']}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, type FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { Mail, MapPin, MessageSquare, Clock } from 'lucide-react';
 import { SectionWrapper } from '@/components/landing/ui/section-wrapper';
@@ -32,7 +33,40 @@ const CHANNELS = [
   },
 ];
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ContactPage() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [company, setCompany] = useState('');
+  const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setSubmitted(false);
+
+    const fieldErrors: Record<string, string> = {};
+    if (!firstName.trim()) fieldErrors['firstName'] = 'First name is required';
+    if (!lastName.trim()) fieldErrors['lastName'] = 'Last name is required';
+    if (!email.trim()) {
+      fieldErrors['email'] = 'Email is required';
+    } else if (!EMAIL_PATTERN.test(email)) {
+      fieldErrors['email'] = 'Enter a valid email';
+    }
+    if (!message.trim()) fieldErrors['message'] = 'Message is required';
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
+    setSubmitted(true);
+  }
+
   return (
     <>
       {/* Hero */}
@@ -116,7 +150,16 @@ export default function ContactPage() {
           </SectionWrapper>
 
           <SectionWrapper delay={0.15}>
-            <form className="mt-10 space-y-5" onSubmit={(e) => e.preventDefault()}>
+            <form
+              className="mt-10 space-y-5"
+              onSubmit={handleSubmit}
+              noValidate
+            >
+              {submitted && (
+                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                  Thanks! We&apos;ll get back to you within one business day.
+                </div>
+              )}
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="first-name" className="block text-sm font-medium text-slate-700">
@@ -125,8 +168,19 @@ export default function ContactPage() {
                   <input
                     id="first-name"
                     type="text"
-                    className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className={`mt-1.5 w-full rounded-lg border px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none ${
+                      errors['firstName']
+                        ? 'border-error-500'
+                        : 'border-slate-300'
+                    }`}
                   />
+                  {errors['firstName'] && (
+                    <p className="mt-1.5 text-[13px] text-error-600">
+                      {errors['firstName']}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="last-name" className="block text-sm font-medium text-slate-700">
@@ -135,8 +189,19 @@ export default function ContactPage() {
                   <input
                     id="last-name"
                     type="text"
-                    className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className={`mt-1.5 w-full rounded-lg border px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none ${
+                      errors['lastName']
+                        ? 'border-error-500'
+                        : 'border-slate-300'
+                    }`}
                   />
+                  {errors['lastName'] && (
+                    <p className="mt-1.5 text-[13px] text-error-600">
+                      {errors['lastName']}
+                    </p>
+                  )}
                 </div>
               </div>
               <div>
@@ -146,8 +211,17 @@ export default function ContactPage() {
                 <input
                   id="email"
                   type="email"
-                  className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={`mt-1.5 w-full rounded-lg border px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none ${
+                    errors['email'] ? 'border-error-500' : 'border-slate-300'
+                  }`}
                 />
+                {errors['email'] && (
+                  <p className="mt-1.5 text-[13px] text-error-600">
+                    {errors['email']}
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor="company" className="block text-sm font-medium text-slate-700">
@@ -156,6 +230,8 @@ export default function ContactPage() {
                 <input
                   id="company"
                   type="text"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
                   className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
                 />
               </div>
@@ -166,8 +242,17 @@ export default function ContactPage() {
                 <textarea
                   id="message"
                   rows={4}
-                  className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none resize-none"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className={`mt-1.5 w-full rounded-lg border px-4 py-2.5 text-sm text-slate-900 transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none resize-none ${
+                    errors['message'] ? 'border-error-500' : 'border-slate-300'
+                  }`}
                 />
+                {errors['message'] && (
+                  <p className="mt-1.5 text-[13px] text-error-600">
+                    {errors['message']}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
