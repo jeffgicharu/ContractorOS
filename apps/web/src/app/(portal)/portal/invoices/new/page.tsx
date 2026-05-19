@@ -5,7 +5,11 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
 import { Button } from '@/components/ui/button';
-import type { Engagement, Invoice } from '@contractor-os/shared';
+import {
+  createInvoiceSchema,
+  type Engagement,
+  type Invoice,
+} from '@contractor-os/shared';
 
 interface LineItem {
   description: string;
@@ -26,6 +30,7 @@ export default function CreateInvoicePage() {
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     async function loadEngagements() {
@@ -69,23 +74,38 @@ export default function CreateInvoicePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setErrors({});
+
+    const body = {
+      engagementId,
+      invoiceNumber,
+      periodStart,
+      periodEnd,
+      notes: notes || undefined,
+      lineItems: lineItems.map((item) => ({
+        description: item.description,
+        quantity: parseFloat(item.quantity),
+        unitPrice: parseFloat(item.unitPrice),
+      })),
+    };
+
+    const result = createInvoiceSchema.safeParse(body);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path.join('.');
+        if (key && !fieldErrors[key]) {
+          fieldErrors[key] = issue.message;
+        }
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const body = {
-        engagementId,
-        invoiceNumber,
-        periodStart,
-        periodEnd,
-        notes: notes || undefined,
-        lineItems: lineItems.map((item) => ({
-          description: item.description,
-          quantity: parseFloat(item.quantity),
-          unitPrice: parseFloat(item.unitPrice),
-        })),
-      };
-
-      const { data } = await api.post<Invoice>('/invoices', body);
+      const { data } = await api.post<Invoice>('/invoices', result.data);
       router.push(`/portal/invoices/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create invoice');
@@ -98,7 +118,7 @@ export default function CreateInvoicePage() {
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Create Invoice</h1>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+      <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
         {error && (
           <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700">
             {error}
@@ -118,10 +138,18 @@ export default function CreateInvoicePage() {
                   value={engagementId}
                   onChange={(e) => setEngagementId(e.target.value)}
                   placeholder="Engagement ID"
-                  required
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    errors['engagementId']
+                      ? 'border-error-500'
+                      : 'border-slate-200'
+                  }`}
                 />
               </label>
+              {errors['engagementId'] && (
+                <p className="mt-1.5 text-[13px] text-error-600">
+                  {errors['engagementId']}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700">
@@ -132,10 +160,18 @@ export default function CreateInvoicePage() {
                   value={invoiceNumber}
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   placeholder="e.g. INV-2026-005"
-                  required
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    errors['invoiceNumber']
+                      ? 'border-error-500'
+                      : 'border-slate-200'
+                  }`}
                 />
               </label>
+              {errors['invoiceNumber'] && (
+                <p className="mt-1.5 text-[13px] text-error-600">
+                  {errors['invoiceNumber']}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700">
@@ -145,10 +181,18 @@ export default function CreateInvoicePage() {
                   name="periodStart"
                   value={periodStart}
                   onChange={(e) => setPeriodStart(e.target.value)}
-                  required
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    errors['periodStart']
+                      ? 'border-error-500'
+                      : 'border-slate-200'
+                  }`}
                 />
               </label>
+              {errors['periodStart'] && (
+                <p className="mt-1.5 text-[13px] text-error-600">
+                  {errors['periodStart']}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700">
@@ -158,10 +202,18 @@ export default function CreateInvoicePage() {
                   name="periodEnd"
                   value={periodEnd}
                   onChange={(e) => setPeriodEnd(e.target.value)}
-                  required
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    errors['periodEnd']
+                      ? 'border-error-500'
+                      : 'border-slate-200'
+                  }`}
                 />
               </label>
+              {errors['periodEnd'] && (
+                <p className="mt-1.5 text-[13px] text-error-600">
+                  {errors['periodEnd']}
+                </p>
+              )}
             </div>
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-slate-700">
@@ -171,9 +223,16 @@ export default function CreateInvoicePage() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
-                  className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                    errors['notes'] ? 'border-error-500' : 'border-slate-200'
+                  }`}
                 />
               </label>
+              {errors['notes'] && (
+                <p className="mt-1.5 text-[13px] text-error-600">
+                  {errors['notes']}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -190,6 +249,11 @@ export default function CreateInvoicePage() {
               + Add Item
             </button>
           </div>
+          {errors['lineItems'] && (
+            <p className="mt-2 text-[13px] text-error-600">
+              {errors['lineItems']}
+            </p>
+          )}
           <div className="mt-4 space-y-3">
             {lineItems.map((item, idx) => (
               <div key={idx} className="grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-end">
@@ -200,9 +264,17 @@ export default function CreateInvoicePage() {
                     value={item.description}
                     onChange={(e) => updateLineItem(idx, 'description', e.target.value)}
                     placeholder="Work description"
-                    required
-                    className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                    className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm ${
+                      errors[`lineItems.${idx}.description`]
+                        ? 'border-error-500'
+                        : 'border-slate-200'
+                    }`}
                   />
+                  {errors[`lineItems.${idx}.description`] && (
+                    <p className="mt-1.5 text-[13px] text-error-600">
+                      {errors[`lineItems.${idx}.description`]}
+                    </p>
+                  )}
                 </div>
                 <div className="sm:col-span-2">
                   <span className="text-xs font-medium text-slate-500">Quantity</span>
@@ -213,9 +285,17 @@ export default function CreateInvoicePage() {
                     value={item.quantity}
                     onChange={(e) => updateLineItem(idx, 'quantity', e.target.value)}
                     placeholder="0"
-                    required
-                    className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-right font-mono"
+                    className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm text-right font-mono ${
+                      errors[`lineItems.${idx}.quantity`]
+                        ? 'border-error-500'
+                        : 'border-slate-200'
+                    }`}
                   />
+                  {errors[`lineItems.${idx}.quantity`] && (
+                    <p className="mt-1.5 text-[13px] text-error-600">
+                      {errors[`lineItems.${idx}.quantity`]}
+                    </p>
+                  )}
                 </div>
                 <div className="sm:col-span-2">
                   <span className="text-xs font-medium text-slate-500">Unit Price</span>
@@ -226,9 +306,17 @@ export default function CreateInvoicePage() {
                     value={item.unitPrice}
                     onChange={(e) => updateLineItem(idx, 'unitPrice', e.target.value)}
                     placeholder="0.00"
-                    required
-                    className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-right font-mono"
+                    className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm text-right font-mono ${
+                      errors[`lineItems.${idx}.unitPrice`]
+                        ? 'border-error-500'
+                        : 'border-slate-200'
+                    }`}
                   />
+                  {errors[`lineItems.${idx}.unitPrice`] && (
+                    <p className="mt-1.5 text-[13px] text-error-600">
+                      {errors[`lineItems.${idx}.unitPrice`]}
+                    </p>
+                  )}
                 </div>
                 <div className="sm:col-span-2 text-right">
                   <span className="text-xs font-medium text-slate-500">Amount</span>

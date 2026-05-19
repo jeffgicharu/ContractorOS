@@ -2,7 +2,10 @@
 
 import { useState, useRef } from 'react';
 import { api, ApiClientError } from '@/lib/api-client';
-import { DOCUMENT_TYPE_LABELS, type TaxDocumentType } from '@contractor-os/shared';
+import {
+  DOCUMENT_TYPE_LABELS,
+  uploadDocumentSchema,
+} from '@contractor-os/shared';
 
 interface UploadModalProps {
   contractorId: string;
@@ -17,17 +20,44 @@ export function UploadModal({ contractorId, onClose, onUploaded }: UploadModalPr
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setErrors({});
+
+    const fieldErrors: Record<string, string> = {};
+
+    const result = uploadDocumentSchema.safeParse({
+      type: docType,
+      expiresAt: expiresAt
+        ? new Date(expiresAt).toISOString()
+        : undefined,
+      notes: notes || undefined,
+    });
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const field = issue.path[0]?.toString();
+        if (field && !fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
+    }
+
     if (!file) {
-      setError('Please select a file');
+      fieldErrors['file'] = 'Please select a file';
+      setErrors(fieldErrors);
+      return;
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
       return;
     }
 
     setIsUploading(true);
-    setError(null);
 
     try {
       const formData = new FormData();
@@ -66,7 +96,11 @@ export function UploadModal({ contractorId, onClose, onUploaded }: UploadModalPr
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="p-4 sm:p-6 space-y-4"
+          noValidate
+        >
           {error && (
             <div className="rounded-md bg-error-50 border border-error-200 px-4 py-3 text-sm text-error-700">
               {error}
@@ -101,6 +135,11 @@ export function UploadModal({ contractorId, onClose, onUploaded }: UploadModalPr
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               className="w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100"
             />
+            {errors['file'] && (
+              <p className="mt-1.5 text-[13px] text-error-600">
+                {errors['file']}
+              </p>
+            )}
             <p className="mt-1 text-xs text-slate-500">PDF, PNG, JPG, DOC, DOCX. Max 10MB.</p>
           </div>
 
@@ -125,8 +164,15 @@ export function UploadModal({ contractorId, onClose, onUploaded }: UploadModalPr
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               maxLength={1000}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+              className={`w-full rounded-md border px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 ${
+                errors['notes'] ? 'border-error-500' : 'border-slate-300'
+              }`}
             />
+            {errors['notes'] && (
+              <p className="mt-1.5 text-[13px] text-error-600">
+                {errors['notes']}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
@@ -139,7 +185,7 @@ export function UploadModal({ contractorId, onClose, onUploaded }: UploadModalPr
             </button>
             <button
               type="submit"
-              disabled={isUploading || !file}
+              disabled={isUploading}
               className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
             >
               {isUploading ? 'Uploading...' : 'Upload'}

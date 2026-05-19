@@ -76,13 +76,12 @@ export function EngagementForm({ contractorId, onSuccess, onCancel }: Engagement
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4" noValidate>
           <Input
             label="Title"
             name="title"
             placeholder="e.g. Frontend Dashboard Redesign"
             error={fieldErrors['title']}
-            required
           />
 
           <div>
@@ -93,9 +92,18 @@ export function EngagementForm({ contractorId, onSuccess, onCancel }: Engagement
               id="description"
               name="description"
               rows={3}
-              className="block w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-md placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:shadow-ring focus:outline-none"
+              className={`block w-full px-3 py-2 text-sm text-slate-900 bg-white border rounded-md placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:shadow-ring focus:outline-none ${
+                fieldErrors['description']
+                  ? 'border-error-500'
+                  : 'border-slate-300'
+              }`}
               placeholder="Describe the scope of work..."
             />
+            {fieldErrors['description'] && (
+              <p className="mt-1.5 text-[13px] text-error-600">
+                {fieldErrors['description']}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -104,7 +112,6 @@ export function EngagementForm({ contractorId, onSuccess, onCancel }: Engagement
               name="startDate"
               type="date"
               error={fieldErrors['startDate']}
-              required
             />
             <Input
               label="End Date"
@@ -141,6 +148,7 @@ export function EngagementForm({ contractorId, onSuccess, onCancel }: Engagement
               name="currency"
               defaultValue="USD"
               maxLength={3}
+              error={fieldErrors['currency']}
             />
             <div>
               <label htmlFor="paymentTerms" className="block text-sm font-medium text-slate-700 mb-1.5">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
+import { updateOrganizationSettingsSchema } from '@contractor-os/shared';
 
 interface OrgSettings {
   id: string;
@@ -38,6 +39,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState('');
 
   // Form state
@@ -70,9 +72,14 @@ export default function SettingsPage() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    setIsSaving(true);
     setError('');
+    setErrors({});
     setSuccess('');
+
+    const fieldErrors: Record<string, string> = {};
+    if (!name.trim()) {
+      fieldErrors['name'] = 'Organization name is required';
+    }
 
     // Parse reminder days
     const parsedDays = reminderDays
@@ -81,20 +88,38 @@ export default function SettingsPage() {
       .filter((n) => !isNaN(n) && n >= 1 && n <= 90);
 
     if (parsedDays.length === 0) {
-      setError('Please enter at least one valid reminder day (1–90)');
-      setIsSaving(false);
+      fieldErrors['reminderDays'] =
+        'Enter at least one valid reminder day (1–90)';
+    }
+
+    const payload = {
+      name,
+      defaultPaymentTerms: paymentTerms,
+      defaultCurrency: currency,
+      reminderDays: parsedDays,
+    };
+
+    const result = updateOrganizationSettingsSchema.safeParse(payload);
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const field = issue.path[0]?.toString();
+        if (field && !fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
+    }
+
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
       return;
     }
+
+    setIsSaving(true);
 
     try {
       const { data } = (await api.patch<OrgSettings>(
         '/organizations/settings',
-        {
-          name,
-          defaultPaymentTerms: paymentTerms,
-          defaultCurrency: currency,
-          reminderDays: parsedDays,
-        },
+        result.data,
       )) as { data: OrgSettings };
       setOrg(data);
       setReminderDays(data.settings.reminderDays.join(', '));
@@ -150,7 +175,7 @@ export default function SettingsPage() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="mt-8 space-y-6">
+      <form onSubmit={handleSave} className="mt-8 space-y-6" noValidate>
         {/* Organization Info */}
         <section className="rounded-xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">
@@ -174,9 +199,15 @@ export default function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={!isAdmin}
-                className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
-                required
+                className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500 ${
+                  errors['name'] ? 'border-error-500' : 'border-slate-200'
+                }`}
               />
+              {errors['name'] && (
+                <p className="mt-1.5 text-[13px] text-error-600">
+                  {errors['name']}
+                </p>
+              )}
             </div>
 
             <div>
@@ -269,8 +300,15 @@ export default function SettingsPage() {
               onChange={(e) => setReminderDays(e.target.value)}
               disabled={!isAdmin}
               placeholder="7, 3, 1"
-              className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500"
+              className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm text-slate-900 shadow-xs focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-slate-50 disabled:text-slate-500 ${
+                errors['reminderDays'] ? 'border-error-500' : 'border-slate-200'
+              }`}
             />
+            {errors['reminderDays'] && (
+              <p className="mt-1.5 text-[13px] text-error-600">
+                {errors['reminderDays']}
+              </p>
+            )}
             <p className="mt-1 text-xs text-slate-400">
               e.g. &quot;7, 3, 1&quot; sends reminders 7, 3, and 1 day(s) before due date
             </p>

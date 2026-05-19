@@ -6,12 +6,13 @@ import Link from 'next/link';
 import { api, ApiClientError } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ContractorType } from '@contractor-os/shared';
+import { ContractorType, createContractorSchema } from '@contractor-os/shared';
 
 export default function NewContractorPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -24,20 +25,38 @@ export default function NewContractorPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setErrors({});
+
+    const payload: Record<string, unknown> = {
+      email,
+      firstName,
+      lastName,
+      type,
+    };
+    if (engagementTitle) payload.engagementTitle = engagementTitle;
+    if (engagementStartDate) payload.engagementStartDate = engagementStartDate;
+    if (hourlyRate) payload.hourlyRate = parseFloat(hourlyRate);
+
+    const result = createContractorSchema.safeParse(payload);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0]?.toString();
+        if (field && !fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const body: Record<string, unknown> = {
-        email,
-        firstName,
-        lastName,
-        type,
-      };
-      if (engagementTitle) body.engagementTitle = engagementTitle;
-      if (engagementStartDate) body.engagementStartDate = engagementStartDate;
-      if (hourlyRate) body.hourlyRate = parseFloat(hourlyRate);
-
-      const { data } = await api.post<{ id: string }>('/contractors', body);
+      const { data } = await api.post<{ id: string }>(
+        '/contractors',
+        result.data,
+      );
       router.push(`/contractors/${data.id}`);
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -65,7 +84,11 @@ export default function NewContractorPage() {
         Add Contractor
       </h1>
 
-      <form onSubmit={handleSubmit} className="mt-6 max-w-2xl space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="mt-6 max-w-2xl space-y-6"
+        noValidate
+      >
         {error && (
           <div className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700">
             {error}
@@ -83,14 +106,14 @@ export default function NewContractorPage() {
               name="firstName"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              required
+              error={errors['firstName']}
             />
             <Input
               label="Last Name"
               name="lastName"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              required
+              error={errors['lastName']}
             />
             <div className="sm:col-span-2">
               <Input
@@ -99,7 +122,7 @@ export default function NewContractorPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                error={errors['email']}
               />
             </div>
             <div>
@@ -134,6 +157,7 @@ export default function NewContractorPage() {
                 value={engagementTitle}
                 onChange={(e) => setEngagementTitle(e.target.value)}
                 placeholder="e.g. Frontend Development"
+                error={errors['engagementTitle']}
               />
             </div>
             <Input
@@ -142,6 +166,7 @@ export default function NewContractorPage() {
               type="date"
               value={engagementStartDate}
               onChange={(e) => setEngagementStartDate(e.target.value)}
+              error={errors['engagementStartDate']}
             />
             <Input
               label="Hourly Rate"
@@ -152,6 +177,7 @@ export default function NewContractorPage() {
               value={hourlyRate}
               onChange={(e) => setHourlyRate(e.target.value)}
               placeholder="0.00"
+              error={errors['hourlyRate']}
             />
           </div>
         </div>

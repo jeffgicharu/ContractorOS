@@ -84,7 +84,11 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
           </div>
         )}
 
-        <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-4">
+        <form
+          onSubmit={(e) => void handleSubmit(e)}
+          className="mt-4 space-y-4"
+          noValidate
+        >
           <div>
             <label htmlFor="engagementId" className="block text-sm font-medium text-slate-700 mb-1.5">
               Engagement
@@ -93,8 +97,11 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
               <select
                 id="engagementId"
                 name="engagementId"
-                required
-                className="block w-full h-9 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-md hover:border-slate-400 focus:border-brand-500 focus:shadow-ring focus:outline-none"
+                className={`block w-full h-9 px-3 text-sm text-slate-900 bg-white border rounded-md hover:border-slate-400 focus:border-brand-500 focus:shadow-ring focus:outline-none ${
+                  fieldErrors['engagementId']
+                    ? 'border-error-500'
+                    : 'border-slate-300'
+                }`}
               >
                 <option value="">Select engagement...</option>
                 {engagements.map((eng) => (
@@ -108,8 +115,12 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
                 name="engagementId"
                 placeholder="Engagement ID"
                 error={fieldErrors['engagementId']}
-                required
               />
+            )}
+            {engagements.length > 0 && fieldErrors['engagementId'] && (
+              <p className="mt-1.5 text-[13px] text-error-600">
+                {fieldErrors['engagementId']}
+              </p>
             )}
           </div>
 
@@ -119,7 +130,6 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
             type="date"
             defaultValue={new Date().toISOString().split('T')[0]}
             error={fieldErrors['entryDate']}
-            required
           />
 
           <Input
@@ -131,7 +141,6 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
             max="24"
             placeholder="8"
             error={fieldErrors['hours']}
-            required
           />
 
           <div>
@@ -142,8 +151,11 @@ export function TimeEntryForm({ onSuccess, onCancel }: TimeEntryFormProps) {
               id="description"
               name="description"
               rows={3}
-              required
-              className="block w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-md placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:shadow-ring focus:outline-none"
+              className={`block w-full px-3 py-2 text-sm text-slate-900 bg-white border rounded-md placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:shadow-ring focus:outline-none ${
+                fieldErrors['description']
+                  ? 'border-error-500'
+                  : 'border-slate-300'
+              }`}
               placeholder="What did you work on?"
             />
             {fieldErrors['description'] && (
