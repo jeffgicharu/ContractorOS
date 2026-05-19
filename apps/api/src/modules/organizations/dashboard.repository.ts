@@ -36,18 +36,32 @@ export class DashboardRepository {
       total: string;
       count: string;
     }>(
-      `SELECT
-         to_char(date_trunc('month', i.paid_at), 'YYYY-MM') AS month,
-         to_char(date_trunc('month', i.paid_at), 'Mon') AS month_label,
-         COALESCE(SUM(i.total_amount), 0) AS total,
-         COUNT(*)::text AS count
-       FROM invoices i
-       JOIN contractors c ON i.contractor_id = c.id
-       WHERE c.organization_id = $1
-         AND i.status = 'paid'
-         AND i.paid_at >= date_trunc('month', now()) - interval '${months - 1} months'
-       GROUP BY date_trunc('month', i.paid_at)
-       ORDER BY month ASC`,
+      `WITH spine AS (
+         SELECT generate_series(
+           date_trunc('month', now()) - interval '${months - 1} months',
+           date_trunc('month', now()),
+           interval '1 month'
+         ) AS month
+       ),
+       rev AS (
+         SELECT date_trunc('month', i.paid_at) AS month,
+                SUM(i.total_amount) AS total,
+                COUNT(*) AS count
+         FROM invoices i
+         JOIN contractors c ON i.contractor_id = c.id
+         WHERE c.organization_id = $1
+           AND i.status = 'paid'
+           AND i.paid_at >= date_trunc('month', now()) - interval '${months - 1} months'
+         GROUP BY 1
+       )
+       SELECT
+         to_char(s.month, 'YYYY-MM') AS month,
+         to_char(s.month, 'Mon') AS month_label,
+         COALESCE(r.total, 0) AS total,
+         COALESCE(r.count, 0)::text AS count
+       FROM spine s
+       LEFT JOIN rev r ON r.month = s.month
+       ORDER BY s.month ASC`,
       [orgId],
     );
 
@@ -98,15 +112,27 @@ export class DashboardRepository {
       month_label: string;
       total: string;
     }>(
-      `SELECT
-         to_char(date_trunc('month', created_at), 'YYYY-MM') AS month,
-         to_char(date_trunc('month', created_at), 'Mon') AS month_label,
-         COUNT(*)::text AS total
-       FROM contractors
-       WHERE organization_id = $1
-         AND created_at >= date_trunc('month', now()) - interval '${months - 1} months'
-       GROUP BY date_trunc('month', created_at)
-       ORDER BY month ASC`,
+      `WITH spine AS (
+         SELECT generate_series(
+           date_trunc('month', now()) - interval '${months - 1} months',
+           date_trunc('month', now()),
+           interval '1 month'
+         ) AS month
+       ),
+       growth AS (
+         SELECT date_trunc('month', created_at) AS month, COUNT(*) AS total
+         FROM contractors
+         WHERE organization_id = $1
+           AND created_at >= date_trunc('month', now()) - interval '${months - 1} months'
+         GROUP BY 1
+       )
+       SELECT
+         to_char(s.month, 'YYYY-MM') AS month,
+         to_char(s.month, 'Mon') AS month_label,
+         COALESCE(g.total, 0)::text AS total
+       FROM spine s
+       LEFT JOIN growth g ON g.month = s.month
+       ORDER BY s.month ASC`,
       [orgId],
     );
 
@@ -135,17 +161,31 @@ export class DashboardRepository {
       total: string;
       count: string;
     }>(
-      `SELECT
-         to_char(date_trunc('month', i.paid_at), 'YYYY-MM') AS month,
-         to_char(date_trunc('month', i.paid_at), 'Mon') AS month_label,
-         COALESCE(SUM(i.total_amount), 0) AS total,
-         COUNT(*)::text AS count
-       FROM invoices i
-       WHERE i.contractor_id = $1
-         AND i.status = 'paid'
-         AND i.paid_at >= date_trunc('month', now()) - interval '${months - 1} months'
-       GROUP BY date_trunc('month', i.paid_at)
-       ORDER BY month ASC`,
+      `WITH spine AS (
+         SELECT generate_series(
+           date_trunc('month', now()) - interval '${months - 1} months',
+           date_trunc('month', now()),
+           interval '1 month'
+         ) AS month
+       ),
+       rev AS (
+         SELECT date_trunc('month', i.paid_at) AS month,
+                SUM(i.total_amount) AS total,
+                COUNT(*) AS count
+         FROM invoices i
+         WHERE i.contractor_id = $1
+           AND i.status = 'paid'
+           AND i.paid_at >= date_trunc('month', now()) - interval '${months - 1} months'
+         GROUP BY 1
+       )
+       SELECT
+         to_char(s.month, 'YYYY-MM') AS month,
+         to_char(s.month, 'Mon') AS month_label,
+         COALESCE(r.total, 0) AS total,
+         COALESCE(r.count, 0)::text AS count
+       FROM spine s
+       LEFT JOIN rev r ON r.month = s.month
+       ORDER BY s.month ASC`,
       [contractorId],
     );
 
