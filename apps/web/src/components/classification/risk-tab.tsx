@@ -5,6 +5,7 @@ import { api } from '@/lib/api-client';
 import type { ClassificationAssessment } from '@contractor-os/shared';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
+import { formatDate } from '@/lib/format';
 import { RiskScoreGauge } from './risk-score-gauge';
 import { TestBreakdown } from './test-breakdown';
 import { RiskTrendChart } from './risk-trend-chart';
@@ -114,7 +115,7 @@ export function RiskTab({ contractorId }: RiskTabProps) {
                 <ScoreCard label="California ABC" score={assessment.abcScore} max={100} weight="30%" />
               </div>
               <p className="mt-4 text-xs text-slate-400">
-                Assessed {new Date(assessment.assessedAt).toLocaleDateString()}
+                Assessed {formatDate(assessment.assessedAt)}
                 {' · '}
                 Weighted: IRS 40% + DOL 30% + ABC 30%
               </p>

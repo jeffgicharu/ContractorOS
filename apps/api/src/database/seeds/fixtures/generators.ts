@@ -44,6 +44,34 @@ const ENGAGEMENT_TITLES = [
 
 const DOCUMENT_TYPES = ['w9', 'w8ben', 'insurance_certificate', 'nda', 'contract', 'other'] as const;
 
+const TIME_ENTRY_TASKS = [
+  'Implemented API endpoint and unit tests',
+  'Fixed production bug in checkout flow',
+  'Code review and PR feedback',
+  'Pair programming session on auth refactor',
+  'Sprint planning and backlog grooming',
+  'Database schema migration and rollout',
+  'Investigated and resolved performance regression',
+  'Built dashboard UI components',
+  'Wrote integration tests for billing module',
+  'Client requirements call and follow-up notes',
+  'Refactored legacy reporting service',
+  'On-call incident triage and remediation',
+];
+
+const INVOICE_LINE_DESCRIPTIONS = [
+  'Software development services',
+  'Technical consulting',
+  'UI/UX design work',
+  'Code review and mentoring',
+  'Infrastructure and DevOps support',
+  'QA and automated testing',
+  'Architecture and technical design',
+  'Bug fixes and maintenance',
+  'Data analysis and reporting',
+  'Project management and coordination',
+];
+
 // Seed data only — crypto.randomInt keeps static analysis happy (no
 // Math.random in a flagged context) and is plenty for fixture generation.
 export function randomPick<T>(arr: readonly T[]): T {
@@ -103,7 +131,7 @@ export function generateEngagement(contractorId: string, orgId: string, idx: num
     contractorId,
     organizationId: orgId,
     title: ENGAGEMENT_TITLES[idx % ENGAGEMENT_TITLES.length]!,
-    description: `Project engagement #${idx + 1}`,
+    description: `${ENGAGEMENT_TITLES[idx % ENGAGEMENT_TITLES.length]!} engagement covering scoped deliverables, milestone reviews, and ongoing collaboration with the internal team.`,
     startDate: randomDateOnly(365, 30),
     endDate: idx % 3 === 0 ? randomDateOnly(29, 0) : null,
     hourlyRate: idx % 4 === 0 ? null : randomBetween(75, 250),
@@ -121,7 +149,7 @@ export function generateTimeEntries(contractorId: string, engagementId: string, 
     engagementId,
     entryDate: randomDateOnly(90, 1),
     hours: randomBetween(1, 8) + (randomBool() ? 0.5 : 0),
-    description: `Work item ${i + 1}`,
+    description: TIME_ENTRY_TASKS[(i + randomInt(TIME_ENTRY_TASKS.length)) % TIME_ENTRY_TASKS.length]!,
   }));
 }
 
@@ -171,7 +199,7 @@ export function generateInvoice(
 
   const lineItemCount = randomBetween(1, 4);
   const lineItems = Array.from({ length: lineItemCount }, (_, i) => ({
-    description: `Service item ${i + 1}`,
+    description: INVOICE_LINE_DESCRIPTIONS[(i + randomInt(INVOICE_LINE_DESCRIPTIONS.length)) % INVOICE_LINE_DESCRIPTIONS.length]!,
     quantity: randomBetween(4, 40),
     unitPrice: randomBetween(50, 200),
   }));
@@ -610,7 +638,11 @@ export function generateNotification(
   body: string,
   data: Record<string, unknown> = {},
 ) {
-  return { userId, type, title, body, data };
+  // Spread notifications across the trailing ~14 days so they don't all
+  // read "27m ago". Always at least a minute in the past.
+  const minsAgo = randomBetween(5, 14 * 24 * 60);
+  const createdAt = new Date(Date.now() - minsAgo * 60_000).toISOString();
+  return { userId, type, title, body, data, createdAt };
 }
 
 export { ENGAGEMENT_TITLES, DOCUMENT_TYPES };

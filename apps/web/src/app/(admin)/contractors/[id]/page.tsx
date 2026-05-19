@@ -290,7 +290,8 @@ function OverviewTab({ contractor }: { contractor: ContractorDetail }) {
               }`}
             />
             <span className="text-[13px] text-slate-600">
-              W-9 {contractor.documentStatus.hasCurrentW9 ? 'on file' : 'missing'}
+              {contractor.type === 'foreign' ? 'W-8BEN' : 'W-9'}{' '}
+              {contractor.documentStatus.hasCurrentW9 ? 'on file' : 'missing'}
             </span>
           </div>
           <div className="flex items-center gap-2">
