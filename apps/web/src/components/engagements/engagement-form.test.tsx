@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EngagementForm } from './engagement-form';
 
@@ -71,6 +71,30 @@ describe('EngagementForm', () => {
     await fillBaseFields({ hourlyRate: '125' });
     await userEvent.click(screen.getByRole('button', { name: /create engagement/i }));
     expect(await screen.findByText(/engagement already exists/i)).toBeInTheDocument();
+  });
+
+  it('shows an inline description error and does not submit when it exceeds the limit', async () => {
+    render(<EngagementForm contractorId="c-1" onSuccess={vi.fn()} onCancel={vi.fn()} />);
+    await fillBaseFields({ hourlyRate: '125' });
+    fireEvent.change(screen.getByLabelText(/description/i), {
+      target: { value: 'x'.repeat(2001) },
+    });
+    await userEvent.click(screen.getByRole('button', { name: /create engagement/i }));
+    expect(await screen.findByText(/at most 2000/i)).toBeInTheDocument();
+    expect(apiPostMock).not.toHaveBeenCalled();
+  });
+
+  it('shows an inline currency error when the code is not 3 letters', async () => {
+    render(<EngagementForm contractorId="c-1" onSuccess={vi.fn()} onCancel={vi.fn()} />);
+    await fillBaseFields({ hourlyRate: '125' });
+    const currency = screen.getByLabelText(/currency/i);
+    await userEvent.clear(currency);
+    await userEvent.type(currency, 'US');
+    await userEvent.click(screen.getByRole('button', { name: /create engagement/i }));
+    expect(
+      await screen.findByText(/currency must be a 3-letter code/i),
+    ).toBeInTheDocument();
+    expect(apiPostMock).not.toHaveBeenCalled();
   });
 
   it('calls onCancel when the Cancel button is clicked', async () => {
