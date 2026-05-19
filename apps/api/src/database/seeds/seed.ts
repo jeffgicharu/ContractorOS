@@ -226,7 +226,10 @@ async function demoSeed() {
     }> = [];
     let invoiceNum = 0;
     let invoiceCount = 0;
-    const PAID_MONTHS = [0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5]; // weighted toward recent months
+    // Spread paid invoices fairly evenly across the trailing 6 months with a
+    // gentle mid-window bump and only a partial current month, so the revenue
+    // chart reads like an established business rather than a final-month spike.
+    const PAID_MONTHS = [0, 1, 1, 2, 2, 3, 3, 3, 4, 4, 5, 5];
     for (const eng of engagementMap) {
       const count = randomBetween(2, 5);
       for (let i = 0; i < count; i++) {
