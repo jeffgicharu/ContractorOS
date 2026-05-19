@@ -4,6 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import type { TimeEntry, PaginationMeta } from '@contractor-os/shared';
 import { api } from '@/lib/api-client';
 import { formatDate } from '@/lib/format';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 
 interface TimeEntriesTabProps {
   contractorId: string;
@@ -62,7 +67,8 @@ export function TimeEntriesTab({ contractorId }: TimeEntriesTabProps) {
           <p className="text-sm text-slate-500">No time entries yet.</p>
         </div>
       ) : (
-        <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+        <>
+        <div className="hidden rounded-lg border border-slate-200 bg-white overflow-hidden sm:block">
           <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50">
@@ -94,6 +100,23 @@ export function TimeEntriesTab({ contractorId }: TimeEntriesTabProps) {
             </tbody>
           </table>
         </div>
+
+        {/* Cards (below sm) */}
+        <MobileCardList>
+          {entries.map((entry) => (
+            <MobileCard key={entry.id} title={formatDate(entry.entryDate)}>
+              <MobileCardRow label="Hours">
+                <span className="font-mono text-slate-900">
+                  {entry.hours.toFixed(1)}
+                </span>
+              </MobileCardRow>
+              <MobileCardRow label="Description">
+                {entry.description}
+              </MobileCardRow>
+            </MobileCard>
+          ))}
+        </MobileCardList>
+        </>
       )}
 
       {meta && meta.totalPages > 1 && (

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { api, ApiClientError } from '@/lib/api-client';
 import { formatDate, formatCurrency } from '@/lib/format';
 import { Button } from '@/components/ui/button';
+import { TableScroll } from '@/components/ui/responsive-table';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { InvoiceTimeline } from '@/components/invoices/invoice-timeline';
 import type { InvoiceDetail, InvoiceStatus } from '@contractor-os/shared';
@@ -241,20 +242,21 @@ export default function InvoiceDetailPage() {
       </div>
 
       {/* Line items table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white">
         <div className="px-6 py-4 border-b border-slate-50">
           <h3 className="text-base font-semibold text-slate-900">Line Items</h3>
         </div>
+        <TableScroll>
         <table className="w-full border-separate border-spacing-0">
           <thead>
             <tr className="bg-slate-50/50">
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Description
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Qty
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400 hidden sm:table-cell">
+              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
                 Unit Price
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
@@ -266,10 +268,10 @@ export default function InvoiceDetailPage() {
             {invoice.lineItems.map((item) => (
               <tr key={item.id} className="border-b border-slate-50">
                 <td className="px-6 py-3 text-[13px] text-slate-700">{item.description}</td>
-                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700 hidden sm:table-cell">
+                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
                   {item.quantity}
                 </td>
-                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700 hidden sm:table-cell">
+                <td className="px-4 py-3 text-right text-[13px] font-mono text-slate-700">
                   {formatCurrency(item.unitPrice)}
                 </td>
                 <td className="px-6 py-3 text-right text-[13px] font-mono font-medium text-slate-900">
@@ -279,6 +281,7 @@ export default function InvoiceDetailPage() {
             ))}
           </tbody>
         </table>
+        </TableScroll>
       </div>
 
       {/* Notes */}

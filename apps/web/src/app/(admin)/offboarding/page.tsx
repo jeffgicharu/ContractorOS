@@ -6,6 +6,11 @@ import { api } from '@/lib/api-client';
 import { formatDate } from '@/lib/format';
 import type { OffboardingWorkflow, OffboardingStatus } from '@contractor-os/shared';
 import { OffboardingStatusBadge } from '@/components/offboarding/offboarding-status-badge';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 
 const STATUS_TABS = [
   { label: 'All', value: '' },
@@ -107,7 +112,7 @@ export default function OffboardingPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white sm:block">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/50">
@@ -175,6 +180,46 @@ export default function OffboardingPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Cards (below sm) */}
+            <MobileCardList>
+              {workflows.map((w) => (
+                <MobileCard
+                  key={w.id}
+                  href={`/offboarding/${w.id}`}
+                  title={w.contractorName}
+                  accessory={
+                    <OffboardingStatusBadge
+                      status={w.status as OffboardingStatus}
+                      variant="pill"
+                    />
+                  }
+                >
+                  <MobileCardRow label="Reason">
+                    {REASON_LABELS[w.reason] ?? w.reason}
+                  </MobileCardRow>
+                  <MobileCardRow label="Progress">
+                    <span className="flex items-center justify-end gap-2">
+                      <span className="h-1.5 w-16 rounded-full bg-slate-100">
+                        <span
+                          className="block h-1.5 rounded-full bg-brand-500"
+                          style={{ width: `${w.progress}%` }}
+                        />
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        {w.progress}%
+                      </span>
+                    </span>
+                  </MobileCardRow>
+                  <MobileCardRow label="Effective Date">
+                    {formatDate(w.effectiveDate)}
+                  </MobileCardRow>
+                  <MobileCardRow label="Created">
+                    {formatDate(w.createdAt)}
+                  </MobileCardRow>
+                </MobileCard>
+              ))}
+            </MobileCardList>
 
             {/* Pagination */}
             {meta.totalPages > 1 && (

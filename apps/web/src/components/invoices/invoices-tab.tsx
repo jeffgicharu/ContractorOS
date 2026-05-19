@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api-client';
 import { formatDate, formatCurrency } from '@/lib/format';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import { InvoiceStatusBadge } from './invoice-status-badge';
 import type { InvoiceListItem, InvoiceStatus } from '@contractor-os/shared';
 
@@ -50,7 +55,8 @@ export function InvoicesTab({ contractorId }: InvoicesTabProps) {
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+    <>
+    <div className="hidden rounded-lg border border-slate-200 bg-white overflow-hidden sm:block">
       <table className="w-full border-separate border-spacing-0">
         <thead>
           <tr className="bg-slate-50">
@@ -98,5 +104,32 @@ export function InvoicesTab({ contractorId }: InvoicesTabProps) {
         </tbody>
       </table>
     </div>
+
+    {/* Cards (below sm) */}
+    <MobileCardList>
+      {invoices.map((inv) => (
+        <MobileCard
+          key={inv.id}
+          href={`/invoices/${inv.id}`}
+          title={<span className="font-mono">{inv.invoiceNumber}</span>}
+          accessory={
+            <InvoiceStatusBadge status={inv.status as InvoiceStatus} />
+          }
+        >
+          <MobileCardRow label="Amount">
+            <span className="font-mono text-slate-900">
+              {formatCurrency(inv.totalAmount)}
+            </span>
+          </MobileCardRow>
+          <MobileCardRow label="Period">
+            {formatDate(inv.periodStart)} – {formatDate(inv.periodEnd)}
+          </MobileCardRow>
+          <MobileCardRow label="Due Date">
+            {formatDate(inv.dueDate)}
+          </MobileCardRow>
+        </MobileCard>
+      ))}
+    </MobileCardList>
+    </>
   );
 }

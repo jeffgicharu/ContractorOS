@@ -6,6 +6,11 @@ import { api } from '@/lib/api-client';
 import { formatDate } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { TimeEntryForm } from '@/components/time-entries/time-entry-form';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 
 export default function PortalTimeEntriesPage() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
@@ -111,7 +116,8 @@ export default function PortalTimeEntriesPage() {
           <p className="text-sm text-slate-500">No time entries yet. Click "Log Time" to get started.</p>
         </div>
       ) : (
-        <div className="mt-4 rounded-xl border border-slate-200 bg-white overflow-x-auto">
+        <>
+        <div className="mt-4 hidden rounded-xl border border-slate-200 bg-white overflow-x-auto sm:block">
           <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
@@ -155,6 +161,32 @@ export default function PortalTimeEntriesPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Cards (below sm) */}
+        <MobileCardList className="mt-4">
+          {entries.map((entry) => (
+            <MobileCard key={entry.id} title={formatDate(entry.entryDate)}>
+              <MobileCardRow label="Hours">
+                <span className="font-mono text-slate-900">
+                  {entry.hours.toFixed(1)}
+                </span>
+              </MobileCardRow>
+              <MobileCardRow label="Description">
+                {entry.description}
+              </MobileCardRow>
+              <MobileCardRow label="">
+                <button
+                  type="button"
+                  onClick={() => handleDelete(entry.id)}
+                  className="text-xs font-medium text-error-600 hover:text-error-700"
+                >
+                  Delete
+                </button>
+              </MobileCardRow>
+            </MobileCard>
+          ))}
+        </MobileCardList>
+        </>
       )}
 
       {/* Pagination */}

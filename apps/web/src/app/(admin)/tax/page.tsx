@@ -4,7 +4,30 @@ import { useState, useEffect } from 'react';
 import { api } from '@/lib/api-client';
 import { formatCurrency } from '@/lib/format';
 import { DocumentStatusBadge } from '@/components/documents/document-status-badge';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import type { ReadinessEntry1099 } from '@contractor-os/shared';
+
+function ReadyBadge({ entry }: { entry: ReadinessEntry1099 }) {
+  if (entry.isReady) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md bg-success-50 text-success-700">
+        Ready
+      </span>
+    );
+  }
+  if (entry.requires1099) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md bg-error-50 text-error-700">
+        Not Ready
+      </span>
+    );
+  }
+  return <span className="text-[13px] text-slate-400">N/A</span>;
+}
 
 export default function TaxReadinessPage() {
   const currentYear = new Date().getFullYear();
@@ -64,8 +87,8 @@ export default function TaxReadinessPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
+      {/* Table (sm and up) */}
+      <div className="mt-6 hidden rounded-xl border border-slate-200 bg-white overflow-x-auto sm:block">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -115,17 +138,7 @@ export default function TaxReadinessPage() {
                     )}
                   </td>
                   <td className="px-4">
-                    {entry.isReady ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md bg-success-50 text-success-700">
-                        Ready
-                      </span>
-                    ) : entry.requires1099 ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-md bg-error-50 text-error-700">
-                        Not Ready
-                      </span>
-                    ) : (
-                      <span className="text-[13px] text-slate-400">N/A</span>
-                    )}
+                    <ReadyBadge entry={entry} />
                   </td>
                 </tr>
               ))}
@@ -133,6 +146,45 @@ export default function TaxReadinessPage() {
           </table>
         )}
       </div>
+
+      {/* Cards (below sm) */}
+      <MobileCardList className="mt-6">
+        {isLoading ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-20 text-center">
+            <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+          </div>
+        ) : entries.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-20 text-center text-sm text-slate-500">
+            No domestic contractors found.
+          </div>
+        ) : (
+          entries.map((entry) => (
+            <MobileCard
+              key={entry.contractorId}
+              title={entry.contractorName}
+              accessory={<ReadyBadge entry={entry} />}
+            >
+              <MobileCardRow label="YTD Payments">
+                <span className="font-mono text-slate-900">
+                  {formatCurrency(entry.ytdPayments)}
+                </span>
+              </MobileCardRow>
+              <MobileCardRow label="W-9 Status">
+                <DocumentStatusBadge
+                  status={entry.hasCurrentW9 ? 'current' : 'missing'}
+                />
+              </MobileCardRow>
+              <MobileCardRow label="Requires 1099">
+                {entry.requires1099 ? (
+                  <span className="font-medium text-slate-900">Yes</span>
+                ) : (
+                  <span className="text-slate-400">No</span>
+                )}
+              </MobileCardRow>
+            </MobileCard>
+          ))
+        )}
+      </MobileCardList>
     </div>
   );
 }

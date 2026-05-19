@@ -12,6 +12,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ContractorStatusBadge } from '@/components/contractors/contractor-status-badge';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import { useAuth } from '@/hooks/use-auth';
 
 const STATUS_OPTIONS = [
@@ -135,8 +140,8 @@ export default function ContractorListPage() {
         </select>
       </div>
 
-      {/* Table */}
-      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      {/* Table (sm and up) */}
+      <div className="mt-4 hidden overflow-x-auto rounded-xl border border-slate-200 bg-white sm:block">
         <table className="w-full border-separate border-spacing-0">
           <thead>
             <tr>
@@ -219,6 +224,38 @@ export default function ContractorListPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Cards (below sm) */}
+      <MobileCardList className="mt-4">
+        {isLoading ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-12 text-center">
+            <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+          </div>
+        ) : contractors.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white px-4 py-12 text-center text-sm text-slate-500">
+            {search || statusFilter
+              ? 'No contractors match your filters'
+              : 'No contractors yet. Add your first contractor to get started.'}
+          </div>
+        ) : (
+          contractors.map((contractor) => (
+            <MobileCard
+              key={contractor.id}
+              href={`/contractors/${contractor.id}`}
+              title={`${contractor.firstName} ${contractor.lastName}`}
+              accessory={<ContractorStatusBadge status={contractor.status} />}
+            >
+              <MobileCardRow label="Email">{contractor.email}</MobileCardRow>
+              <MobileCardRow label="Type">
+                <span className="capitalize">{contractor.type}</span>
+              </MobileCardRow>
+              <MobileCardRow label="Created">
+                {formatDate(contractor.createdAt)}
+              </MobileCardRow>
+            </MobileCard>
+          ))
+        )}
+      </MobileCardList>
 
       {/* Pagination */}
       {meta && meta.totalPages > 1 && (
