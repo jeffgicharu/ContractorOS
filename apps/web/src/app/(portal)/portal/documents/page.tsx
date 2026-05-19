@@ -8,6 +8,7 @@ import { UploadModal } from '@/components/documents/upload-modal';
 import {
   DOCUMENT_TYPE_LABELS,
   REQUIRED_DOCUMENTS_DOMESTIC,
+  REQUIRED_DOCUMENTS_FOREIGN,
   type TaxDocumentType,
   type TaxDocument,
   type ContractorDetail,
@@ -15,6 +16,7 @@ import {
 
 export default function PortalDocumentsPage() {
   const [contractorId, setContractorId] = useState<string | null>(null);
+  const [contractorType, setContractorType] = useState<'domestic' | 'foreign'>('domestic');
   const [documents, setDocuments] = useState<TaxDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
@@ -37,6 +39,7 @@ export default function PortalDocumentsPage() {
       try {
         const { data: me } = await api.get<ContractorDetail>('/contractors/me');
         setContractorId(me.id);
+        setContractorType(me.type);
         await loadDocuments(me.id);
       } catch {
         setIsLoading(false);
@@ -63,7 +66,11 @@ export default function PortalDocumentsPage() {
   const currentTypes = documents
     .filter((d) => d.isCurrent)
     .map((d) => d.documentType);
-  const missingDocs = REQUIRED_DOCUMENTS_DOMESTIC.filter(
+  const requiredDocs =
+    contractorType === 'foreign'
+      ? REQUIRED_DOCUMENTS_FOREIGN
+      : REQUIRED_DOCUMENTS_DOMESTIC;
+  const missingDocs = requiredDocs.filter(
     (req) => !currentTypes.includes(req),
   );
   const expiredDocs = documents.filter(

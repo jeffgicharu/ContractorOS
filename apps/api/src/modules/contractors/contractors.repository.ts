@@ -154,6 +154,11 @@ export class ContractorsRepository {
     const contractor = await this.findById(orgId, id);
     if (!contractor) return null;
 
+    // Foreign contractors are required to file a W-8BEN, not a W-9. The
+    // documentStatus.hasCurrentW9 field carries "has the current required
+    // tax form" regardless of which form that is for this contractor type.
+    const requiredTaxForm = contractor.type === 'foreign' ? 'w8ben' : 'w9';
+
     // Run the 5 child queries concurrently. Previous implementation
     // awaited them sequentially, which added one round-trip per
     // sub-resource (~6× the wall-clock of the slowest fetch). They are
@@ -192,11 +197,11 @@ export class ContractorsRepository {
         expiring: string;
       }>(
         `SELECT
-          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'w9' AND is_current = true AND (expires_at IS NULL OR expires_at > now())) as has_w9,
+          EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = $2::tax_document_type AND is_current = true AND (expires_at IS NULL OR expires_at > now())) as has_w9,
           EXISTS(SELECT 1 FROM tax_documents WHERE contractor_id = $1 AND document_type = 'contract' AND is_current = true AND (expires_at IS NULL OR expires_at > now())) as has_contract,
           COUNT(*) FILTER (WHERE expires_at IS NOT NULL AND expires_at < now() + INTERVAL '30 days') as expiring
          FROM tax_documents WHERE contractor_id = $1 AND is_current = true`,
-        [id],
+        [id, requiredTaxForm],
       ).catch(() => ({ rows: [{ has_w9: false, has_contract: false, expiring: '0' }] })),
       this.pool.query<{ total: string }>(
         `SELECT COALESCE(SUM(total_amount), 0) as total

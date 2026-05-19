@@ -155,8 +155,22 @@ async function demoSeed() {
         });
       }
     }
-    // Link first contractor to user account
-    await pool.query(`UPDATE contractors SET user_id = $1 WHERE id = $2`, [SEED_CONTRACTOR_USER_ID, contractors[0]!.id]);
+    // Link first contractor to the contractor user account, and align its
+    // identity with that user (John Smith / john.smith@example.com) so every
+    // screen — portal greeting, sidebar, profile, contractor record — agrees.
+    const linkedContractorId = contractors[0]!.id;
+    await pool.query(
+      `UPDATE contractors
+       SET user_id = $1, first_name = 'John', last_name = 'Smith', email = 'john.smith@example.com'
+       WHERE id = $2`,
+      [SEED_CONTRACTOR_USER_ID, linkedContractorId],
+    );
+    // Keep the in-memory refs (used by audit/invoice name lookups, built
+    // below) consistent with the renamed contractor.
+    const linkedOnboarded = onboardedContractors.find((o) => o.id === linkedContractorId);
+    if (linkedOnboarded) {
+      linkedOnboarded.name = 'John Smith';
+    }
     console.log(`Inserted ${CONTRACTOR_COUNT} contractors`);
 
     // Engagements
@@ -249,6 +263,51 @@ async function demoSeed() {
           [inv.id],
         );
 
+        // Status history + approval steps so the Invoice detail panels are
+        // populated and consistent with the Details dates (a Paid invoice
+        // must not show "No status history yet").
+        if (inv.status !== 'draft' && inv.submittedAt) {
+          const history: Array<[string | null, string, string]> = [
+            ['draft', 'submitted', inv.submittedAt],
+          ];
+          if (inv.approvedAt) history.push(['submitted', 'approved', inv.approvedAt]);
+          if (inv.scheduledAt) history.push(['approved', 'scheduled', inv.scheduledAt]);
+          if (inv.paidAt) history.push(['scheduled', 'paid', inv.paidAt]);
+          if (inv.status === 'rejected') {
+            const rejectedAt = new Date(
+              new Date(inv.submittedAt).getTime() + 86_400_000,
+            ).toISOString();
+            history.push(['submitted', 'rejected', rejectedAt]);
+          }
+          for (const [from, to, at] of history) {
+            const changedBy = to === 'submitted' ? SEED_MANAGER_ID : SEED_ADMIN_ID;
+            await pool.query(
+              `INSERT INTO invoice_status_history (invoice_id, from_status, to_status, changed_by, reason, created_at)
+               VALUES ($1,$2::invoice_status,$3::invoice_status,$4,$5,$6)`,
+              [inv.id, from, to, changedBy, to === 'rejected' ? 'Amounts require revision' : null, at],
+            );
+          }
+
+          // Every invoice that reached approval (or beyond) gets a decided
+          // approval step; rejected ones get a rejected step.
+          if (inv.approvedAt) {
+            await pool.query(
+              `INSERT INTO approval_steps (invoice_id, approver_id, step_order, decision, decided_at, notes, created_at)
+               VALUES ($1,$2,1,'approved'::approval_decision,$3,$4,$5)`,
+              [inv.id, SEED_ADMIN_ID, inv.approvedAt, 'Approved for payment', inv.submittedAt],
+            );
+          } else if (inv.status === 'rejected') {
+            const rejectedAt = new Date(
+              new Date(inv.submittedAt).getTime() + 86_400_000,
+            ).toISOString();
+            await pool.query(
+              `INSERT INTO approval_steps (invoice_id, approver_id, step_order, decision, decided_at, notes, created_at)
+               VALUES ($1,$2,1,'rejected'::approval_decision,$3,$4,$5)`,
+              [inv.id, SEED_ADMIN_ID, rejectedAt, 'Amounts require revision', inv.submittedAt],
+            );
+          }
+        }
+
         invoiceRefs.push({
           id: inv.id,
           invoiceNumber: inv.invoiceNumber,
@@ -319,21 +378,70 @@ async function demoSeed() {
         `non-compliant ${complianceTally.noncompliant} → ~${complianceRate}% compliance rate)`,
     );
 
-    // Classification assessments
+    // Classification assessments — the gauge (overall) must agree with its
+    // own Test Scores. Pick a target tier, derive the three component scores
+    // within that tier's band, then compute the weighted overall and re-derive
+    // the risk level from the canonical thresholds so they can never disagree.
+    const TIER_BANDS: Record<string, [number, number]> = {
+      low: [8, 28],
+      medium: [33, 53],
+      high: [58, 73],
+      critical: [78, 98],
+    };
+    const riskFromScore = (s: number): 'low' | 'medium' | 'high' | 'critical' =>
+      s <= 30 ? 'low' : s <= 55 ? 'medium' : s <= 75 ? 'high' : 'critical';
+    // Split a target subtotal into n positive parts that sum exactly to it.
+    const splitScore = (total: number, parts: number): number[] => {
+      const out: number[] = [];
+      let remaining = total;
+      for (let p = 0; p < parts; p++) {
+        if (p === parts - 1) {
+          out.push(Math.max(0, remaining));
+        } else {
+          const slice = Math.round(remaining / (parts - p));
+          out.push(Math.max(0, slice));
+          remaining -= slice;
+        }
+      }
+      return out;
+    };
     let assessmentCount = 0;
     for (const cId of activeContractorIds.slice(0, 35)) {
-      const riskLevel = randomPick(RISK_LEVELS);
-      const score = riskLevel === 'low' ? randomBetween(10, 30) : riskLevel === 'medium' ? randomBetween(31, 55) : riskLevel === 'high' ? randomBetween(56, 75) : randomBetween(76, 100);
+      const tier = randomPick(RISK_LEVELS);
+      const [lo, hi] = TIER_BANDS[tier]!;
+      const irsScore = randomBetween(lo, hi);
+      const dolScore = randomBetween(lo, hi);
+      const abcScore = randomBetween(lo, hi);
+      const overallScore = Math.round(irsScore * 0.4 + dolScore * 0.3 + abcScore * 0.3);
+      const overallRisk = riskFromScore(overallScore);
+
+      // IRS factors: three groups (max 40/30/30) whose scores sum to irsScore.
+      const [irsBehavioral, irsFinancial, irsRelationship] = splitScore(irsScore, 3);
+      // ABC factors: three prongs whose scores sum to abcScore.
+      const [abcA, abcB, abcC] = splitScore(abcScore, 3);
+
+      // Spread assessed_at over roughly the last 45 days (always in the past).
+      const assessedAt = new Date(
+        Date.now() - randomBetween(1, 45) * 86_400_000 - randomBetween(0, 23) * 3_600_000,
+      ).toISOString();
 
       await pool.query(
-        `INSERT INTO classification_assessments (id, contractor_id, organization_id, overall_risk, overall_score,
+        `INSERT INTO classification_assessments (id, contractor_id, organization_id, assessed_at, overall_risk, overall_score,
           irs_score, irs_factors, dol_score, dol_factors, abc_score, abc_factors, input_data)
-         VALUES ($1,$2,$3,$4::risk_level,$5,$6,$7,$8,$9,$10,$11,$12)`,
+         VALUES ($1,$2,$3,$4,$5::risk_level,$6,$7,$8,$9,$10,$11,$12,$13)`,
         [
-          randomUUID(), cId, SEED_ORG_ID, riskLevel, score,
-          randomBetween(10, 80), JSON.stringify({ behavioral_control: { score: randomBetween(5, 30), max: 40, factors: {} }, financial_control: { score: randomBetween(5, 20), max: 30, factors: {} }, relationship_type: { score: randomBetween(5, 20), max: 30, factors: {} } }),
-          randomBetween(10, 80), JSON.stringify({}),
-          randomBetween(10, 80), JSON.stringify({ prong_a: { passed: randomBool(), weight: 34, score: randomBetween(0, 34) }, prong_b: { passed: randomBool(), weight: 33, score: randomBetween(0, 33) }, prong_c: { passed: randomBool(), weight: 33, score: randomBetween(0, 33) } }),
+          randomUUID(), cId, SEED_ORG_ID, assessedAt, overallRisk, overallScore,
+          irsScore, JSON.stringify({
+            behavioral_control: { score: Math.min(irsBehavioral!, 40), max: 40, factors: {} },
+            financial_control: { score: Math.min(irsFinancial!, 30), max: 30, factors: {} },
+            relationship_type: { score: Math.min(irsRelationship!, 30), max: 30, factors: {} },
+          }),
+          dolScore, JSON.stringify({ score: dolScore, max: 100, factors: {} }),
+          abcScore, JSON.stringify({
+            prong_a: { passed: abcA! < 12, weight: 34, score: Math.min(abcA!, 34) },
+            prong_b: { passed: abcB! < 11, weight: 33, score: Math.min(abcB!, 33) },
+            prong_c: { passed: abcC! < 11, weight: 33, score: Math.min(abcC!, 33) },
+          }),
           JSON.stringify({ hoursPerWeek: randomBetween(10, 50) }),
         ],
       );
@@ -379,11 +487,32 @@ async function demoSeed() {
       const workflowId = randomUUID();
       offboardingIds.push(workflowId);
       const status = offboardStatuses[offboardCount % offboardStatuses.length]!;
+      const effectiveDate = randomDateOnly(30, 0);
       await pool.query(
         `INSERT INTO offboarding_workflows (id, contractor_id, organization_id, initiated_by, reason, effective_date, status, notes)
          VALUES ($1,$2,$3,$4,$5::offboarding_reason,$6,$7::offboarding_status,$8)`,
-        [workflowId, cId, SEED_ORG_ID, SEED_ADMIN_ID, randomPick(offboardReasons), randomDateOnly(30, 0), status, null],
+        [workflowId, cId, SEED_ORG_ID, SEED_ADMIN_ID, randomPick(offboardReasons), effectiveDate, status, null],
       );
+
+      // A completed offboarding means the contractor has truly left — flip
+      // their status so the Contractors list / dashboard don't contradict the
+      // workflow. The checklist items are all 'completed' in this branch.
+      if (status === 'completed') {
+        await pool.query(
+          `UPDATE contractors SET status = 'offboarded', offboarded_at = $2 WHERE id = $1`,
+          [cId, new Date(`${effectiveDate}T12:00:00.000Z`).toISOString()],
+        );
+        await pool.query(
+          `UPDATE contractor_status_history SET effective_until = now()
+           WHERE contractor_id = $1 AND effective_until IS NULL`,
+          [cId],
+        );
+        await pool.query(
+          `INSERT INTO contractor_status_history (contractor_id, status, changed_by, reason, effective_from)
+           VALUES ($1, 'offboarded', $2, 'Offboarding completed', $3)`,
+          [cId, SEED_ADMIN_ID, new Date(`${effectiveDate}T12:00:00.000Z`).toISOString()],
+        );
+      }
 
       const checklistTypes = ['revoke_system_access', 'revoke_code_repo_access', 'revoke_communication_tools',
         'retrieve_equipment', 'process_final_invoice', 'archive_documents',
@@ -399,33 +528,45 @@ async function demoSeed() {
     }
     console.log(`Inserted ${offboardCount} offboarding workflows`);
 
-    // Notifications
+    // Notifications — reference REAL invoice numbers from the seeded set so a
+    // notification never points at an invoice that doesn't exist, and spread
+    // created_at over the trailing ~14 days (handled in generateNotification).
+    const realInvoices = invoiceRefs.length > 0 ? invoiceRefs : null;
+    const pickInvoiceNumber = (): string =>
+      realInvoices ? randomPick(realInvoices).invoiceNumber : 'INV-2026-001';
     const notifData = [
-      ...Array.from({ length: 20 }, () => generateNotification(
-        SEED_ADMIN_ID,
-        randomPick(NOTIFICATION_TYPES),
-        'Invoice Activity',
-        `Invoice INV-2025-${String(randomBetween(1, invoiceNum)).padStart(3, '0')} status changed`,
-        { invoiceNumber: `INV-2025-${String(randomBetween(1, invoiceNum)).padStart(3, '0')}` },
-      )),
+      ...Array.from({ length: 20 }, () => {
+        const invNo = pickInvoiceNumber();
+        return generateNotification(
+          SEED_ADMIN_ID,
+          randomPick(NOTIFICATION_TYPES),
+          'Invoice Activity',
+          `Invoice ${invNo} status changed`,
+          { invoiceNumber: invNo },
+        );
+      }),
       ...Array.from({ length: 15 }, () => generateNotification(
         SEED_MANAGER_ID,
         randomPick(NOTIFICATION_TYPES),
         'System Notification',
         'A system event occurred',
       )),
-      ...Array.from({ length: 15 }, () => generateNotification(
-        SEED_CONTRACTOR_USER_ID,
-        randomPick(['invoice_approved', 'invoice_paid', 'invoice_rejected']),
-        'Invoice Update',
-        'Your invoice has been updated',
-      )),
+      ...Array.from({ length: 15 }, () => {
+        const invNo = pickInvoiceNumber();
+        return generateNotification(
+          SEED_CONTRACTOR_USER_ID,
+          randomPick(['invoice_approved', 'invoice_paid', 'invoice_rejected']),
+          'Invoice Update',
+          `Your invoice ${invNo} has been updated`,
+          { invoiceNumber: invNo },
+        );
+      }),
     ];
     for (const n of notifData) {
       await pool.query(
-        `INSERT INTO notifications (user_id, type, title, body, data)
-         VALUES ($1,$2::notification_type,$3,$4,$5)`,
-        [n.userId, n.type, n.title, n.body, JSON.stringify(n.data)],
+        `INSERT INTO notifications (user_id, type, title, body, data, created_at)
+         VALUES ($1,$2::notification_type,$3,$4,$5,$6)`,
+        [n.userId, n.type, n.title, n.body, JSON.stringify(n.data), n.createdAt],
       );
     }
     console.log(`Inserted ${notifData.length} notifications`);

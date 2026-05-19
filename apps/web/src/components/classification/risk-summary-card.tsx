@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { RiskLevel } from '@contractor-os/shared';
 import { RiskLevelBadge } from '@/components/contractors/risk-level-badge';
+import { formatDate } from '@/lib/format';
 
 interface RiskSummaryCardProps {
   contractorId: string;
@@ -19,8 +20,7 @@ export function RiskSummaryCard({
   overallScore,
   assessedAt,
 }: RiskSummaryCardProps) {
-  const date = new Date(assessedAt);
-  const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+  const formattedDate = formatDate(assessedAt);
 
   return (
     <Link

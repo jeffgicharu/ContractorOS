@@ -224,7 +224,7 @@ export default function ProfilePage() {
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="rounded-lg border border-slate-100 p-4">
                 <p className="text-xs font-medium uppercase tracking-[0.05em] text-slate-400">
-                  W-9 on File
+                  {profile?.type === 'foreign' ? 'W-8BEN on File' : 'W-9 on File'}
                 </p>
                 <p className="mt-1 text-sm font-medium">
                   {profile?.documentStatus.hasCurrentW9 ? (
