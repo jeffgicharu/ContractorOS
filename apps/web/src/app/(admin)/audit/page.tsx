@@ -5,6 +5,11 @@ import { api } from '@/lib/api-client';
 import type { AuditEvent } from '@contractor-os/shared';
 import { AuditFilters } from '@/components/audit/audit-filters';
 import { AuditDiffViewer } from '@/components/audit/audit-diff-viewer';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 
 type AuditEventWithEmail = AuditEvent & { userEmail?: string };
 
@@ -107,7 +112,7 @@ export default function AuditPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <div className="hidden overflow-x-auto rounded-xl border border-slate-200 bg-white sm:block">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/50">
@@ -184,6 +189,48 @@ export default function AuditPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Cards (below sm) */}
+            <MobileCardList>
+              {events.map((event) => (
+                <Fragment key={event.id}>
+                  <MobileCard
+                    onClick={() =>
+                      setExpandedId(
+                        expandedId === event.id ? null : event.id,
+                      )
+                    }
+                    title={<span className="capitalize">{event.entityType}</span>}
+                    subtitle={formatTimestamp(event.createdAt)}
+                    accessory={<ActionBadge action={event.action} />}
+                  >
+                    <MobileCardRow label="User">
+                      {event.userEmail ?? event.userId ?? '—'}
+                    </MobileCardRow>
+                    <MobileCardRow label="Entity ID">
+                      <span className="font-mono text-[12px] text-slate-400">
+                        {event.entityId?.slice(0, 8) ?? '—'}
+                      </span>
+                    </MobileCardRow>
+                    <MobileCardRow label="">
+                      <span className="text-xs text-brand-600">
+                        {expandedId === event.id
+                          ? 'Hide changes'
+                          : 'View changes'}
+                      </span>
+                    </MobileCardRow>
+                  </MobileCard>
+                  {expandedId === event.id && (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <AuditDiffViewer
+                        oldValues={event.oldValues}
+                        newValues={event.newValues}
+                      />
+                    </div>
+                  )}
+                </Fragment>
+              ))}
+            </MobileCardList>
 
             {meta.totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between">

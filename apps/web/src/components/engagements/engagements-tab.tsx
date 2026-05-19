@@ -5,6 +5,11 @@ import type { Engagement } from '@contractor-os/shared';
 import { api } from '@/lib/api-client';
 import { formatDate, formatCurrency } from '@/lib/format';
 import { Button } from '@/components/ui/button';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import { EngagementStatusBadge } from './engagement-status-badge';
 import { EngagementForm } from './engagement-form';
 
@@ -67,7 +72,8 @@ export function EngagementsTab({ contractorId }: EngagementsTabProps) {
           <p className="text-sm text-slate-500">No engagements yet.</p>
         </div>
       ) : (
-        <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+        <>
+        <div className="hidden rounded-lg border border-slate-200 bg-white overflow-hidden sm:block">
           <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50">
@@ -117,6 +123,33 @@ export function EngagementsTab({ contractorId }: EngagementsTabProps) {
             </tbody>
           </table>
         </div>
+
+        {/* Cards (below sm) */}
+        <MobileCardList>
+          {engagements.map((e) => (
+            <MobileCard
+              key={e.id}
+              title={e.title}
+              accessory={<EngagementStatusBadge status={e.status} />}
+            >
+              <MobileCardRow label="Start Date">
+                {formatDate(e.startDate)}
+              </MobileCardRow>
+              <MobileCardRow label="End Date">
+                {formatDate(e.endDate)}
+              </MobileCardRow>
+              <MobileCardRow label="Rate">
+                <span className="font-mono text-slate-900">
+                  {formatRate(e)}
+                </span>
+              </MobileCardRow>
+              <MobileCardRow label="Payment">
+                {formatPaymentTerms(e.paymentTerms)}
+              </MobileCardRow>
+            </MobileCard>
+          ))}
+        </MobileCardList>
+        </>
       )}
 
       {showForm && (

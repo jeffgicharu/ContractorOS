@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api-client';
 import { formatDate, formatCurrency } from '@/lib/format';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import type { InvoiceListItem, PaginationMeta } from '@contractor-os/shared';
 
 const STATUS_TABS = [
@@ -134,8 +139,8 @@ export default function PortalPaymentsPage() {
         </nav>
       </div>
 
-      {/* Payments Table */}
-      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+      {/* Payments Table (sm and up) */}
+      <div className="mt-4 hidden overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs sm:block">
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/50">
@@ -215,6 +220,40 @@ export default function PortalPaymentsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Cards (below sm) */}
+      <MobileCardList className="mt-4">
+        {isLoading ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-12 text-center">
+            <div className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+          </div>
+        ) : invoices.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-12 text-center text-sm text-slate-500">
+            No payments found
+          </div>
+        ) : (
+          invoices.map((inv) => (
+            <MobileCard
+              key={inv.id}
+              href={`/portal/invoices/${inv.id}`}
+              title={<span className="font-mono">{inv.invoiceNumber}</span>}
+              accessory={<InvoiceStatusBadge status={inv.status} />}
+            >
+              <MobileCardRow label="Amount">
+                <span className="font-mono font-medium text-slate-900">
+                  {formatCurrency(inv.totalAmount)}
+                </span>
+              </MobileCardRow>
+              <MobileCardRow label="Period">
+                {formatDate(inv.periodStart)} – {formatDate(inv.periodEnd)}
+              </MobileCardRow>
+              <MobileCardRow label="Due Date">
+                {formatDate(inv.dueDate)}
+              </MobileCardRow>
+            </MobileCard>
+          ))
+        )}
+      </MobileCardList>
 
       {/* Pagination */}
       {meta && meta.totalPages > 1 && (

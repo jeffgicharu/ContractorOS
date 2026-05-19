@@ -6,6 +6,11 @@ import { formatDate } from '@/lib/format';
 import { DocumentStatusBadge, getDocumentStatus } from '@/components/documents/document-status-badge';
 import { UploadModal } from '@/components/documents/upload-modal';
 import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
+import {
   DOCUMENT_TYPE_LABELS,
   REQUIRED_DOCUMENTS_DOMESTIC,
   REQUIRED_DOCUMENTS_FOREIGN,
@@ -140,8 +145,8 @@ export default function PortalDocumentsPage() {
         </div>
       )}
 
-      {/* Documents table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
+      {/* Documents table (sm and up) */}
+      <div className="mt-6 hidden rounded-xl border border-slate-200 bg-white overflow-x-auto sm:block">
         {documents.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-sm text-slate-500">No documents uploaded yet.</p>
@@ -203,6 +208,40 @@ export default function PortalDocumentsPage() {
           </table>
         )}
       </div>
+
+      {/* Cards (below sm) */}
+      <MobileCardList className="mt-6">
+        {documents.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-20 text-center text-sm text-slate-500">
+            No documents uploaded yet.
+          </div>
+        ) : (
+          documents.map((doc) => (
+            <MobileCard
+              key={doc.id}
+              onClick={() => handleDownload(doc)}
+              title={
+                DOCUMENT_TYPE_LABELS[doc.documentType as TaxDocumentType] ??
+                doc.documentType
+              }
+              subtitle={doc.fileName}
+              accessory={<DocumentStatusBadge status={getDocumentStatus(doc)} />}
+            >
+              <MobileCardRow label="Uploaded">
+                {formatDate(doc.createdAt)}
+              </MobileCardRow>
+              <MobileCardRow label="Expires">
+                {formatDate(doc.expiresAt)}
+              </MobileCardRow>
+              <MobileCardRow label="">
+                <span className="text-sm font-medium text-brand-600">
+                  Download
+                </span>
+              </MobileCardRow>
+            </MobileCard>
+          ))
+        )}
+      </MobileCardList>
 
       {showUpload && contractorId && (
         <UploadModal

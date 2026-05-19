@@ -6,6 +6,11 @@ import { api } from '@/lib/api-client';
 import { formatDate, formatCurrency } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import type { InvoiceListItem, PaginationMeta, InvoiceStatus } from '@contractor-os/shared';
 
 const STATUS_TABS = [
@@ -78,8 +83,8 @@ export default function PortalInvoicesPage() {
         </nav>
       </div>
 
-      {/* Table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
+      {/* Table (sm and up) */}
+      <div className="mt-6 hidden rounded-xl border border-slate-200 bg-white overflow-x-auto sm:block">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -144,6 +149,49 @@ export default function PortalInvoicesPage() {
           </table>
         )}
       </div>
+
+      {/* Cards (below sm) */}
+      <MobileCardList className="mt-6">
+        {isLoading ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-20 text-center">
+            <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+          </div>
+        ) : invoices.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-20 text-center">
+            <p className="text-sm text-slate-500">No invoices yet.</p>
+            <Button
+              size="sm"
+              className="mt-4"
+              onClick={() => router.push('/portal/invoices/new')}
+            >
+              Create Your First Invoice
+            </Button>
+          </div>
+        ) : (
+          invoices.map((inv) => (
+            <MobileCard
+              key={inv.id}
+              href={`/portal/invoices/${inv.id}`}
+              title={<span className="font-mono">{inv.invoiceNumber}</span>}
+              accessory={
+                <InvoiceStatusBadge status={inv.status as InvoiceStatus} />
+              }
+            >
+              <MobileCardRow label="Amount">
+                <span className="font-mono text-slate-900">
+                  {formatCurrency(inv.totalAmount)}
+                </span>
+              </MobileCardRow>
+              <MobileCardRow label="Period">
+                {formatDate(inv.periodStart)} – {formatDate(inv.periodEnd)}
+              </MobileCardRow>
+              <MobileCardRow label="Due Date">
+                {formatDate(inv.dueDate)}
+              </MobileCardRow>
+            </MobileCard>
+          ))
+        )}
+      </MobileCardList>
 
       {/* Pagination */}
       {meta && meta.totalPages > 1 && (

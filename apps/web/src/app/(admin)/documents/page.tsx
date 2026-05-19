@@ -4,7 +4,24 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api-client';
 import { DocumentStatusBadge } from '@/components/documents/document-status-badge';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import { DOCUMENT_TYPE_LABELS, type TaxDocumentType, type ComplianceReportEntry } from '@contractor-os/shared';
+
+function CompliantBadge({ compliant }: { compliant: boolean }) {
+  return compliant ? (
+    <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-md bg-success-50 text-success-700">
+      Yes
+    </span>
+  ) : (
+    <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-md bg-error-50 text-error-700">
+      No
+    </span>
+  );
+}
 
 const FILTER_TABS = [
   { label: 'All', value: 'all' },
@@ -80,8 +97,8 @@ export default function DocumentVaultPage() {
         </nav>
       </div>
 
-      {/* Table */}
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white overflow-x-auto">
+      {/* Table (sm and up) */}
+      <div className="mt-6 hidden rounded-xl border border-slate-200 bg-white overflow-x-auto sm:block">
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
@@ -145,15 +162,7 @@ export default function DocumentVaultPage() {
                       )}
                     </td>
                     <td className="px-4">
-                      {entry.isCompliant ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-md bg-success-50 text-success-700">
-                          Yes
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-md bg-error-50 text-error-700">
-                          No
-                        </span>
-                      )}
+                      <CompliantBadge compliant={entry.isCompliant} />
                     </td>
                   </tr>
                 );
@@ -162,6 +171,63 @@ export default function DocumentVaultPage() {
           </table>
         )}
       </div>
+
+      {/* Cards (below sm) */}
+      <MobileCardList className="mt-6">
+        {isLoading ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-20 text-center">
+            <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white py-20 text-center text-sm text-slate-500">
+            No contractors match this filter.
+          </div>
+        ) : (
+          filtered.map((entry) => {
+            const taxFormType =
+              entry.contractorType === 'foreign' ? 'w8ben' : 'w9';
+            const hasTaxForm = entry.currentDocuments.includes(
+              taxFormType as TaxDocumentType,
+            );
+            const hasContract = entry.currentDocuments.includes(
+              'contract' as TaxDocumentType,
+            );
+            return (
+              <MobileCard
+                key={entry.contractorId}
+                href={`/contractors/${entry.contractorId}?tab=Documents`}
+                title={entry.contractorName}
+                subtitle={
+                  entry.contractorType === 'foreign' ? 'Foreign' : 'Domestic'
+                }
+                accessory={<CompliantBadge compliant={entry.isCompliant} />}
+              >
+                <MobileCardRow label="W-9 / W-8BEN">
+                  <DocumentStatusBadge
+                    status={hasTaxForm ? 'current' : 'missing'}
+                  />
+                </MobileCardRow>
+                <MobileCardRow label="Contract">
+                  <DocumentStatusBadge
+                    status={hasContract ? 'current' : 'missing'}
+                  />
+                </MobileCardRow>
+                <MobileCardRow label="Expiring Docs">
+                  {entry.expiringDocuments.length > 0 ? (
+                    <span className="font-medium text-warning-600">
+                      {entry.expiringDocuments
+                        .map((d) => getDocTypeLabel(d.type))
+                        .join(', ')}
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">None</span>
+                  )}
+                </MobileCardRow>
+              </MobileCard>
+            );
+          })
+        )}
+      </MobileCardList>
     </div>
   );
 }

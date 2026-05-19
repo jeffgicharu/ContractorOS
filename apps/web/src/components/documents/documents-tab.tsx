@@ -5,6 +5,11 @@ import { api } from '@/lib/api-client';
 import { formatDate } from '@/lib/format';
 import { DocumentStatusBadge, getDocumentStatus } from './document-status-badge';
 import { UploadModal } from './upload-modal';
+import {
+  MobileCard,
+  MobileCardList,
+  MobileCardRow,
+} from '@/components/ui/responsive-table';
 import { DOCUMENT_TYPE_LABELS, type TaxDocumentType, type TaxDocument } from '@contractor-os/shared';
 
 interface DocumentsTabProps {
@@ -73,7 +78,8 @@ export function DocumentsTab({ contractorId }: DocumentsTabProps) {
           <p className="text-sm text-slate-500">No documents uploaded for this contractor.</p>
         </div>
       ) : (
-        <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+        <>
+        <div className="hidden rounded-lg border border-slate-200 bg-white overflow-hidden sm:block">
           <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50">
@@ -129,6 +135,35 @@ export function DocumentsTab({ contractorId }: DocumentsTabProps) {
             </tbody>
           </table>
         </div>
+
+        {/* Cards (below sm) */}
+        <MobileCardList>
+          {documents.map((doc) => (
+            <MobileCard
+              key={doc.id}
+              onClick={() => handleDownload(doc)}
+              title={
+                DOCUMENT_TYPE_LABELS[doc.documentType as TaxDocumentType] ??
+                doc.documentType
+              }
+              subtitle={doc.fileName}
+              accessory={<DocumentStatusBadge status={getDocumentStatus(doc)} />}
+            >
+              <MobileCardRow label="Uploaded">
+                {formatDate(doc.createdAt)}
+              </MobileCardRow>
+              <MobileCardRow label="Expires">
+                {formatDate(doc.expiresAt)}
+              </MobileCardRow>
+              <MobileCardRow label="">
+                <span className="text-sm font-medium text-brand-600">
+                  Download
+                </span>
+              </MobileCardRow>
+            </MobileCard>
+          ))}
+        </MobileCardList>
+        </>
       )}
 
       {showUpload && (

@@ -193,7 +193,8 @@ export default function PortalDashboardPage() {
         </div>
 
         {recentInvoices.length > 0 ? (
-          <table className="w-full">
+          <>
+          <table className="hidden w-full sm:table">
             <thead>
               <tr className="border-b border-slate-50 bg-slate-50/50">
                 <th className="px-6 py-2 text-left text-xs font-medium uppercase tracking-[0.05em] text-slate-400">Invoice #</th>
@@ -229,6 +230,57 @@ export default function PortalDashboardPage() {
               ))}
             </tbody>
           </table>
+
+          {/* Recent invoices list (below sm) */}
+          <ul className="divide-y divide-slate-50 sm:hidden">
+            {recentInvoices.map((inv) => (
+              <li key={inv.id}>
+                <Link
+                  href={`/portal/invoices/${inv.id}`}
+                  className="flex items-center justify-between gap-3 px-6 py-3 hover:bg-slate-50"
+                >
+                  <div className="min-w-0">
+                    <span
+                      className="text-sm font-medium text-brand-600"
+                      style={{ fontFamily: 'JetBrains Mono, monospace' }}
+                    >
+                      {inv.invoiceNumber}
+                    </span>
+                    <div className="mt-1">
+                      <span
+                        className={`rounded-md px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[inv.status] ?? 'bg-slate-100 text-slate-600'}`}
+                      >
+                        {inv.status.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <div
+                      className="text-sm text-slate-900"
+                      style={{
+                        fontVariantNumeric: 'tabular-nums',
+                        fontFamily: 'JetBrains Mono, monospace',
+                      }}
+                    >
+                      $
+                      {inv.totalAmount.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </div>
+                    <div className="mt-1 text-xs text-slate-500">
+                      {new Date(
+                        inv.submittedAt ?? inv.createdAt,
+                      ).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </div>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          </>
         ) : (
           <div className="px-6 py-12 text-center">
             <p className="text-sm text-slate-400">No invoices yet.</p>
