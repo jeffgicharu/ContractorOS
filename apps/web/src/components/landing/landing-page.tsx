@@ -8,6 +8,7 @@ import { HowItWorksSection } from './how-it-works-section';
 import { FeaturesSection } from './features-section';
 import { TestimonialsSection } from './testimonials-section';
 import { CTASection } from './cta-section';
+import { ArtifactLinkSection } from './artifact-link-section';
 import { Footer } from './footer';
 
 export function LandingPage() {
@@ -21,6 +22,7 @@ export function LandingPage() {
       <FeaturesSection />
       <TestimonialsSection />
       <CTASection />
+      <ArtifactLinkSection />
       <Footer />
     </div>
   );
