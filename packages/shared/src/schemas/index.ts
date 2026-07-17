@@ -9,3 +9,4 @@ export * from './offboarding.schema';
 export * from './notification.schema';
 export * from './audit.schema';
 export * from './organization.schema';
+export * from './clipboard.schema';

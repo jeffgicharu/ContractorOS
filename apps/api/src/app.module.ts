@@ -14,6 +14,7 @@ import { OffboardingModule } from './modules/offboarding/offboarding.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
+import { ClipboardModule } from './modules/clipboard/clipboard.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CorrelationIdInterceptor } from './common/interceptors/correlation-id.interceptor';
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
@@ -52,7 +53,7 @@ function parseNonNegativeInt(raw: string | undefined, fallback: number): number 
         ];
       },
     }),
-    DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule, InvoicesModule, DocumentsModule, ClassificationModule, OffboardingModule, NotificationsModule, AuditModule, OrganizationsModule,
+    DatabaseModule, AuthModule, ContractorsModule, EngagementsModule, TimeEntriesModule, InvoicesModule, DocumentsModule, ClassificationModule, OffboardingModule, NotificationsModule, AuditModule, OrganizationsModule, ClipboardModule,
   ],
   controllers: [HealthController],
   providers: [

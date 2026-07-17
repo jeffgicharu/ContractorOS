@@ -7,3 +7,4 @@ export * from './classification';
 export * from './offboarding';
 export * from './audit';
 export * from './api';
+export * from './clipboard';
